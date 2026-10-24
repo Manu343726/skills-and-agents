@@ -1,149 +1,100 @@
 ---
 name: documentation-standards
-description: Where a project's documentation lives and why the project says so, the docs/ layout when it is the default, the ADR format, README requirements, link conventions, evidence beside every claim, the English-only rule, and the split between a document and a ticket.
+description: Where a project's documentation lives when the project declares it, the shape of a page, the ADR format, link conventions, evidence beside every claim, the English-only rule, and the split between a document and a ticket.
 ---
 
 # Documentation standards
 
-The documentation is part of the change, not a follow-up. A document that no longer describes the
-code is a bug with a `path:line` on each side.
+## Where it lives
 
-## Where the documentation lives
+**The project says where its documentation is, and the answer is not negotiable per author.** Look
+for it in the project's own `AGENTS.md`/`CONTRIBUTING` or its documentation skill. Two cases, and
+they behave differently:
 
-**A project declares its documentation system in `AGENTS.md` (or, failing that, `README.md`), and
-the declaration is part of the repository's contract.** The reason is that projects do not agree:
-one keeps hierarchical Markdown under `docs/`, another edits pages in an external system through an
-API, a third has a single README and means it.
+- **In the repository** (default `docs/`): hierarchical Markdown, one topic per file, nothing
+  generated under it. A change that alters behaviour edits the page it invalidates **in the same
+  change**.
+- **In an external system** (a wiki, a documentation service): written there, by its own convention,
+  and the repository holds only the pointer.
 
-| Declared as | What it means | Where you write |
-|---|---|---|
-| `docs/` (Markdown, hierarchical) | one topic per file, the tree below | the repository |
-| a generated site over `docs/` | the Markdown is the source, the HTML is built | the repository |
-| an external system, named | the pages live there with their own tool | **that tool**, never a Markdown copy |
-| a mirror of an external system | the repository copy is generated | the external source |
-| a single `README.md` | sections, not pages | the repository |
+A page that is neither is a page nobody will find.
 
-**With nothing declared, assume `docs/` with hierarchical Markdown** — it is the least surprising
-default, it needs no service, and it survives the project. Then *declare it*: add the sentence to
-`AGENTS.md` in the same change, so the next session reads the answer instead of inventing one.
+## One page, one topic
 
-```markdown
-## Where the documentation lives
-
-This project documents in `docs/`, hierarchical Markdown, one topic per file. Nothing is kept in
-an external system, and nothing under `docs/` is generated.
-
-<!-- or: -->
-## Where the documentation lives
-
-Machines, services and networks are documented in **Homelable**, not here; the
-`homelable-docs` skill carries its conventions. This repository keeps only
-`docs/adr/` and the API references, which are generated from `api/openapi.yaml`.
-```
-
-A declaration that is wrong is worse than none: a writer told "external system" who finds Markdown
-edits the wrong copy. When the two disagree, the system with the read-write tool wins and the
-declaration is corrected in the same change.
-
-### Documents and tickets are one record
-
-| | The document | The ticket |
-|---|---|---|
-| Answers | what the system **is**, now | what **happened**, what was measured, how to get back |
-| Lives | the project's documentation system | the tracker (`type/*`, `status/*`) |
-| Written | after the change, describing the result | with the change, closing when verified |
-| Owner | `docs-writer` | `ticket-manager` |
-
-A change that alters behaviour needs both, and neither substitutes for the other: a page with no
-issue has no evidence, and an issue with no page leaves the system describing itself wrongly. When
-they disagree, **the issue with the measurement wins** and the document is corrected. `docs-writer`
-never files, closes or labels an issue; it says which issue its page belongs to and `ticket-manager`
-owns the state.
-
-## Layout (when the project documents in `docs/`)
-
-```
-docs/architecture.md            the shape of the system and why it is that shape
-docs/adr/NNNN-<slug>.md         one decision per file, immutable once accepted
-docs/api/connect.md             the engine contract as a reference
-docs/api/rest.md                the REST surface from api/openapi.yaml
-docs/api/mqtt.md                topic taxonomy and payload envelope
-docs/api/sse.md                 the state stream
-docs/runbooks/<task>.md         repeatable operational procedures
-README.md                       what it is, how to build, how to run
-AGENTS.md                       the contract of the repository for agents
-```
-
-One topic per file. A page that needs a table of contents is two pages.
-
-## ADR
-
-```markdown
-# ADR-0007: The engine speaks Connect unary, not gRPC
-
-- Status: accepted
-- Date: 2026-10-24
-- Deciders: manu343726
-- Issue: https://git.manu343726.com/manu343726/z80-emulator/issues/12
-
-## Context
-What forces the decision. Measured facts, not adjectives: the versions, the constraint, the
-command that produced the number.
-
-## Decision
-The choice in the present tense, and what it rules out.
-
-## Consequences
-What becomes easy, what becomes hard, what must be revisited and when.
-```
-
-An accepted ADR is never edited. A later decision adds `Superseded by ADR-NNNN` at the top and a
-new file. Nothing is deleted, ever.
-
-## Every entity and file is a link
-
-- A repository path: ``[`engine/src/cpu.cpp`](../engine/src/cpu.cpp)``.
-- A service: `[engine](http://localhost:8080)` or its documented endpoint.
-- The board: `<https://git.manu343726.com/manu343726/z80-emulator/issues/12>`.
-- A skill: `` `z80-isa` `` (by id), and a document: ``[ADR-0007](adr/0007-connect-unary.md)``.
-
-A bare path in prose is a defect: the reader cannot open it.
+- **A file answers one question** and its title says which. Systems that mixes an architectural
+  decision, a runbook and a changelog is three pages wearing one hat.
+- **Start with the answer**, then the detail. A reader looking for how to run the thing should not
+  have to reach paragraph six.
+- **State the audience** when it is not obvious: an operator, a contributor, a future agent.
+- **Dated claims carry the date**, and a number carries the command that produced it.
 
 ## Evidence beside the claim
 
-| Wrong | Right |
-|---|---|
-| "coverage is good" | `go test ./... -coverprofile` → 81.2 % on 2026-10-24 |
-| "fast" | `perf stat ./build/z80_tests` → 1.2 G instr/s, measured 2026-10-24 |
-| "we use React 19" | `web/package.json:24` → `"react": "19.0.0"` |
-| "the endpoint works" | `curl …` → `HTTP 200`, body `{"status":"ok"}` |
+The rule that separates documentation from opinion:
 
-A number carries how it was obtained. A version carries the file and line. A behaviour carries the
-test that asserts it.
+- A measurement appears with **what was run and what it printed**: the command, the value, the file
+  and line, the timestamp.
+- A claim nobody measured is written as a claim — or as `unsourced:`, an open question, not a fact.
+- **A document that lags its code is worse than no document**: it is confidently wrong. If you
+  cannot update it, mark it as outdated and file the issue in the same change.
 
-## README
+## ADRs
 
-Required, in order: one paragraph saying what the project is; a directory table; how to build and
-test each stack (the four commands); how to run it (engine, backend, web); where the documentation
-lives; licence. A reader with no context must reach a running emulator from this page alone.
+One decision per file, immutable once accepted:
 
-## Rules
+```markdown
+# ADR-0007: The service speaks unary RPC, not a streaming variant
 
-1. **English only**, including comments inside quoted code and commit messages.
-2. **Quoted code is real.** Open the file, copy the lines. A paraphrased API is a wrong API.
-3. **Present tense, no history.** Git has the history; the document describes what is.
-4. **No TODO without an issue link.** `grep -rn 'TODO\|FIXME' docs/` must return only lines with a
-   URL.
-5. **Prerequisites of a runbook name the machine and the check**: `ssh Homelab`, `gcc 16.2.1`
-   (`gcc --version`), not "a recent compiler".
-6. **Update in the same change** as the code, with the commit body naming the document.
+- Status: accepted | superseded by ADR-00XX
+- Date: YYYY-MM-DD
+- Deciders: …
 
-## Before reporting
+## Context
+The forces at play, in a paragraph. The measurement that made this a decision.
 
-```sh
-git diff --stat -- docs/ README.md AGENTS.md
-grep -rn 'TODO\|FIXME' docs/ README.md AGENTS.md
-grep -rnE '\[[^]]+\]\(\.\./' docs/ | head -40     # spot-check relative links
+## Decision
+What was chosen, in one sentence, then the detail.
+
+## Consequences
+What becomes easier, what becomes harder, what is now impossible, and what it costs.
 ```
 
-Open every link you added. A 404 in a document is a broken change.
+- **A superseded ADR is not edited.** A new one supersedes it, and the old one says so in its status.
+- **An ADR without consequences is an announcement.** The rejected alternative and its cost belong in
+  the file.
+
+## Links
+
+- **Anything with identity is a link** — a repository path, a service endpoint, a component, a ticket.
+  A reader opens it instead of hunting for it.
+- A path that exists in the repository is linked as a path; a service is linked to its endpoint or to
+  the page that documents it.
+- **No bare "here"** as link text, and no link to a line that will move tomorrow.
+
+## Language and tone
+
+- **English**, everywhere the project is English — including comments, commit messages and issue
+  bodies. Material ported from another language is translated, not pasted.
+- **Active voice, present tense**, second person for instructions: "run", not "it should be run".
+- No marketing adjectives. A page that says "powerful" says nothing.
+
+## Document or ticket?
+
+| It is a document when… | It is a ticket when… |
+|---|---|
+| it describes how things are, and stays true | it describes an event: something broke, changed, was decided to change |
+| it is read repeatedly | it is read once, then closed |
+| its history matters | its status matters |
+| an ADR, a runbook, an architecture page, a README | an incident, a feature, an improvement, a proposal nobody has built |
+
+A ticket that accumulates design belongs in a document with the ticket linking it. A document that
+accumulates a to-do list has become a ticket and should be one.
+
+## Before you save a page
+
+- [ ] The project's declared location, and the link from wherever a reader would start.
+- [ ] One topic, the answer first, the audience named.
+- [ ] Every number with the command that produced it; every unverified claim marked as such.
+- [ ] Every entity and path a link.
+- [ ] The pages this change invalidates are updated in the same change.
+- [ ] English throughout.

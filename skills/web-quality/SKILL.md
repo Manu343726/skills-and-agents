@@ -1,114 +1,70 @@
 ---
 name: web-quality
-description: React 19 and strict TypeScript conventions for the emulator frontend — components, zustand state, the REST and SSE data layer, canvas rendering, keyboard input, accessibility and Vitest tests.
+description: Browser frontend conventions that survive a review — strict TypeScript, one owner per piece of state, a data layer that regenerates instead of hand-writing, canvas and streaming surfaces that degrade honestly, accessibility from the first line, and tests that assert behaviour.
 ---
 
 # Web quality
 
-React 19 + TypeScript strict + Vite + Tailwind, state in zustand, tests in Vitest with Testing
-Library. The browser talks to the backend's REST API and one SSE stream per session.
-
-## Reuse before you write
-
-**Before implementing a mechanism, name the library that already implements it, and use that
-library.** A hand-written mechanism is a recorded decision with a reason — no maintained package, a
-licence, a measured cost such as bundle size or a browser API that does not fit — carried in the
-commit body, never the default.
-
-- **The wire layer is generated**: `fetch` for the request, `EventSource` for the stream, and the
-  client generated from `api/openapi.yaml` (`npm run gen:api`) for the types. A fetch wrapper that
-  re-declares the response envelope, or an `EventSource` replaced by a hand-rolled reconnect loop,
-  is the reinvented mechanism.
-- **State**: React's built-ins, then zustand, then TanStack Query where the problem is a server
-  cache. A bespoke state machine is a decision with a reason, not a first move.
-- **Tests**: Vitest + Testing Library (`render`, `screen`, `userEvent`) before a custom renderer, a
-  hand-rolled DOM helper or a home-made assertion library.
-- **Also in scope**: HTTP and JSON through `fetch` and the generated types, routing, form
-  validation, date and time formatting (`Intl` before a dependency), UUIDs (`crypto.randomUUID`),
-  retries and backoff, globbing, test fixtures. Process supervision and log rotation do not arise
-  in a browser; do not build them there either. A dependency added to `package.json` lands with a
-  refreshed lockfile in the same change.
-
-**Out of scope: domain code.** The Z80 decoder, the assembler and disassembler, the netlist kernel,
-the ULA and PSG models are the product; no package supplies them, and writing them is the work.
-This rule is not "never write code".
-
-In review, a reinvented library is a **`BLOCK`** finding, and the evidence names the library that
-should have been used.
-
 ## TypeScript
 
-- `web/tsconfig.json` keeps `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride`,
-  `verbatimModuleSyntax`. Do not weaken it to make a build pass.
-- **No `any`.** A boundary is `unknown`, then a narrowing guard or a generated type from
-  `api/openapi.yaml`. `as` is allowed only for a DOM cast after a `null` check.
-- Exported functions state their return type; components do not need one.
-- Types come from the contract (`npm run gen:api`), never hand-written duplicates.
+- **`strict` on, and `any` is a finding** — `unknown` plus a narrowing check, or a type that says what
+  the value is.
+- **Discriminated unions over booleans**: `{ status: "idle" } | { status: "ok"; data: T }`, so an
+  impossible state cannot be represented.
+- **No non-null assertion on data from outside**; parse at the boundary and hand the typed result in.
+- **Generated clients are generated.** An API type written by hand next to the generated one is a
+  second contract that will drift.
+- **Exhaustive switches** (`never` in the default) for anything that maps a union to UI.
 
-## Components
+## State
 
-- Function components only; no `React.FC`, no default export for a component that is imported by
-  name (`export function Screen(...)`).
-- Props as `type Props = { ... }`, readonly where the component does not mutate.
-- Server state comes from the API client; UI state (the selected session, the panel layout, the
-  ROM catalog filters) lives in a zustand store:
+- **One owner of each piece of state.** Data that comes from the server lives in the store, not copied
+  into a component's `useState` and then reconciled by hand.
+- **Derive, do not duplicate.** A value that can be computed from the store is a selector.
+- **Effects are for the outside world** — subscribe, fetch, focus. An effect that computes state from
+  state is a render loop with a delay.
+- **Subscriptions are cleaned up**, and the cleanup is part of the code that opens them.
 
-```ts
-type MachineState = { session: string | null; frame: number; connect: (id: string) => void };
-export const useMachine = create<MachineState>()((set, get) => ({ ... }));
-```
+## The data layer
 
-- One `useEffect` per concern, with its cleanup. No effect that fetches what the store already
-  holds; no `useState` for something another component reads.
+- **One module that speaks to the API**, one that speaks to the stream, and components that call them.
+  A `fetch` buried in a component is a second place to change when the contract moves.
+- **Errors are values in the UI**: loading, empty, failed and stale are states with a rendering, not a
+  spinner that never ends.
+- **Streams reconnect with backoff and say they are reconnecting**; a silent drop is indistinguishable
+  from a frozen picture.
+- **Binary or high-rate data is scheduled, not rendered per message**: a buffer ahead of the playhead
+  for audio, a frame budget for a canvas, and a documented underrun behaviour.
 
-## Data layer
+## Rendering
 
-- REST through the generated client; a failed request surfaces the error envelope
-  `{"error":{"code","message"}}` in the UI, not a blank screen.
-- **SSE**: one `EventSource` per session, created in a store action and closed by the same action's
-  cleanup (`return () => es.close()`). `onerror` reconnects with capped exponential backoff
-  (1 s → 30 s) and stops when the session is deselected. A closed stream must never become a hot
-  loop; the backoff is tested with fake timers.
-- The canvas redraws in `requestAnimationFrame`, keyed by the frame counter from the stream — never
-  once per React render. No allocation inside the draw loop; the palette is cached.
-- Keyboard input: one `keydown` listener on `window`, registered on mount and removed on unmount.
-  Never swallow `Tab`, `F5`, `Ctrl/Cmd+L`, `Ctrl/Cmd+R`. The mapping (the Z80 matrix) is documented
-  in `docs/`.
+- **Canvas work is measured**, not assumed: the draw happens at the source's rate, not at React's.
+  Keep the draw loop out of the render path.
+- **No layout thrash in an animation**, no work per frame that could be done per change.
+- **Keyboard input is captured deliberately** (with a modifier or a focus rule), and the page stays
+  usable without a mouse.
 
-## Accessibility and style
+## Accessibility
 
-- Every control has an accessible name: `<label htmlFor>` or `aria-label`. Icon-only buttons always
-  carry `aria-label`.
-- The canvas has a text alternative that describes the machine state (running, halted, PC, frame).
-- Focus is visible (`focus-visible:` ring) and never trapped; modals restore focus on close.
-- Tailwind for styling; no inline `style` except dynamic canvas geometry and transformed values.
-- Colour is never the only signal (a flag is not just red/green).
+- **Every control is reachable and named** when it is written: a real `<button>`, a label, an
+  accessible name. `div onClick` is not a control.
+- **Focus is visible and managed** — a modal traps it, closing a dialog returns it.
+- **Contrast and sizing are part of the definition of done**, not a later pass.
 
 ## Tests
 
-`web/src/**/*.test.tsx`, Vitest + Testing Library, beside the component:
+- **Vitest + Testing Library, asserting what the user sees**: roles and text, not implementation
+  details or CSS classes.
+- **A hook or a store gets its own test**; a component that needs five fakes to render is a design
+  smell before it is a test problem.
+- **The stream and the clock are faked** in tests, and the fake lives beside the setup, not in each
+  file.
+- **A test must fail if the behaviour is removed** — prove it once and say so in the pull request.
 
-```tsx
-render(<Controls session="abc" />);
-await userEvent.click(screen.getByRole("button", { name: /reset/i }));
-expect(onReset).toHaveBeenCalledOnce();
-```
+## Review checklist
 
-- Query by role and accessible name, not by CSS class or test id.
-- `EventSource` is mocked in `web/src/test/setup.ts`; assert on rendered state after a dispatched
-  event, not on store internals.
-- Fake timers for the SSE backoff; no `sleep` in a test.
-- Coverage gate: 70 %.
-
-## Gates
-
-```sh
-npm ci
-npm run lint
-npx tsc --noEmit
-npm test -- --run
-npm run build
-```
-
-`npm ci` (not `npm install`) so `package-lock.json` is the only source of versions. A dependency
-added to `package.json` lands with a refreshed lockfile in the same change.
+- [ ] `strict` clean, no new `any`, no hand-written mirror of a generated type.
+- [ ] One owner per piece of state; no effect computing state from state.
+- [ ] Every failure path renders something a user can act on.
+- [ ] New controls are keyboard-reachable and named.
+- [ ] The test asserts behaviour and would fail without the change.

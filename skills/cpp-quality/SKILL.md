@@ -1,116 +1,70 @@
 ---
 name: cpp-quality
-description: C++20 conventions for the emulation core — ownership and RAII, error handling without exceptions in the hot path, ABI stability, the CMake target layout, sanitizers, clang-tidy and deterministic behaviour.
+description: C++20 conventions that survive a review — ownership and RAII, errors without exceptions where they cannot afford them, ABI and const-correctness, a CMake target layout, sanitizers, warnings as errors, and determinism.
 ---
 
 # C++ quality
 
-The core is a library that must be fast, deterministic and safe on untrusted input. These rules are
-checked in review; a deviation is a finding, not a preference.
-
-## Reuse before you write
-
-**Before implementing a mechanism, name the library that already implements it, and use that
-library.** Writing the mechanism instead is a recorded decision with a reason — no maintained
-library, a licence that forbids it, a measured cost that rules it out — carried in the commit body.
-It is never the default, and "it was quick to write" is not a reason.
-
-- **The standard library before a third-party one**: `<chrono>`, `<random>`, `<filesystem>`,
-  `<format>`, `<span>`, `<expected>`, `<string_view>` before a hand-rolled or imported equivalent.
-- **Conan before vendoring**: a dependency is a `requires()` in `conanfile.py` with its version,
-  its lockfile entry and its licence. No header is pasted into `third_party/` without an ADR.
-- **JSON and serialisation**: `google::protobuf::util::JsonStringToMessage` and
-  `MessageToJsonString` on the message types generated from `engine.proto`. A hand-written JSON
-  codec beside a protobuf schema is a defect, not a shortcut.
-- **HTTP**: a maintained HTTP library for the Connect unary server. A hand-written HTTP/1.1 parser
-  and serialiser over raw sockets is the same defect — `engine/src/server/http.cpp` was it.
-- **Tests**: GoogleTest from Conan (`GTest::gtest_main`), never a bespoke main-and-assert harness.
-- **Also in scope**: CLI parsing, configuration, logging and log rotation, retries and backoff,
-  assertions and mocking, process supervision, date and time handling, UUIDs, globbing, test
-  fixtures. Each of them has a library; find it before you write it.
-
-**Out of scope: domain code.** The Z80 decoder, the assembler and disassembler, the netlist kernel,
-the ULA and PSG models are the product. No library supplies them and writing them is the work — this
-rule is not "never write code".
-
-In review, a reinvented library is a **`BLOCK`** finding, and the evidence names the library that
-should have been used.
-
-## Language and standard
-
-- **C++20**, declared once per target: `target_compile_features(z80_core PUBLIC cxx_std_20)`.
-  No compiler-extension dialects (`-std=gnu++20` only if a CMake feature requires it, and say why).
-- Warnings on every target, errors on new ones:
-  `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror`.
-- `clang-format` with the repository `.clang-format`; formatting is not a review topic.
-
 ## Ownership
 
-- **RAII for every resource.** `std::array`, `std::span`, `std::string_view`, `std::unique_ptr`.
-  No `new`, no `delete`, no owning raw pointer, no `malloc`.
-- A function that does not own takes `T&` or `std::span<T>`; a function that observes only takes
-  `const T&`. `std::shared_ptr` only where lifetime is genuinely shared, never as a default.
-- `z80_core` and `z80_machine` allocate at construction. After `reset()` they may not allocate.
+- **RAII, always.** A resource is a constructor's job and a destructor's, never a comment in a
+  `close()` someone must remember. `std::unique_ptr` for ownership, `std::shared_ptr` only when the
+  lifetime is genuinely shared, raw pointers and references for borrowing.
+- **A function that does not own what it takes does not delete it.** `T*` and `T&` mean "borrowed,
+  outlives this call" and the signature says so.
+- **`const` is the default**: `const` methods, `const&` parameters, `constexpr` for what is known at
+  compile time. A mutable member is a design decision and gets a comment.
+- **Five special members out loud.** If a type owns something, say which of the copy/move operations
+  exist; `= delete` the ones that cannot be right.
+- **No naked `new`.** No `malloc` outside an allocator.
 
 ## Errors
 
-- **No exception may leave the hot path** (`step()`, memory read/write, interrupt dispatch). Those
-  functions are `noexcept`. An invalid state is a bug caught by an assertion or a test, not a throw.
-- Fallible setup (`load_rom`, `open_server`, `parse_header`) returns `std::expected<T, E>` (C++23) or
-  a documented `bool`/`std::error_code` pair while on C++20. Choose one per module and say it.
-- Never `catch (...)` silently. A catch clause that does not rethrow must log and convert at a
-  documented boundary, and that boundary is tested.
+- **Pick one policy per layer and write it down**: exceptions at the API boundary, error codes or
+  `std::optional`/`std::expected` in a hot path, `noexcept` where a throw would be a lie.
+- **A function that can fail says how** — return type, `[[nodiscard]]`, or a documented precondition.
+  Failure that is neither returned nor thrown is a crash waiting for a customer.
+- **Validate at the boundary, trust inside it.** A parser validates untrusted input once; the code
+  behind it does not re-check the same invariant.
+- **No exceptions in a destructor, no exceptions across a C ABI**, no exception used for control flow.
 
-## The hot path
+## The shape of the code
 
-- No allocation, no `std::function` indirect call, no virtual dispatch per instruction in `step()`.
-  Dispatch is a table of function pointers or a `switch` the compiler turns into a jump table —
-  measure with `perf stat` before claiming either is faster.
-- No wall clock, no `rand()`, no locale, no `std::cout` in the core. Determinism is a test property:
-  the same ROM and input sequence produce the same memory image and the same T-state count.
-- `static` mutable state is forbidden in the core; a lookup table is `constexpr` or `inline
-  constexpr`.
+- **Small translation units, one responsibility per header.** A header includes what it uses and
+  nothing else; forward declarations before includes where a pointer would do.
+- **`[[nodiscard]]`, `[[maybe_unused]]`, `[[likely]]` sparingly and honestly** — each one is a claim
+  the compiler will not check for you.
+- **No global mutable state.** A singleton is global mutable state with a nicer name; pass what is
+  needed, or own it in a context object.
+- **Names say the unit**: `_tstates`, `_bytes`, `_hz`. A number without a unit is a bug in waiting.
+- **Signed/unsigned and narrowing**: `std::size_t` for sizes, explicit casts where a width changes,
+  `-Wconversion` on.
 
-## CMake targets
+## The build
 
-| Target | Type | Contents |
-|---|---|---|
-| `z80_core` | static library | CPU, registers, bus interface, timing. No I/O, no RPC. |
-| `z80_machine` | static library | 64 KiB RAM, interrupt wiring, machine loop. Links `z80_core`. |
-| `engine_server` | executable | Connect unary server, links `z80_machine`. |
-| `z80_tests` | executable | GoogleTest, `engine/tests/*_test.cpp`. |
+- **Targets, not a soup of files.** A library per concern, an executable that links them, tests as a
+  target of their own. `target_*` commands, never `include_directories` at the top.
+- **The compiler is the project's, not the host's.** Whatever installs the toolchain owns the
+  compiler, and a check fails the build when it resolves another.
+- **Warnings as errors** at the project's level, and the level is in the build file, not in a
+  contributor's memory.
+- **Reproducible**: pinned versions, no date or path baked into a binary, no uninitialised read.
+- **Sanitizers are a build flag**, not a separate project: ASan+UBSan in CI, TSan where threads exist.
 
-One `CMakeLists.txt` per directory, `target_sources`/`target_link_libraries` on the target, no
-directory-wide `include_directories` or `add_definitions`. Public headers under `engine/include/`,
-included as `#include "z80/cpu.hpp"`. Conan supplies `conan_toolchain.cmake` and `CMakeDeps`
-targets (`GTest::gtest_main`); do not hardcode include paths.
+## Tests
 
-## Tooling gates
+- One test file per unit, named for the family it covers.
+- **Assert on values, with the unit and the source of the expected number beside it.** A test that
+  asserts "it did not crash" is a smoke test and is labelled as one.
+- **A test that cannot fail is not a test**: prove it fails against the defect, keep both runs in the
+  pull request.
+- Deterministic: no sleep, no wall clock, no ordering assumption that the standard does not give.
 
-```sh
-conan install . --output-folder=build --build=missing -pr:a=profiles/linux-gcc-release
-cmake --preset conan-release && cmake --build --preset conan-release
-ctest --preset conan-release --output-on-failure
-cmake --preset conan-asan && cmake --build --preset conan-asan && ctest --preset conan-asan
-clang-tidy -p build engine/src/*.cpp engine/include/**/*.hpp
-```
+## Review checklist
 
-Sanitizers: ASan + UBSan in the `linux-clang-asan` profile; TSan when a thread is introduced (the
-core is single-threaded by design — the server is not). A sanitizer finding is a failing build.
-
-## ABI stability
-
-- The engine's binary interface to Go is **Connect over HTTP**, not C++. The C++ ABI that matters
-  is the one between `z80_core`, `z80_machine` and `engine_server`, and it is rebuilt together —
-  so prefer value semantics over pimpl, and do not freeze a layout needlessly.
-- The host-module ABI for C++ ROMs is the exception: it is `extern "C"`, versioned in the `.rom`
-  header, and documented in `rom-toolchain`. A change there is a contract change.
-- `engine.proto` is the wire contract; see `connect-rpc`. Never expose a C++ type in it.
-
-## Checklist
-
-1. Every new behaviour has a GoogleTest with registers, all eight flags, memory and T-states.
-2. No allocation or exception added to a `noexcept` function.
-3. Sanitizer preset passes.
-4. `clang-tidy` adds no new finding.
-5. Timing unchanged unless the change is a timing fix with its test updated.
+- [ ] Every resource has an owner and a destructor.
+- [ ] Every failure path is returned, thrown or terminated — chosen, not accidental.
+- [ ] No allocation, lock or `std::function` added to a hot path without a measurement.
+- [ ] No new global mutable state.
+- [ ] The test would fail if the change were reverted.
+- [ ] The build file says what the target needs, and nothing global.
