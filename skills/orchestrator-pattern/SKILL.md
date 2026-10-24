@@ -1,6 +1,6 @@
 ---
 name: orchestrator-pattern
-description: How to cut a task into bounded background workstreams, isolate each in its own worktree, brief each subagent with measured facts and disjoint file ownership, verify every claim, gate the merge on a verifier's verdict at a recorded base sha, merge only an approval that still describes main, audit what already landed, and keep the record honest.
+description: How to cut a task into bounded background workstreams, isolate each in its own worktree, brief each subagent with measured facts and disjoint file ownership, verify every claim, gate the merge on a verifier's verdict at a recorded base sha, decide when to merge and hand it to the merger, audit what already landed, and keep the record honest.
 ---
 
 # The orchestrator pattern
@@ -40,8 +40,15 @@ same file, they are sequential — never parallel. If one changes a contract
 | Documentation | `docs-writer` | a page, an ADR |
 | Board | `ticket-manager` | labels, issue bodies, transitions |
 | Dependencies | `conan-dependencies` | `conanfile.py`, profiles, lockfiles |
+| Merge a verified PR | `merger` | the merge itself, the proof, the local sync |
 | Integrate, as an exception | `integrator` | a merge Forgejo cannot perform |
 | Audit | `reviewer` | `PASS` or `BLOCK`, on what already landed |
+| Change this library | `agent-author` | an agent, a skill, the index, a permission |
+
+**Every task type has a role. `general` is never the answer, and a task that fits no role is a
+defect of this library that gets a role in the same change.** A workstream whose work no row here
+covers is not a workstream yet: `agent-author` writes the role, wires it into this table and into
+`agents/orchestrator.md`, and the work is cut after that — not "handled with a general agent".
 
 ## 3. The worktree
 
@@ -160,9 +167,19 @@ the worktree it already has.
 
 ## 8. The merge
 
-On `APPROVED`, you merge the PR through Forgejo — `merge_pull_request` — with a real message, not
-by pushing `main`. A direct push to `main` is a defect, not a shortcut: it skips the trial merge
-and leaves no PR to point at.
+**You decide when; `merger` merges.** The decision and the act are two roles on purpose: the agent
+that judged the PR is not the agent that lands it, and the agent that lands it is not the agent
+that wrote it.
+
+On `APPROVED`, and only while the approval still describes `main`, you hand `merger` the PR index
+and say the verdict is current. It checks the three conditions itself — the PR open to `main`, the
+newest review body's first line `## Verdict: APPROVED`, and the base sha that verdict names equal
+to the sha `main` is on now — and either merges with `merge_pull_request` or refuses, naming
+which. It then proves the result with `get_pull_request_by_index` and `list_branches`, deletes the
+head branch, and fast-forwards the operator's checkout, which is the one documented exception to
+"nobody writes in the main checkout".
+
+Never push `main` to land it: a direct push skips the trial merge and leaves no PR to point at.
 
 Merge only on an approval that still holds. The verifier measured a base sha; if `main` has moved
 past it, the approval is stale — re-verify, do not merge a measurement that no longer describes the
@@ -204,7 +221,7 @@ The revert sha, the finding and the reason go in the issue; the branch returns t
 | in flight | `in-progress` | `work/<name>`, commits landing | subagent |
 | delivered | `in-progress` | branch pushed, PR open | subagent, then orchestrator verifies |
 | verified | `in-progress` | `APPROVED` at a recorded base sha | `verifier`, serialized |
-| merged | `done` + closed | PR merged on `main` by `merge_pull_request` | orchestrator |
+| merged | `done` + closed | PR merged by `merger` via `merge_pull_request` | `merger`, on your decision |
 | reverted | `todo` | revert commit on `main`, PR closed | orchestrator, finding quoted |
 
 A workstream with no open PR has not delivered. A merge stands on an `APPROVED` that still matches

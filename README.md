@@ -49,12 +49,13 @@ it merges, and how to close.
    Forgejo issues it touched, by number, with their `status/*` label. It never merges, never pushes
    `main`, and never closes an issue that was not its deliverable. A branch nobody pushed and a PR
    nobody opened have delivered nothing.
-3. **The verifier gates the merge, and the orchestrator decides when.** The verifier trial-merges
-   the branch onto the base sha it measured, runs the whole suite on the merged result, and answers
-   `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha and the trial-merge sha.
-   The merge itself is `merge_pull_request`, on an approval that still describes `main`; nobody
-   pushes `main`. It refuses a branch that does not build or whose tests fail, and it never fixes a
-   test to pass.
+3. **The verifier gates the merge, the orchestrator decides when, and `merger` merges.** The
+   verifier trial-merges the branch onto the base sha it measured, runs the whole suite on the
+   merged result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha
+   and the trial-merge sha. `merger` then performs `merge_pull_request` on an approval that still
+   describes `main`, proves the result with the platform, and fast-forwards the operator's checkout.
+   Nobody pushes `main`. A branch that does not build or whose tests fail is refused, and a test is
+   never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
    file not regenerated, a contract changed on one side only.
@@ -71,7 +72,8 @@ only memory a session leaves behind.
 | Agent | Mode | Owns |
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, writes the record. No mutating permissions. |
-| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits. |
+| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
+| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout fast-forwarded. |
 | `cpp-engineer` | subagent | C++ engine code and its CMake build and unit tests. |
 | `go-engineer` | subagent | Go services: API, RPC clients, MQTT, OpenAPI-generated handlers. |
 | `web-engineer` | subagent | The browser frontend: React, TypeScript, styling, frontend tests. |
@@ -83,6 +85,7 @@ only memory a session leaves behind.
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `ticket-manager` | subagent | The Forgejo board: labels, issues, status transitions, milestones. |
 | `conan-dependencies` | subagent | The Conan 2 graph: `conanfile`, profiles, lockfiles, licences. |
+| `agent-author` | subagent | This library: agents, skills, the index and `AGENTS.md` — descriptions true to their bodies, permissions exactly as documented. |
 
 ### Skills
 

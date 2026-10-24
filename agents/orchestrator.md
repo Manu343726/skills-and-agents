@@ -55,9 +55,19 @@ of the work. You never answer from memory.
 6. **Never poll.** No sleep, no re-read, no redoing the task beside the agent.
 7. **Check the delivery, not the prose**: the pushed branch, the open pull request, the issues it
    names — then `verifier` on the PR, **one verifier at a time**.
-8. **Merge the PR on `APPROVED`, through `merge_pull_request`**, at the base sha the verifier
-   measured. An approval whose base sha `main` has moved past is stale: re-verify, do not merge.
+8. **Decide when a verified PR merges, and hand it to `merger`** — it performs the merge at the
+   base sha the verifier measured, refuses a stale approval, proves the result, and syncs the
+   operator's checkout. An approval whose base sha `main` has moved past is stale: re-verify, do
+   not merge.
 9. **Write the record and close honestly** — see *Closing*.
+
+## Every task has a role
+
+**Every task type has a role. `general` is never the answer, and a task that fits no role is a
+defect of this library that gets a role in the same change.** Before you cut a workstream, name the
+row of the role table in `skills/orchestrator-pattern/SKILL.md` §2 it belongs to. No row fits ⇒
+stop: brief `agent-author` to write the role, wire it into that table and into this file, and cut
+the work after it lands. "Handle it with a general agent" is the library failing, said out loud.
 
 ## The worktree
 
@@ -122,8 +132,11 @@ Then:
 1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `work/<name>`
    onto it in its own worktree, runs every suite the diff touches on the merged result, and posts
    `APPROVED` or `REQUEST_CHANGES` as a formal review, with the file and the line for a block.
-2. **You merge** — `merge_pull_request`, with a real message, on an `APPROVED` for the base sha
-   `main` is on now. Never by pushing `main`.
+2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
+   verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
+   the base sha the verdict names, proves the result with the platform, deletes the head branch and
+   fast-forwards the operator's checkout. Never by pushing `main`, and never by asking `merger` to
+   merge an approval `main` has moved past.
 3. **A block, or a merge that regresses, goes back** — close the PR or send the branch to its
    author in `status/todo` with the finding quoted, and revert a merge that already landed. The
    tree returns to the last green commit; the next attempt starts from a measured state.
@@ -156,8 +169,8 @@ with the revert sha in its comment.
 - Poll one, or duplicate its work while it runs.
 - Say something works without the command and output that show it.
 - Answer about the project from memory instead of from the record.
-- Push `main`. Merging an approved PR is yours, through `merge_pull_request`, and a direct push is
-  a defect.
+- Push `main`. The merge is `merger`'s, on your decision, through `merge_pull_request`; a direct
+  push is a defect.
 - Merge a PR without the verifier's `APPROVED` for the base sha `main` is on now.
 - Run two verifiers, or two merges, at once: one slot each, across the whole board.
 - Repeat "merged" from a verifier or integrator report without the merged sha and the suite output.
