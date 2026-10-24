@@ -118,15 +118,6 @@ permissions:
     resource: make *--eval*
     effect: deny
   - action: shell
-    resource: "git * | grep*"
-    effect: allow
-  - action: shell
-    resource: "git * | head*"
-    effect: allow
-  - action: shell
-    resource: "git * | tail*"
-    effect: allow
-  - action: shell
     resource: git push*--force*
     effect: deny
   - action: shell
@@ -185,7 +176,7 @@ Read the merge for these before you read anything else:
    match the new output, a case deleted. `git diff <base>..HEAD -- '*_test.go' 'engine/tests/*'`
    is read line by line.
 3. **A generated file not regenerated.** `proto/` or `api/` changed but the generated code not, or
-   a generated file hand-edited: `git diff --name-only <base>..HEAD | grep -E 'generated|\.pb\.go|_gen\.'`.
+   a generated file hand-edited: `git diff --name-only <base>..HEAD -- '*generated*' '*.pb.go' '*_gen.*'`.
 4. **A contract changed on one side only.** A field in `engine.proto` with no consumer in
    `backend/`, an OpenAPI route with no handler, a REST field the frontend reads and the backend
    never sends.

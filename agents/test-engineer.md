@@ -160,12 +160,6 @@ permissions:
     resource: gcovr*--gcov-executable*
     effect: deny
   - action: shell
-    resource: "go test* | tail*"
-    effect: allow
-  - action: shell
-    resource: "ctest* | tail*"
-    effect: allow
-  - action: shell
     resource: git push*--force*
     effect: deny
   - action: shell

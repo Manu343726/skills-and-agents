@@ -46,6 +46,9 @@ permissions:
     resource: git log*
     effect: allow
   - action: shell
+    resource: git branch --show-current*
+    effect: allow
+  - action: shell
     resource: cmake --preset*
     effect: allow
   - action: shell
@@ -88,10 +91,7 @@ permissions:
     resource: curl -sS -o /dev/null*
     effect: allow
   - action: shell
-    resource: timeout 5 curl*
-    effect: allow
-  - action: shell
-    resource: timeout 6 mosquitto_sub*
+    resource: curl -sSN --max-time*
     effect: allow
   - action: shell
     resource: docker compose logs*
@@ -104,12 +104,6 @@ permissions:
     effect: allow
   - action: shell
     resource: mosquitto_sub*
-    effect: allow
-  - action: shell
-    resource: head*
-    effect: allow
-  - action: shell
-    resource: tail*
     effect: allow
   - action: execute
     resource: "*"
@@ -192,24 +186,6 @@ permissions:
   - action: shell
     resource: make *--eval*
     effect: deny
-  - action: shell
-    resource: "timeout 5 curl * | head*"
-    effect: allow
-  - action: shell
-    resource: "git * | head*"
-    effect: allow
-  - action: shell
-    resource: "git * | tail*"
-    effect: allow
-  - action: shell
-    resource: "ctest --preset* | tail*"
-    effect: allow
-  - action: shell
-    resource: "go test* | tail*"
-    effect: allow
-  - action: shell
-    resource: "docker compose logs* | tail*"
-    effect: allow
   - action: shell
     resource: git push*--force*
     effect: deny
@@ -311,10 +287,10 @@ curl -sS -X POST http://localhost:8080/emulator.engine.v1.EngineService/Reset \
 
 # backend REST and SSE
 curl -sS -o /dev/null -w '%{http_code}\n' http://localhost:8081/healthz
-timeout 5 curl -sSN http://localhost:8081/sessions/<id>/events | head -n 20
+curl -sSN --max-time 5 http://localhost:8081/sessions/<id>/events
 
 # MQTT: watch the session's events for 5s, stop after 10 messages
-timeout 6 mosquitto_sub -h localhost -t 'emulator/#' -v -C 10
+mosquitto_sub -h localhost -t 'emulator/#' -v -C 10 -W 6
 ```
 
 Logs: `docker compose logs --tail=100 <service>` from the service directory, or
@@ -346,7 +322,8 @@ Trial-merge sha: `<sha>`
   the review body and in the report; neither stands without the base sha and the trial-merge sha.
   `INCONCLUSIVE` is for a check a dead service made unmeasurable, and it is not an approval.
 - The exit code is part of the measurement; quote it.
-- Quote real output. Truncate with `head -n 40`/`tail -n 20` and say that you truncated.
+- Quote real output. When a run is long, use the command's own limiter (`journalctl -n 40`,
+  `docker compose logs --tail=100`) or name the lines you dropped — and say that you truncated.
 - Never reuse a previous run's result. Re-run the command in this session.
 - A service that is down makes the check **INCONCLUSIVE**, not failed — give the probe that
   showed it down (port closed, container exited, `up{job=...} == 0`).

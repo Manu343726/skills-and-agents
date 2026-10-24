@@ -115,9 +115,6 @@ permissions:
     resource: git -C * *--ext-diff*
     effect: deny
   - action: shell
-    resource: "grep -rn 'TODO\|FIXME' docs/"
-    effect: allow
-  - action: shell
     resource: git push*--force*
     effect: deny
   - action: shell
@@ -267,7 +264,7 @@ A reader with no context must reach a running emulator from it.
 
 ```sh
 grep -rnE '[^\x00-\x7F]' docs/ README.md AGENTS.md   # non-ASCII is allowed only in typography
-grep -rn 'TODO\|FIXME' docs/                        # must be an issue link or removed
+grep -rn -e TODO -e FIXME docs/                     # must be an issue link or removed
 ```
 
 Report the files written, the links you followed to verify them, and anything you could not

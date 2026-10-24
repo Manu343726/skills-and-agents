@@ -31,6 +31,9 @@ permissions:
     resource: git log*
     effect: allow
   - action: shell
+    resource: git grep*
+    effect: allow
+  - action: shell
     resource: grep *
     effect: allow
   - action: shell
@@ -72,9 +75,6 @@ permissions:
   - action: shell
     resource: git -C * *--ext-diff*
     effect: deny
-  - action: shell
-    resource: "git * | grep*"
-    effect: allow
   - action: shell
     resource: git push*--force*
     effect: deny
@@ -130,7 +130,7 @@ git diff --name-only main...HEAD
 
 ## Also check
 
-- **Secrets**: `git diff main...HEAD | grep -nEi 'password|secret|token|api[_-]?key|BEGIN .*PRIVATE'`
+- **Secrets**: `git grep -nEi -e password -e secret -e token -e api_key -e 'BEGIN .*PRIVATE'`
   and that `.env` is gitignored while `.env.example` carries only keys.
 - **Supply chain**: a new `requires(...)` in `engine/conanfile.py` or a new `go.mod`/`package.json`
   entry lands with its lockfile (`engine/locks/*.lock`, `go.sum`, `package-lock.json`) in the same

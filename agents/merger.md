@@ -88,9 +88,6 @@ permissions:
     resource: git -C * *--ext-diff*
     effect: deny
   - action: shell
-    resource: "git * | head*"
-    effect: allow
-  - action: shell
     resource: git push*--force*
     effect: deny
   - action: shell
@@ -231,7 +228,7 @@ git rev-parse --abbrev-ref HEAD          # must be 'main', else refuse and repor
 git status --porcelain                   # note the dirty paths: this is the baseline
 
 git stash push -m "merger: autostash before sync to <merged-sha> at <iso-8601>"
-git stash list | head -1                 # capture the exact ref, e.g. stash@{0}
+git stash list                           # capture the exact ref, e.g. stash@{0}
 
 git pull --rebase
 git stash pop
