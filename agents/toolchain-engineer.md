@@ -31,6 +31,13 @@ You own `toolchain/` and `roms/`. The engine's opcode behaviour is defined in `e
 `z80-isa` skill: if the assembler and the engine disagree, the engine's tests are the reference and
 the bug is yours unless proven otherwise.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+there; the round-trip, golden-vector and fuzz checks are green in every commit that claims to
+work, and the body says which ones you ran. Deliver commits, a summary with the commands and their
+output, and the issue numbers; never merge, never push.
+
 ## The three binaries and the catalog
 
 | Package | Command | Output |
@@ -86,4 +93,5 @@ boundary. A host module that panics or throws is a bug, not an input error.
   clean.
 
 Report files changed, those commands and their output, the corpus entries added, and anything you
-could not do. Do not commit, do not touch the board.
+could not do. Commit in your worktree; deliver commits, the summary and the issue numbers. Never
+merge, never push `main`.

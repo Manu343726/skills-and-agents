@@ -18,7 +18,37 @@ git push -u origin fix/ddcb-result-to-register
 ```
 
 Branch names: `<type>/<slug>` — `feat/rom-catalog`, `fix/ddcb-result-to-register`,
-`chore/conan-lock-refresh`, `docs/connect-rpc`. Lowercase, hyphens, no names.
+`chore/conan-lock-refresh`, `docs/connect-rpc`. Lowercase, hyphens, no names. An agent workstream
+uses `work/<slug>` instead; see *Worktrees*.
+
+## Worktrees
+
+**One workstream, one worktree, one branch, one directory.** The orchestrator creates it before
+briefing and names both in the brief; the subagent works nowhere else.
+
+```sh
+git worktree add ../wt-ddcb-result -b work/ddcb-result main   # or: opencode worktree_create ddcb-result
+git worktree list
+cd ../wt-ddcb-result && git status --short                    # its own index, its own tree
+```
+
+- **Naming**: branch `work/<workstream>`, directory named after the same workstream. Not after the
+  agent — two agents may take turns on one workstream and must never share a tree.
+- **Where they live**: outside the main checkout (`../wt-<name>` beside it, or the harness's own
+  directory). Never nested inside the repository, where it would show up in its own `git status`.
+- **One branch per workstream**, cut from the `main` that was measured. Never from another
+  unfinished workstream.
+- **The main checkout stays the operator's.** Nobody writes there, and no brief names its path.
+- **Rebase before integration, never merge `main` into the branch**:
+  `git fetch origin && git rebase origin/main`. The integration is a fast-forward of `main`; a merge
+  commit in the branch is rewritten by the rebase anyway.
+- **No force-push, and no `main` push but the integrator's.** `git push --force` is a rewrite of
+  somebody else's reference; the integrator fast-forwards `main` and is the only one who does.
+- **A finished workstream is removed**: `git worktree remove <dir>` after the merge, or
+  `opencode worktree_remove <dir>`. Its branch stays until the merge lands, then it is deleted.
+
+The worktree is what makes parallel work possible: one `git status`, one index and one stash per
+agent, so a branch that does not build cannot break the tree somebody else is reading.
 
 ## Conventional Commits
 
@@ -65,8 +95,8 @@ separately.
 Refs: #12
 ```
 
-Each commit is one logical change that builds and passes on its own. "wip" and "fix tests" never
-reach `main`; squash before merge if the branch is noisy.
+Each commit is one logical change that builds and passes on its own, and its body says what was
+measured. "wip" and "fix tests" never reach `main`; squash before merge if the branch is noisy.
 
 ## Pull requests
 
@@ -74,11 +104,14 @@ reach `main`; squash before merge if the branch is noisy.
   split, or it is a contract change reviewed on its own.
 - **Title** follows the commit convention; the body carries the issue link, the evidence and the
   rollback.
-- **Review**: at least one; a contract change (`proto/`, `api/`) gets a second review by the
-  owner of the consumer.
+- **Review**: `reviewer` makes the final pass on the **merged tree**, after integration — its
+  `BLOCK` is a revert, not a follow-up. A contract change (`proto/`, `api/`) also gets a read by
+  the owner of the consumer before it is merged.
 - **CI must be green** on the final commit: engine build + tests, Go build + test `-race`, web
   lint + typecheck + tests + build.
 - Rebase, do not merge `main` into the branch; the history stays linear.
+- **The integrator lands it**: `git switch main && git merge --ff-only work/<name>`. Nobody else
+  pushes `main`, and the worktree is removed once the merge lands.
 
 ## What never gets committed
 

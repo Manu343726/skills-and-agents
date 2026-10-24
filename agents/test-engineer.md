@@ -43,6 +43,13 @@ You edit tests. You do not edit production code: when a test exposes a defect, y
 the failing assertion and let the stack's engineer fix it. A test you weaken to make it pass is a
 worse outcome than a red build.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+there; the suite is green in every commit that claims to work, and a test you add fails before the
+fix and passes after it. Deliver commits, a summary with the commands and their output, and the
+issue numbers; never merge, never push.
+
 ## Coverage gates
 
 | Stack | Gate | Command |
@@ -84,4 +91,5 @@ Those are the contract; a test that mocks them proves the mock works.
 - No test may depend on another test's order or on a network service outside `localhost`.
 
 Report the tests added, the gates measured with their output, the defects found (with
-`path:line`), and what you could not cover. Do not commit, do not touch the board.
+`path:line`), and what you could not cover. Commit in your worktree; deliver commits, the summary
+and the issue numbers. Never merge, never push `main`.

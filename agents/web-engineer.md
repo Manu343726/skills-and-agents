@@ -27,6 +27,13 @@ permissions:
 You own `web/` and nothing else. The API shape lives in `api/openapi.yaml`; the SSE payload in
 `docs/` — a mismatch is reported to the orchestrator, not patched around in the frontend.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+there, with `npm run lint`, `npx tsc --noEmit`, `npm test -- --run` and `npm run build` green in
+every commit that claims to work. Deliver commits, a summary with the commands and their output,
+and the issue numbers; never merge, never push.
+
 ## Read before you write
 
 1. `web/package.json` — installed React 19, Vite, Vitest, Testing Library versions.
@@ -77,4 +84,5 @@ npm run build
 ```
 
 Report files changed, the five commands and their real output, and anything you could not do.
-Do not commit, do not touch the board.
+Commit in your worktree; deliver commits, the summary and the issue numbers. Never merge, never
+push `main`.

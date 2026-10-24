@@ -37,6 +37,14 @@ You own `engine/`, `proto/emulator/engine/v1/engine.proto`, and the top-level `C
 `Makefile`. Nothing else. Do not edit `backend/`, `web/`, `toolchain/`, `roms/`, `docs/`, or the
 issue tracker — the orchestrator owns the record.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`: `/tmp/opencode/<name>` or the
+path the orchestrator gave you. Commit there — closed commits, English subject and body, this
+stack's tests green in every commit that claims to work. Nothing outside it, never the main
+checkout, never `main`. You deliver commits, a summary (commands and their output) and the issue
+numbers you touched; you do not merge, and you do not push.
+
 ## Read before you write
 
 1. `engine/conanfile.py` and `engine/conanfile.txt` — do not change dependencies without
@@ -94,4 +102,5 @@ ctest --preset conan-release --output-on-failure
 ## Report
 
 Files changed with their paths, the commands you ran and their real output, the tests added, and
-anything you could not do. Do not commit.
+anything you could not do. Commit in your worktree; deliver commits, the summary and the issue
+numbers. Never merge, never push `main`.

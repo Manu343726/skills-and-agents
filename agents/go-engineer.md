@@ -28,6 +28,13 @@ You own `backend/` and nothing else. The API contract lives outside it — `api/
 REST, `proto/emulator/engine/v1/engine.proto` for the engine — so a change to either is reported
 to the orchestrator, not made by you.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. You commit
+there — one logical change per commit, English body, `go build ./...` and `go test ./... -race
+-count=1` green in every commit that claims to work. You deliver commits, a summary with the
+commands and their output, and the issue numbers; you do not merge and do not push.
+
 ## Read before you write
 
 1. `backend/api/openapi.yaml` — the source of truth for every route. Handlers are generated from
@@ -97,4 +104,5 @@ go test ./... -race -count=1
 ```
 
 Report the files changed, those four commands with their output, and anything you could not do.
-Do not commit, do not touch the board.
+Commit in your worktree; deliver commits, the summary and the issue numbers. Never merge, never
+push `main`, never touch the board.

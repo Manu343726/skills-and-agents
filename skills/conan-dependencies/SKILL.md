@@ -1,6 +1,6 @@
 ---
 name: conan-dependencies
-description: Conan 2 in this repository — conanfile.py with layout() and generate(), tool_requires for cmake and ninja, requires for gtest, the three profiles, lockfiles that pin what the recipe leaves as a range, and the measured facts about what conan-center actually has.
+description: Conan 2 in this repository — the compiler, cmake and ninja all come from Conan as tool_requires in the profile, requires for gtest and taskflow, lockfiles that pin what the recipe leaves as a range, and the measured facts about which gcc conan-center actually has binaries for.
 ---
 
 # Conan 2 dependencies
@@ -14,15 +14,24 @@ Conan 2 resolves the C++ build toolchain and libraries for `engine/`. It is inst
 |---|---|
 | conan-center `cmake` | **prebuilt** for linux x86_64: 4.4.4, package id `63fead0844576fc02943e16909f08fcdddd6f44b` |
 | conan-center `ninja` | **prebuilt** for linux x86_64: 1.13.2 |
-| conan-center `gcc/15.2.0` | **no packages** — "This recipe version has no packages"; a `tool_requires` builds GCC from source (hours, several GB) |
+| conan-center `gcc/15.2.0`, `gcc/15.1.0` | **no packages** — "No packages found for this revision"; a `tool_requires` would build GCC from source (hours, several GB) |
+| conan-center `gcc/12.2.0` | **prebuilt** Linux x86_64 Release, package id `d7987d171eee2d52d5e91f57ca9521b6eb07fd4f`, recipe revision `17348354` (2024-04-23), requiring `gmp`, `isl`, `mpc`, `mpfr`, `zlib`. The same package id exists for `11.3.0` and `10.2.0` |
+| conan-center `llvm-core` | only a macOS armv8 package, so Clang from Conan is not an option on a Linux host |
 | host toolchain | gcc 16.2.1, cmake 4.4.3, ninja 1.13.2, protobuf 36.0 (`protoc`), Go 1.27, Node 26 |
 
 Consequences, and they are not negotiable by convenience:
 
-- The default profile uses the **host gcc** and pins only `cmake` and `ninja` as `tool_requires`.
-- A pinned compiler (`tool_requires("gcc/...")`) is the **documented exception**, reached through
-  `--profile:build=cross` on the day a reproducible compiler is genuinely required. It is never
-  the default, because it turns a 2-minute build into hours.
+- **The engine is built with the tools Conan downloads, never with the host's.** The compiler, the
+  build system and the generator are all `tool_requires` in the **profile**, so the recipe's
+  dependencies are built with the same compiler as the recipe.
+- **The pinned compiler is `gcc/12.2.0`** — the newest GCC in conan-center that ships a Linux
+  binary. GCC 12 covers the C++20 the engine uses (`std::span`, concepts, designated initialisers,
+  three-way comparison). Bump it the day conan-center publishes a newer binary, and regenerate the
+  lockfile in the same change.
+- A `tool_requires` in the **`conanfile.py` alone is a mistake** here: it applies to the consumer
+  only, and the dependencies still build with whatever the system has.
+- `gcc/15.x` is the trap: a modern version number with no binary is slower than an older one with a
+  binary, and the difference is a day.
 
 ## `conanfile.py`
 
@@ -41,8 +50,11 @@ class EngineConan(ConanFile):
 
     def requirements(self):
         self.requires("gtest/[>=1.14 <2]")
+        self.requires("taskflow/[>=4.0 <5]")
 
     def build_requirements(self):
+        # The compiler is a tool_requires of the *profile*, not of this recipe: here it
+        # would apply to this package alone and leave the dependencies to the host.
         self.tool_requires("cmake/[>=3.25 <5]")
         self.tool_requires("ninja/[>=1.11]")
 
@@ -63,11 +75,45 @@ class EngineConan(ConanFile):
 
 ## Profiles
 
+The profile carries the **whole toolchain**, compiler included, because a tool required by the
+profile is in scope while the recipe's dependencies are built:
+
+```ini
+# engine/profiles/linux-gcc-release
+[settings]
+arch=x86_64
+build_type=Release
+compiler=gcc
+compiler.cppstd=gnu20
+compiler.libcxx=libstdc++11
+compiler.version=12
+os=Linux
+
+[tool_requires]
+gcc/12.2.0
+cmake/[>=3.25 <5]
+ninja/[>=1.11]
+
+[conf]
+tools.cmake.cmaketoolchain:generator=Ninja
 ```
-engine/profiles/linux-gcc-release    compiler=gcc, version=16, libcxx=libstdc++11, build_type=Release
+
+```
+engine/profiles/linux-gcc-release    as above
 engine/profiles/linux-gcc-debug      same, build_type=Debug, -g -O0
-engine/profiles/linux-clang-asan     compiler=clang, build_type=Debug, ASan + UBSan flags
+engine/profiles/linux-clang-asan     compiler=clang — NOT usable from Conan on this host (no Linux
+                                     package); reach it with a host clang and say so, or drop the profile
 ```
+
+**Verify the compiler is Conan's, not the host's**, because a silent fallback looks identical
+until another machine builds it:
+
+```sh
+grep -m1 'CMAKE_CXX_COMPILER:' engine/build/build/CMakeCache.txt
+# must be under ~/.conan2, never /usr/bin
+```
+
+A `make` target runs that check and fails the build when it does not hold.
 
 Each is a full profile file (`[settings]`, `[conf]`, `[buildenv]` where needed), committed, and
 used with `-pr:a=<path>` so host and build use it. No ad-hoc `-s build_type=...` on a command

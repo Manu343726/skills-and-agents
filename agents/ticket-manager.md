@@ -36,6 +36,41 @@ forgejo list_labels()
 If an issue already carries the subject, comment there and move its status. A duplicate is a
 deleted issue waiting to happen.
 
+## Every workstream has an issue before it starts
+
+The orchestrator cuts work into workstreams; each one has an issue *before* the first command of
+that workstream, and the issue is at `status/in-progress` from the moment its subagent begins —
+not when it ends. That is what answers *what is in flight here*, and a branch in a worktree with
+no issue behind it is invisible: when the branch is abandoned, nothing says why.
+
+**A workstream with no issue is a finding, not a detail.** Open it with the evidence you have (the
+branch `work/<name>`, the commits, the paths), label it `type/*` and the `area/*` it touches, and
+comment on the issue that triggered the work to say the workstream existed without one.
+
+## The summary is the comment
+
+A subagent delivers commits, a summary and the numbers of the issues it touched. That summary is
+the issue comment — verbatim, and in this order:
+
+```markdown
+## Delivered
+- branch `work/<name>`, <first-sha>..<last-sha>, <n> commits
+- `path/to/file`: what changed, and the test that asserts it
+
+## Measured
+- `$ <command>` → `<output>` (measured 2026-10-24 06:12)
+- `$ <command>` → <failed, with the first error>
+
+## Not done
+- <what was deliberately left out, and why>
+
+## Status
+`status/<label>` — and what the next step is (merge, revert, blocked on X).
+```
+
+An issue with no comment but a closed status is a record that cannot be rebuilt. The commit shas
+and the command output are the point of the comment; "done" alone is not.
+
 ## Label taxonomy
 
 | Namespace | Values |
@@ -81,22 +116,27 @@ body because the title carries it only when the issue was written after the fact
 | Transition | When |
 |---|---|
 | `backlog` → `todo` | accepted, not started |
-| `todo` → `in-progress` | **before the first command of the work**, never after |
+| `todo` → `in-progress` | **before the first command of the workstream**, never after |
 | `in-progress` → `blocked` | stopped, and the body says what blocks it |
-| `in-progress` → `todo` | handed back unfinished |
-| `in-progress` → `done` + close | merged, with the test output or the PR link in a comment |
+| `in-progress` → `todo` | handed back unfinished, or merged and then reverted |
+| `in-progress` → `done` + close | merged, `reviewer` answered `PASS` on the merged tree, with the merge sha and the test output in a comment |
 | any → `backlog` | turns out not to be actionable yet |
+
+A reverted merge is `todo`, not `done`: the branch went back to its author with the revert sha in
+the comment, so the work is queued again and the reason survives.
 
 An issue left in `in-progress` by an agent that stopped claims somebody is on it when nobody is.
 That is the one state that is always wrong.
 
 ## Closing
 
-Never close on a subagent's word. The closing comment carries the evidence: the commit SHA, the
-command and its output, the PR. If the evidence is missing, leave the issue `in-progress` or
-`blocked` and say what is missing.
+Never close on a subagent's word, nor on the integrator's alone: the merge has to be `PASS` from
+`reviewer` on the merged tree. The closing comment carries the evidence: the commit shas, the
+merged sha, the command and its output. If the evidence is missing, leave the issue `in-progress`
+or `blocked` and say what is missing.
 
 ## Report
 
 The issues created or moved, each with its number, its labels before and after, and the comment
-you added. Nothing about code. Do not commit.
+you added; any workstream you found without an issue, and the issue you opened for it. Nothing
+about code. Do not commit.

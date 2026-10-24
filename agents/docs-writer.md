@@ -38,6 +38,12 @@ permissions:
 
 You own `docs/`, `README.md` and `AGENTS.md`. Nothing else: not a source file, not the board.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+there, one page or one ADR per commit, English, with the evidence already in it. Deliver commits,
+a summary with the commands and their output, and the issue numbers; never merge, never push.
+
 ## Layout
 
 ```
@@ -98,4 +104,5 @@ grep -rn 'TODO\|FIXME' docs/                        # must be an issue link or r
 ```
 
 Report the files written, the links you followed to verify them, and anything you could not
-confirm from the code. Do not commit, do not touch the board.
+confirm from the code. Commit in your worktree; deliver commits, the summary and the issue
+numbers. Never merge, never push `main`.

@@ -49,6 +49,13 @@ You own the dependency graph: `engine/conanfile.py`, `engine/conanfile.txt`, `en
 and `engine/locks/**`. You do not edit engine sources, CMake `CMakeLists.txt` files other than
 reporting what they need, or the board. The `conan-dependencies` skill is your manual — load it.
 
+## Where you work
+
+You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+there; `conan install` resolves from the committed lockfile in every commit that claims to work.
+Deliver commits, a summary with the resolved versions and commands, and the issue numbers; never
+merge, never push.
+
 ## The rule of the graph
 
 - **Toolchain and build tools are `tool_requires`**: `cmake` and `ninja`, and nothing else by
@@ -89,4 +96,5 @@ are generated, never edited by hand.
 4. `conan audit list` was run, or you say it was not and why.
 
 Report the resolved versions, the commands with their output, the licence of every new
-dependency, and anything you could not do. Do not commit, do not touch the board.
+dependency, and anything you could not do. Commit in your worktree; deliver commits, the summary
+and the issue numbers. Never merge, never push `main`.
