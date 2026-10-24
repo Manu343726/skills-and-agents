@@ -19,28 +19,38 @@ git push -u origin fix/ddcb-result-to-register
 
 Branch names: `<type>/<slug>` — `feat/rom-catalog`, `fix/ddcb-result-to-register`,
 `chore/conan-lock-refresh`, `docs/connect-rpc`. Lowercase, hyphens, no names. An agent workstream
-uses `work/<slug>` instead; see *Worktrees*.
+uses `dev/<issue-id>` instead — or `dev/<slug>-<ids>` when one task serves several issues; see
+*Worktrees*.
 
 ## Worktrees
 
-**One workstream, one worktree, one branch, one directory.** The orchestrator creates it before
-briefing and names both in the brief; the subagent works nowhere else.
+**One workstream, one branch `dev/<issue-id>`, one worktree under `.worktrees/`.** The orchestrator
+creates both before briefing and names them in the brief; every brief opens with that directory as
+the working directory.
 
 ```sh
-git worktree add ../wt-ddcb-result -b work/ddcb-result main   # or: opencode worktree_create ddcb-result
+git worktree add .worktrees/<name> dev/<id>     # or: opencode worktree_create <name>
+git push -u origin dev/<id>                     # the branch exists on the platform at once
 git worktree list
-cd ../wt-ddcb-result && git status --short                    # its own index, its own tree
+cd .worktrees/<name> && git status --short       # its own index, its own tree
 ```
 
-- **Naming**: branch `work/<workstream>`, directory named after the same workstream. Not after the
-  agent — two agents may take turns on one workstream and must never share a tree.
-- **Where they live**: outside the main checkout (`../wt-<name>` beside it, or the harness's own
-  directory). Never nested inside the repository, where it would show up in its own `git status`.
+- **Naming**: branch `dev/<issue-id>` — `dev/80`, or `dev/io-contention-80-81` when one task serves
+  several; directory named after the same workstream. Not after the agent: two agents may take turns
+  on one workstream and must never share a tree.
+- **Where they live**: `.worktrees/<name>` inside the repository, gitignored, because
+  `worktree.directory` in `opencode.jsonc` makes that the parent. The harness's default root is
+  outside the workspace (`~/.local/share/opencode/worktree/<project id>`), and the permission layer
+  refuses that path to every role — measured, repeatedly: `permission.rejected: external_directory`.
+  A worktree an agent cannot reach is a workstream that dies at step 0.
+- **Push the branch the moment it exists**, before the first file changes. Liveness is read from the
+  platform, and a branch that only exists locally has delivered nothing.
 - **One branch per workstream**, cut from the `main` that was measured. Never from another
-  unfinished workstream.
+  unfinished workstream. Git refuses to check one branch out in two worktrees, so one branch means
+  one writer — mechanically, not by good intentions.
 - **The main checkout stays the operator's.** Nobody writes there, and no brief names its path.
 - **The workstream pushes its own branch and opens the pull request.** That is the delivery:
-  `git push -u origin work/<name>` and `create_pull_request` against `main`. A branch nobody pushed
+  `git push -u origin dev/<id>` and `create_pull_request` against `main`. A branch nobody pushed
   has delivered nothing, and a worktree that is removed takes an unpushed branch with it.
 - **Rebase before opening the pull request, never merge `main` into the branch**:
   `git fetch origin && git rebase origin/main`. A merge commit in the branch is rewritten by the
@@ -101,9 +111,12 @@ separately.
 Refs: #12
 ```
 
-Each commit is one logical change that builds and passes on its own, and its body says what was
-measured. "wip" and "fix tests" never reach `main`: tidy the branch by squashing your own noise
-before you open the pull request. The merge itself does not squash — the authors' commits are kept.
+As many commits as the work needs, and **every commit is pushed when it is made** — `commit` and
+`push` are one step, never a local pile, because a commit nobody pushed dies with the session. A
+commit that claims to work builds and passes at that commit; an exploratory commit says so and
+never claims otherwise. Nothing is squashed before the pull request: the branch history is what the
+verifier reads, and flattening it erases how the change was found. The merge does not squash them
+either.
 
 ## Pull requests
 
@@ -111,7 +124,7 @@ The pull request is the queue: it is what a later session can enumerate
 (`list_repo_pull_requests state: "open"`), so a delivery that is only a message in a session is a
 delivery nobody can find.
 
-- **Every workstream opens one**, with `create_pull_request`: base `main`, head `work/<name>`.
+- **Every workstream opens one**, with `create_pull_request`: base `main`, head `dev/<id>`.
 - **Size**: ≤ 400 changed lines excluding generated code and tests fixtures. A larger change is
   split, or it is a contract change reviewed on its own.
 - **Title** follows the commit convention. The **body** carries `Refs #N` for every issue the
@@ -133,9 +146,9 @@ delivery nobody can find.
   checks could never pass, and whether Forgejo counts a self-review as an approval is unmeasured.
   The agents enforce the rule; the platform does not refuse a bad merge.
 - No squash: the authors' commits are kept, and the merge message follows
-  `Integrate work/<name>: <what it does>`.
+  `Integrate dev/<id>: <what it does>`.
 - **The branch and its worktree are removed after the merge**, together with the local ref:
-  `git worktree remove <dir>` and `git branch -d work/<name>`.
+  `git worktree remove <dir>` and `git branch -d dev/<id>`.
 
 ## What never gets committed
 

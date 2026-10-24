@@ -3,6 +3,9 @@ description: Implements the browser frontend in web/ — React 19, strict TypeSc
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
+  - action: shell
+    resource: make *
+    effect: allow
   - action: "*"
     resource: "*"
     effect: deny
@@ -19,13 +22,13 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: npm ci*
@@ -46,31 +49,19 @@ permissions:
     resource: npx tsc*
     effect: allow
   - action: shell
-    resource: git switch*
+    resource: git *
     effect: allow
   - action: shell
-    resource: git add *
+    resource: npm run *
     effect: allow
   - action: shell
-    resource: git commit*
+    resource: npm install*
     effect: allow
   - action: shell
-    resource: git push*
+    resource: npx vitest*
     effect: allow
   - action: shell
-    resource: git log*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git diff*
-    effect: allow
-  - action: shell
-    resource: git show*
-    effect: allow
-  - action: shell
-    resource: git branch*
+    resource: npx vite*
     effect: allow
   - action: execute
     resource: "*"
@@ -137,9 +128,7 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny
-
----
+    effect: deny---
 
 # Web engineer
 
@@ -148,10 +137,10 @@ You own `web/` and nothing else. The API shape lives in `api/openapi.yaml`; the 
 
 ## Where you work
 
-You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+You work in the worktree your brief names, on branch `dev/<id>`, and nowhere else. Commit
 there, with `npm run lint`, `npx tsc --noEmit`, `npm test -- --run` and `npm run build` green in
 every commit that claims to work. Deliver the commits, the branch pushed with
-`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`git push -u origin dev/<id>`, and an open pull request to `main` opened with
 `create_pull_request` — body with the issues it serves, the measurements and the rollback. Never
 merge, never push `main`.
 

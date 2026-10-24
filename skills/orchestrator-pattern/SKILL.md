@@ -50,37 +50,58 @@ defect of this library that gets a role in the same change.** A workstream whose
 covers is not a workstream yet: `agent-author` writes the role, wires it into this table and into
 `agents/orchestrator.md`, and the work is cut after that — not "handled with a general agent".
 
-## 3. The worktree
+## 3. Before the first brief: is the project wired?
 
-**One workstream, one worktree, one branch `work/<name>`**, the worktree created by you before the
-brief:
+An agent that starts in a project audit before it plans, and an unwired project is fixed before any
+work is cut — not discovered by a workstream that dies at step 0. Six checks, each with the evidence
+that settles it:
+
+| Check | Settled by | If it fails |
+|---|---|---|
+| The project config is `opencode.jsonc` at the repository root | the file exists; `read` it | create it, then say a restart is needed |
+| `.opencode/` does not shadow it | `ls .opencode` says it is absent | every discovered `.opencode/opencode.json(c)` is merged **after** the direct one, so remove it |
+| The MCP servers the project needs are declared under `mcp.servers` | the block lists them | declare them; a server declared a minute ago is absent from the running session, which is not evidence the declaration is wrong |
+| The board answers | one cheap call, e.g. `list_repo_issues` | stop and say it: without the board there is no issue, and without an issue there is no branch |
+| The permission floor is written | `permissions` + `policies` in the config | write it: git allowed in full, the destructive verbs refused |
+| Worktrees land inside the project | `worktree.directory` set, and the path in `.gitignore` | configure it, or every role is denied the tree it is told to work in |
+
+The server log is read once after a configuration change: a `tool.use` policy that fails validation
+is dropped with a warning and the restriction is simply absent, with no error to notice.
+
+## 4. The worktree
+
+**One workstream, one branch `dev/<issue-id>`, one worktree under `.worktrees/`** — all three
+created by you before the brief:
 
 ```
-opencode worktree_create <name>      # → a directory on a detached HEAD, and no branch
+opencode worktree_create <name>                # → .worktrees/<name>, per `worktree.directory`
+git worktree add .worktrees/<name> dev/<id>    # the shell route, same result
+git push -u origin dev/<id>                    # the branch is on the platform before the first file
 ```
 
-The tool returns the directory **detached**; it does not create the branch. The branch is the
-brief's step 0: the agent runs `git switch -c work/<name>` before it writes anything, and pastes
-`git branch --show-current` so its first report proves the branch exists. A brief that names a
-branch nobody created ends in a commit no ref reaches, and `worktree_remove` takes it with the tree.
+**The branch is pushed as soon as it exists.** Liveness is read from the platform; a branch that
+only exists in one working tree has delivered nothing and dies with the session. The brief's step 0
+is `git branch --show-current`, pasted, so the first report proves the branch exists and tracks
+`origin`.
 
-The harness worktree tool, not a shell command, so your `shell` denial still holds; if the harness
-has none, `merge-conflict-fixer` runs `git worktree add <dir> -b work/<name> main` and reports the
-path. Name it after the workstream (`ddcb-result`, `sse-heartbeat`), never after the agent. One
-branch per workstream, cut from the `main` you measured; a dead workstream is `worktree_remove`d
-and the issue says why.
+The worktree root is **configured, not defaulted**: `worktree.directory` in the project's
+`opencode.jsonc` points at `.worktrees/`, which is gitignored. Without it the harness uses its own
+data directory, outside the workspace, and the permission layer refuses that path to every role —
+measured four times in a single session: `permission.rejected: external_directory`. A worktree an
+agent cannot reach is a workstream that dies at step 0, before it writes a line.
 
-It is structural: one checkout means one index, one stash and one `git status`, so two parallel
-edits become one indistinguishable diff. A worktree's branch *is* a directory, and a branch that
-does not build cannot break the tree you are reading.
+**Git enforces one branch, one writer**: it refuses to check the same branch out in two worktrees.
+The invariant a duplicate writer broke is mechanical now, not a rule somebody has to remember. It is
+also structural: one checkout means one index, one stash and one `git status`, so two parallel edits
+become one indistinguishable diff.
 
-## 4. The brief
+## 5. The brief
 
 A subagent starts with **no** context of this session. Everything it needs is in the brief:
 
 ```markdown
 ## Worktree
-`/tmp/opencode/<name>`, on a detached HEAD. Step 0: `git switch -c work/<name>`, then paste
+`.worktrees/<id>`, on a detached HEAD. Step 0: `git switch -c dev/<id>`, then paste
 `git branch --show-current`. Nothing outside it; commit there.
 
 ## Ownership
@@ -100,16 +121,16 @@ Fix the DDCB result-to-register write, with the regression test in
 `backend/`, `web/`, `toolchain/`, `proto/`, `docs/`, the issue tracker, `main`.
 
 ## Delivery
-Commit early and push early: a `wip:` commit and `git push -u origin work/<name>` as soon as there
+Commit early and push early: a `wip:` commit and `git push -u origin dev/<id>` as soon as there
 is anything, so liveness is readable from the branch; squash your own `wip:` commits before the PR.
-Then commits on `work/<name>`, the branch pushed, an open PR to `main` naming every issue it
-serves, and the report with the shas and the PR number — section 6.
+Then commits on `dev/<id>`, the branch pushed, an open PR to `main` naming every issue it
+serves, and the report with the shas and the PR number — section 7.
 ```
 
 No brief without a *measured* fact: a command that ran, a `path:line`, a version. No brief with
 the main checkout's path in it: an agent told where `main` lives works in `main`.
 
-## 5. Launch, and while they run
+## 6. Launch, and while they run
 
 `subagent`, `background: true`, always — never foreground. Launch independent workstreams in one
 burst, each in its own worktree, then work on something that does not overlap (the next issue, the
@@ -127,9 +148,9 @@ Read it from artifacts instead, all of which survive independently of the sessio
 | Artifact | What it says |
 |---|---|
 | `.git/worktrees/<name>/logs/HEAD` | when HEAD last moved, and to what |
-| the branch tip's committer date (`git log -1 --format=%cI work/<name>`) | when a commit last landed |
+| the branch tip's committer date (`git log -1 --format=%cI dev/<id>`) | when a commit last landed |
 | the newest mtime under the worktree (`find <dir> -newer …`) | when a file was last written |
-| `git ls-remote origin work/<name>` | when the branch was last pushed |
+| `git ls-remote origin dev/<id>` | when the branch was last pushed |
 
 **Warn at 45 minutes** with no HEAD movement and no working-tree write. The threshold is a
 measurement, not a preference: the startup window before a first commit was **35m48s** and
@@ -153,20 +174,26 @@ files picked up by a stray `git add -A`. If the worktree must be removed, the op
 
 ### An early `wip:` commit and an early push
 
-Every brief asks for a `wip:` commit and an early `git push -u origin work/<name>` as soon as there
-is anything at all, and a squash before delivery. Liveness needs an artifact to read, and a
-worktree that has never committed has none — the same 40 minutes of honest work and forty minutes
-of nothing look identical from outside. The `wip:` commit is squashed away before the PR; it exists
-to make progress visible while it is progress.
+Every brief says the same thing: **commit when there is something worth keeping, and push the
+commit immediately** — `commit` and `push` are one step, not two moments. There is no local pile and
+no `wip:` that waits for attention. Liveness needs an artifact to read, and the same 40 minutes of
+honest work and forty minutes of nothing look identical from outside until something is on the
+remote.
 
-## 6. The delivery contract
+The number of commits is the work's business: one or twenty, exploratory ones included, each
+pushing its own message. What is not negotiable is that every commit that claims to work passes at
+that commit.
+
+## 7. The delivery contract
 
 A subagent delivers exactly three things, and nothing else:
 
-1. **Closed commits** on `work/<name>` — self-contained, English subject and a body that says what
-   was measured, tests passing in every commit that claims to work.
-2. **The branch pushed** — `git push -u origin work/<name>`, with the output pasted.
-3. **An open pull request** to `main` — `create_pull_request`, head `work/<name>`, base `main`,
+1. **As many commits as the work needs** on `dev/<id>` — English subject and a body that says what
+   was measured, tests passing in every commit that claims to work, and **each one pushed when it
+   is made**.
+2. **The branch pushed** — `git push -u origin dev/<id>` at creation and after every commit, with
+   the output pasted.
+3. **An open pull request** to `main` — `create_pull_request`, head `dev/<id>`, base `main`,
    and a body that names every issue it serves by number. The report carries the PR number.
 
 The report also carries the summary: what changed, what was measured with the command and its
@@ -174,14 +201,15 @@ output, what was deliberately not done, the branch and the commit shas. A branch
 on its own: a report is a message in a session and dies with it, while an open PR is listed by
 `list_repo_pull_requests` from any session.
 
-The `wip:` commits written to make liveness readable are squashed before the PR: what arrives is
-the logical change, not the trail of it.
+Nothing is squashed before the PR. The branch history is what the verifier reads; flattening it
+erases how the change was found, and an exploratory commit that says it is one is honest instead of
+deleted.
 
 It does not merge, does not review its own PR, does not push `main`, and does not close an issue
 unless that issue *was* the deliverable. A delivery missing the PR number, the shas or the issue
 numbers is incomplete.
 
-## 7. When a report arrives
+## 8. When a report arrives
 
 A report is a claim, not a measurement. Re-measure before repeating it:
 
@@ -190,7 +218,7 @@ A report is a claim, not a measurement. Re-measure before repeating it:
 | "tests pass" | the same command, in this session, fresh output |
 | "no state committed" | `git status --short` in that worktree |
 | "field added to the contract" | `git diff proto/ api/`, then check generated code |
-| "3 commits on `work/<name>`" | `git log --oneline main..work/<name>` |
+| "3 commits on `dev/<id>`" | `git log --oneline main..dev/<id>` |
 
 If it does not hold, brief a **new** subagent with the failing output and the same ownership.
 
@@ -209,8 +237,8 @@ the base sha in it is what decides whether the approval still describes `main`.
 
 | Check | Passes when |
 |---|---|
-| the PR is open to `main` | `get_pull_request_by_index` returns it, head `work/<name>` |
-| the branch has commits | `git log --oneline main..work/<name>` lists them |
+| the PR is open to `main` | `get_pull_request_by_index` returns it, head `dev/<id>` |
+| the branch has commits | `git log --oneline main..dev/<id>` lists them |
 | the trial merge applies | the verifier's merge onto the recorded base sha exits 0 |
 | the suites pass on the merge | the verifier pasted every command and its exit 0 |
 | the approval still holds | `main` is still the base sha the verifier measured |
@@ -220,7 +248,7 @@ the base sha in it is what decides whether the approval still describes `main`.
 A PR that fails the gate is never merged: it goes back to its author with the failing output, in
 the worktree it already has.
 
-## 8. The merge
+## 9. The merge
 
 **You decide when; `merger` merges.** The decision and the act are two roles on purpose: the agent
 that judged the PR is not the agent that lands it, and the agent that lands it is not the agent
@@ -251,7 +279,7 @@ yours to enforce, not the verifier's to detect.
 The PR closed or sent back without merging goes to its author in `status/todo` with the finding
 quoted, in the worktree it already has.
 
-## 9. The review, and the revert
+## 10. The review, and the revert
 
 The review is inside the verifier's pass on the PR: that is the gate a merge passes. `reviewer`
 stays for periodic audits of what already landed — the merged tree, read for what a trial merge
@@ -268,13 +296,13 @@ git push origin main && make test    # green again, or you are not done
 The revert sha, the finding and the reason go in the issue; the branch returns to its author in
 `status/todo` with the finding quoted, and the next attempt starts from a measured green tree.
 
-## 10. The lifecycle
+## 11. The lifecycle
 
 | State | Board | Git | Who acts |
 |---|---|---|---|
 | proposed | `backlog` | — | orchestrator |
 | accepted | `todo` | — | orchestrator |
-| in flight | `in-progress` | `work/<name>`, commits landing | subagent |
+| in flight | `in-progress` | `dev/<id>`, commits landing | subagent |
 | delivered | `in-progress` | branch pushed, PR open | subagent, then orchestrator verifies |
 | verified | `in-progress` | `APPROVED` at a recorded base sha | `verifier`, serialized |
 | merged | `done` + closed | PR merged by `merger` via `merge_pull_request` | `merger`, on your decision |
@@ -283,7 +311,7 @@ The revert sha, the finding and the reason go in the issue; the branch returns t
 A workstream with no open PR has not delivered. A merge stands on an `APPROVED` that still matches
 `main`; anything else is re-verified before it lands.
 
-## 11. Failure modes
+## 12. Failure modes
 
 - **Empty or partial report** — the agent died, was cut, or answered "mostly". Not done; relaunch
   narrower in a fresh worktree from the same `main`, and ask for the exact missing item.
@@ -296,7 +324,7 @@ A workstream with no open PR has not delivered. A merge stands on an `APPROVED` 
 - **Report contradicts the code** — the code wins. Quote the line in the next brief.
 - **A workstream with no issue** — a finding: `ticket-manager` opens it with the branch and shas.
 
-## 12. The record, and closing
+## 13. The record, and closing
 
 The record is written by you, in the same change that produces the finding: the issue comment
 (command, output, `path:line`, timestamp, what changed and the rollback), the `status/*` moved

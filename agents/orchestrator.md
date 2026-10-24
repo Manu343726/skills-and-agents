@@ -87,9 +87,9 @@ is not evidence**: an agent reading code and an agent that died are both quiet, 
 Read liveness from artifacts, which outlive the session:
 
 - `.git/worktrees/<name>/logs/HEAD` — when HEAD last moved;
-- `git log -1 --format=%cI work/<name>` — when the branch tip was committed;
+- `git log -1 --format=%cI dev/<id>` — when the branch tip was committed;
 - the newest write under the worktree (`find <dir> -newer <file>`) — when a file last changed;
-- `git ls-remote origin work/<name>` — when the branch was last pushed.
+- `git ls-remote origin dev/<id>` — when the branch was last pushed.
 
 **Warn at 45 minutes** with no HEAD movement and no working-tree write. The number is a measurement
 from this machine on 2026-10-24: the startup window before a first commit was **35m48s** and
@@ -107,16 +107,41 @@ a relaunch puts two agents in one tree, and two agents in one tree has already c
 workstream's files, picked up by a stray `git add -A`. Removal is the operator's call, and
 `git status --porcelain` is read first.
 
+## Before the first brief: the wiring audit
+
+An agent that starts in a project audits it before it plans, and an unwired project is fixed before
+any work is cut. Six checks, each settled by evidence and not by assumption: the project config is
+`opencode.jsonc` at the repository root; `.opencode/` does not exist to shadow it; the MCP servers
+the project needs are under `mcp.servers`; the board answers to one cheap call; the permission floor
+is written (`permissions` plus `policies`, git allowed in full and the destructive verbs refused);
+and `worktree.directory` puts worktrees inside the project, with the path gitignored. A server
+declared a minute ago is absent from the running session -- that is the config being read at
+startup, not evidence the declaration is wrong. After any configuration change, read the server log
+once: a `tool.use` statement that fails validation is dropped with a warning, and the restriction is
+then simply absent.
+
 ## The worktree
 
-Every workstream gets its own worktree and branch, the worktree created before the brief with the
-harness worktree tool: `opencode worktree_create <name>` → a directory on a **detached HEAD**, and
-no branch. The branch is the brief's step 0: the agent runs `git switch -c work/<name>` and pastes
-`git branch --show-current` before it writes anything. That is not a shell command, so your `shell`
-denial stands. Name it after the workstream (`ddcb-result`, `sse-heartbeat`), never after an agent:
-two agents may take turns on one workstream, never on one tree at once. The branch *is* a directory
-here — the diff is that directory, a discarded workstream is a `worktree_remove`, and a branch that
-does not build cannot break the tree you are reading. The main checkout is the operator's; two
+Every workstream gets its own branch `dev/<issue-id>` and its own worktree under `.worktrees/`,
+both created before the brief:
+
+```sh
+opencode worktree_create <name>                # → .worktrees/<name>, per `worktree.directory`
+git worktree add .worktrees/<name> dev/<id>    # the shell route, same result
+git push -u origin dev/<id>                    # the branch exists on the platform at once
+```
+
+**The branch is pushed as soon as it exists** — liveness is read from the platform, and a branch
+that lives only in one working tree dies with the session. The brief's step 0 is
+`git branch --show-current`, pasted, so the first report proves the branch exists and tracks
+`origin`.
+
+The worktree root is configured, not defaulted: `worktree.directory` in the project's
+`opencode.jsonc`. The harness's own root is outside the workspace and the permission layer refuses
+it to every role -- measured, repeatedly: `permission.rejected: external_directory`. Name the tree
+after the workstream (`io-contention`, `mcp-declaration`), never after an agent: two agents may take
+turns on one workstream, never on one tree at once. Git refuses to check one branch out in two
+worktrees, so one branch means one writer mechanically. The main checkout is the operator's; two
 agents in it overwrite each other with no trace.
 
 ## The brief
@@ -124,7 +149,7 @@ agents in it overwrite each other with no trace.
 A subagent starts with no context of this session. In this order:
 
 - **Worktree**: the directory you created — where everything happens — and **step 0**: it is on a
-  detached HEAD, so `git switch -c work/<name>` and paste `git branch --show-current` before writing.
+  detached HEAD, so `git switch -c dev/<id>` and paste `git branch --show-current` before writing.
   The main checkout's path is not in the brief.
 - **Ownership**: the exact files it owns, and "do not touch" for everything else.
 - **Paths**: what it reads first, full paths from the repository root.
@@ -133,9 +158,9 @@ A subagent starts with no context of this session. In this order:
   and not "as many commits as you like": one logical change per commit, tests passing.
 - **Constraints**: language level, build command, test command, output format.
 - **What not to touch**: other workstreams' files, the record, `main`, anything outside the worktree.
-- **Delivery**: an early `wip:` commit and `git push -u origin work/<name>` as soon as there is
+- **Delivery**: an early `wip:` commit and `git push -u origin dev/<id>` as soon as there is
   anything — liveness needs an artifact to read, and a branch with no commit has none — squashed
-  before the PR; then commits on `work/<name>`, the branch pushed, an open PR to `main`, a summary
+  before the PR; then commits on `dev/<id>`, the branch pushed, an open PR to `main`, a summary
   and the issue numbers — see below.
 
 ## Reuse before you write
@@ -153,10 +178,10 @@ so, and do not pass it on.
 
 A subagent delivers exactly three things, and nothing else:
 
-1. **Closed commits** on `work/<name>` — self-contained, English message with a real body, the
+1. **Closed commits** on `dev/<id>` — self-contained, English message with a real body, the
    suite passing in every commit that claims it works.
-2. **The branch pushed** — `git push -u origin work/<name>`, output pasted.
-3. **An open pull request** to `main` — head `work/<name>`, base `main`, a body that names every
+2. **The branch pushed** — `git push -u origin dev/<id>`, output pasted.
+3. **An open pull request** to `main` — head `dev/<id>`, base `main`, a body that names every
    issue it serves by number, and the PR number in the report.
 
 It also reports a summary — what changed, what was measured (the command and its output), what it
@@ -169,7 +194,7 @@ A branch with no PR is not a delivery: a report is a message in a session and di
 
 Then:
 
-1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `work/<name>`
+1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `dev/<id>`
    onto it in its own worktree, runs every suite the diff touches on the merged result, and posts a
    verdict whose first line is `## Verdict: APPROVED` or `## Verdict: REQUEST_CHANGES`, carrying the
    base sha and the trial-merge sha — a review body, because Forgejo refuses a formal review state

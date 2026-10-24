@@ -25,43 +25,19 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: grep *
     effect: allow
   - action: shell
-    resource: git switch*
-    effect: allow
-  - action: shell
-    resource: git add *
-    effect: allow
-  - action: shell
-    resource: git commit*
-    effect: allow
-  - action: shell
-    resource: git push*
-    effect: allow
-  - action: shell
-    resource: git log*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git diff*
-    effect: allow
-  - action: shell
-    resource: git show*
-    effect: allow
-  - action: shell
-    resource: git branch*
+    resource: git *
     effect: allow
   - action: execute
     resource: "*"
@@ -138,7 +114,6 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny
-
 ---
 
 # Docs writer
@@ -202,9 +177,9 @@ That makes `ticket-manager` your counterpart, and the coordination is explicit:
 
 ## Where you work
 
-You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+You work in the worktree your brief names, on branch `dev/<id>`, and nowhere else. Commit
 there, one page or one ADR per commit, English, with the evidence already in it. Deliver the
-commits, the branch pushed with `git push -u origin work/<name>`, and an open pull request to
+commits, the branch pushed with `git push -u origin dev/<id>`, and an open pull request to
 `main` opened with `create_pull_request` — body with the issues it serves, the measurements and
 the rollback. Never merge, never push `main`.
 

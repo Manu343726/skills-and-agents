@@ -16,37 +16,10 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
-    effect: allow
-  - action: shell
-    resource: git fetch*
-    effect: allow
-  - action: shell
-    resource: git rev-parse*
-    effect: allow
-  - action: shell
-    resource: git switch*
-    effect: allow
-  - action: shell
-    resource: git merge*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git diff*
-    effect: allow
-  - action: shell
-    resource: git show*
-    effect: allow
-  - action: shell
-    resource: git log*
-    effect: allow
-  - action: shell
-    resource: git branch --show-current*
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: cmake --preset*
@@ -104,6 +77,39 @@ permissions:
     effect: allow
   - action: shell
     resource: mosquitto_sub*
+    effect: allow
+  - action: shell
+    resource: git *
+    effect: allow
+  - action: shell
+    resource: ninja *
+    effect: allow
+  - action: shell
+    resource: make *
+    effect: allow
+  - action: shell
+    resource: conan install*
+    effect: allow
+  - action: shell
+    resource: nm *
+    effect: allow
+  - action: shell
+    resource: objdump *
+    effect: allow
+  - action: shell
+    resource: readelf *
+    effect: allow
+  - action: shell
+    resource: addr2line *
+    effect: allow
+  - action: shell
+    resource: size *
+    effect: allow
+  - action: shell
+    resource: strings *
+    effect: allow
+  - action: shell
+    resource: ldd *
     effect: allow
   - action: execute
     resource: "*"
@@ -209,9 +215,7 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny
-
----
+    effect: deny---
 
 # Verifier
 
@@ -221,7 +225,7 @@ where every sentence is backed by a command and the output it printed.
 ## The merge gate
 
 On a pull request you are the gate, and nothing lands without your verdict. The orchestrator hands
-you a PR: its index, its head branch `work/<name>`, and the base sha it was cut from.
+you a PR: its index, its head branch `dev/<id>`, and the base sha it was cut from.
 
 Work in your own worktree, never the trunk. Fetch the branch, record the base sha you were handed,
 and create a trial merge onto **that** sha — not onto whatever `main` has become since:
@@ -230,7 +234,7 @@ and create a trial merge onto **that** sha — not onto whatever `main` has beco
 git fetch origin
 git rev-parse origin/main                 # the base sha, and it must match the one you were handed
 git switch -c verify/pr-<n> <base-sha>
-git merge --no-ff origin/work/<name>      # the trial merge; note the sha it creates
+git merge --no-ff origin/dev/<id>      # the trial merge; note the sha it creates
 ```
 
 Run every suite the diff touches on the merged result, with the command and its output. **All of

@@ -28,13 +28,13 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: conan install*
@@ -58,31 +58,52 @@ permissions:
     resource: clang-tidy -p*
     effect: allow
   - action: shell
-    resource: git switch*
+    resource: git *
     effect: allow
   - action: shell
-    resource: git add *
+    resource: ninja *
     effect: allow
   - action: shell
-    resource: git commit*
+    resource: make *
     effect: allow
   - action: shell
-    resource: git push*
+    resource: gcc*
     effect: allow
   - action: shell
-    resource: git log*
+    resource: g++*
     effect: allow
   - action: shell
-    resource: git status*
+    resource: cc *
     effect: allow
   - action: shell
-    resource: git diff*
+    resource: c++ *
     effect: allow
   - action: shell
-    resource: git show*
+    resource: ar *
     effect: allow
   - action: shell
-    resource: git branch*
+    resource: ld *
+    effect: allow
+  - action: shell
+    resource: nm *
+    effect: allow
+  - action: shell
+    resource: objdump *
+    effect: allow
+  - action: shell
+    resource: readelf *
+    effect: allow
+  - action: shell
+    resource: addr2line *
+    effect: allow
+  - action: shell
+    resource: size *
+    effect: allow
+  - action: shell
+    resource: strings *
+    effect: allow
+  - action: shell
+    resource: ldd *
     effect: allow
   - action: execute
     resource: "*"
@@ -173,9 +194,7 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny
-
----
+    effect: deny---
 
 # C++ engineer
 
@@ -185,11 +204,11 @@ issue tracker — the orchestrator owns the record.
 
 ## Where you work
 
-You work in the worktree your brief names, on branch `work/<name>`: `/tmp/opencode/<name>` or the
+You work in the worktree your brief names, on branch `dev/<id>`: `.worktrees/<id>` or the
 path the orchestrator gave you. Commit there — closed commits, English subject and body, this
 stack's tests green in every commit that claims to work. Nothing outside it, never the main
 checkout, never `main`. Your delivery is three things: the commits, the branch pushed with
-`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`git push -u origin dev/<id>`, and an open pull request to `main` opened with
 `create_pull_request` — its body names every issue it serves, what changed, what you measured and
 the rollback. You never merge, and you never push `main`.
 
@@ -263,5 +282,5 @@ ctest --preset conan-release --output-on-failure
 
 Files changed with their paths, the commands you ran and their real output, the tests added, and
 anything you could not do. Commit in your worktree, push the branch with
-`git push -u origin work/<name>`, and open the pull request to `main`; the summary carries the
+`git push -u origin dev/<id>`, and open the pull request to `main`; the summary carries the
 branch, the commit shas, the PR number and the measurements. Never merge, never push `main`.

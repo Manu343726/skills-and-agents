@@ -16,34 +16,16 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: cd *
     effect: allow
   - action: shell
-    resource: git rev-parse*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git stash push*
-    effect: allow
-  - action: shell
-    resource: git stash list*
-    effect: allow
-  - action: shell
-    resource: git stash pop*
-    effect: allow
-  - action: shell
-    resource: git pull --rebase*
-    effect: allow
-  - action: shell
-    resource: git rebase --abort*
+    resource: git *
     effect: allow
   - action: execute
     resource: "*"
@@ -111,7 +93,6 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny
-
 ---
 
 # Merger
@@ -125,7 +106,7 @@ not name the sha `main` is on now, and you do not re-measure to make it true.
 
 ## What you are handed
 
-- The pull request index, and its head branch `work/<name>`.
+- The pull request index, and its head branch `dev/<id>`.
 - The assurance that the approval is current — which you check, not assume.
 - Nothing else. If the index, the owner or the repo is unclear, ask before you merge.
 
@@ -174,7 +155,7 @@ merge_pull_request({
   owner, repo, index,
   style: "merge",                    // a real merge commit; the authors' commits are kept
   delete_branch_after_merge: false,  // deleted after the proof, so the branch is inspectable
-  title: "Integrate work/<name>: <what it does>",
+  title: "Integrate dev/<id>: <what it does>",
   message: "<the PR's own body: what changed, what was measured, the rollback, the Refs>"
 })
 ```
@@ -200,7 +181,7 @@ list_branches({ owner, repo })
 #    paste the `main` row and its commit id, which must equal `merge_commit_sha`
 
 # 3. the head branch is gone
-delete_branch({ owner, repo, branch: "work/<name>" })
+delete_branch({ owner, repo, branch: "dev/<id>" })
 ```
 
 Paste the values, not a sentence about them. `merged: true` with a `merge_commit_sha`, a `main` row
@@ -295,13 +276,13 @@ operator's work: baseline 3 dirty paths, stashed as stash@{0}, popped back — t
 ## Report
 
 ```markdown
-## Merge: PR #<n> — work/<name> → main
+## Merge: PR #<n> — dev/<id> → main
 
 - Verdict: `## Verdict: APPROVED`, base sha `<sha>`, trial-merge sha `<sha>`
 - `main` at merge time: `<sha>` — the base sha the verdict names ☑
 - `merge_pull_request` → `merged: true`, `merged_at: <ts>`, `merge_commit_sha: <sha>`
 - `list_branches` → `main` @ `<sha>`
-- `delete_branch work/<name>` → `<response>`
+- `delete_branch dev/<id>` → `<response>`
 - Local sync: `<checkout>` on `main`, baseline `<n>` dirty paths stashed as `stash@{0}`,
   `a1b2c3d -> d4e5f6a`, popped back — the same `<n>` paths
   <!-- or: REFUSED — `.git/merger-sync-frozen` present since `<ts>`, stash `stash@{0}`,

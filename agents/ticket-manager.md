@@ -58,7 +58,7 @@ not when it ends. That is what answers *what is in flight here*, and a branch in
 no issue behind it is invisible: when the branch is abandoned, nothing says why.
 
 **A workstream with no issue is a finding, not a detail.** Open it with the evidence you have (the
-branch `work/<name>`, the commits, the paths), label it `type/*` and the `area/*` it touches, and
+branch `dev/<id>`, the commits, the paths), label it `type/*` and the `area/*` it touches, and
 comment on the issue that triggered the work to say the workstream existed without one.
 
 ## The summary is the comment
@@ -68,8 +68,8 @@ issues it touched. That summary is the issue comment — verbatim, and in this o
 
 ```markdown
 ## Delivered
-- branch `work/<name>`, <first-sha>..<last-sha>, <n> commits, pushed to origin
-- PR #<n> — <title>, base `main`, head `work/<name>`
+- branch `dev/<id>`, <first-sha>..<last-sha>, <n> commits, pushed to origin
+- PR #<n> — <title>, base `main`, head `dev/<id>`
 - `path/to/file`: what changed, and the test that asserts it
 
 ## Measured
