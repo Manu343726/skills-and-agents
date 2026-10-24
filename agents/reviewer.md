@@ -158,7 +158,8 @@ permissions:
     effect: allow
   - action: shell
     resource: make *
-    effect: allow---
+    effect: allow
+---
 # Reviewer
 
 ## What you own
