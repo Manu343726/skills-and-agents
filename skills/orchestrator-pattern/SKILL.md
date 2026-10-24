@@ -45,11 +45,17 @@ same file, they are sequential — never parallel. If one changes a contract
 
 ## 3. The worktree
 
-**One workstream, one worktree, one branch `work/<name>`**, created by you before the brief:
+**One workstream, one worktree, one branch `work/<name>`**, the worktree created by you before the
+brief:
 
 ```
-opencode worktree_create <name>      # → a directory, and branch work/<name>
+opencode worktree_create <name>      # → a directory on a detached HEAD, and no branch
 ```
+
+The tool returns the directory **detached**; it does not create the branch. The branch is the
+brief's step 0: the agent runs `git switch -c work/<name>` before it writes anything, and pastes
+`git branch --show-current` so its first report proves the branch exists. A brief that names a
+branch nobody created ends in a commit no ref reaches, and `worktree_remove` takes it with the tree.
 
 The harness worktree tool, not a shell command, so your `shell` denial still holds; if the harness
 has none, `integrator` runs `git worktree add <dir> -b work/<name> main` and reports the path. Name
@@ -67,7 +73,8 @@ A subagent starts with **no** context of this session. Everything it needs is in
 
 ```markdown
 ## Worktree
-`/tmp/opencode/<name>`, branch `work/<name>`. Nothing outside it; commit there.
+`/tmp/opencode/<name>`, on a detached HEAD. Step 0: `git switch -c work/<name>`, then paste
+`git branch --show-current`. Nothing outside it; commit there.
 
 ## Ownership
 You own `engine/src/**` and `engine/tests/**`, nothing else. C++20, no allocation or exception in

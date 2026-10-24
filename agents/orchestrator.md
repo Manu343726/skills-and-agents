@@ -60,19 +60,22 @@ of the work. You never answer from memory.
 
 ## The worktree
 
-Every workstream gets its own worktree and branch, created before the brief with the harness
-worktree tool: `opencode worktree_create <name>` → a directory and branch `work/<name>`. That is
-not a shell command, so your `shell` denial stands. Name it after the workstream (`ddcb-result`,
-`sse-heartbeat`), never after an agent: two agents may take turns on one workstream, never on one
-tree at once. The branch *is* a directory here — the diff is that directory, a discarded
-workstream is a `worktree_remove`, and a branch that does not build cannot break the tree you are
-reading. The main checkout is the operator's; two agents in it overwrite each other with no trace.
+Every workstream gets its own worktree and branch, the worktree created before the brief with the
+harness worktree tool: `opencode worktree_create <name>` → a directory on a **detached HEAD**, and
+no branch. The branch is the brief's step 0: the agent runs `git switch -c work/<name>` and pastes
+`git branch --show-current` before it writes anything. That is not a shell command, so your `shell`
+denial stands. Name it after the workstream (`ddcb-result`, `sse-heartbeat`), never after an agent:
+two agents may take turns on one workstream, never on one tree at once. The branch *is* a directory
+here — the diff is that directory, a discarded workstream is a `worktree_remove`, and a branch that
+does not build cannot break the tree you are reading. The main checkout is the operator's; two
+agents in it overwrite each other with no trace.
 
 ## The brief
 
 A subagent starts with no context of this session. In this order:
 
-- **Worktree**: the directory you created and the branch `work/<name>` — where everything happens.
+- **Worktree**: the directory you created — where everything happens — and **step 0**: it is on a
+  detached HEAD, so `git switch -c work/<name>` and paste `git branch --show-current` before writing.
   The main checkout's path is not in the brief.
 - **Ownership**: the exact files it owns, and "do not touch" for everything else.
 - **Paths**: what it reads first, full paths from the repository root.
