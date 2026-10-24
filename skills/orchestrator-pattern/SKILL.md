@@ -36,12 +36,12 @@ same file, they are sequential — never parallel. If one changes a contract
 | Implement in the browser | `web-engineer` | a component, a store action, a test |
 | Assembler / disassembler / `.rom` | `toolchain-engineer` | a subcommand, a round-trip test |
 | Tests only | `test-engineer` | vectors, fuzz corpus, coverage |
-| Measure | `verifier` | commands and their output |
+| Measure, merge gate | `verifier` | output; `APPROVED` or `REQUEST_CHANGES` on a PR |
 | Documentation | `docs-writer` | a page, an ADR |
 | Board | `ticket-manager` | labels, issue bodies, transitions |
 | Dependencies | `conan-dependencies` | `conanfile.py`, profiles, lockfiles |
-| Integrate | `integrator` | a merged tree, and the suite run on it |
-| Final review | `reviewer` | `PASS` or `BLOCK` on the merged tree |
+| Integrate, as an exception | `integrator` | a merge Forgejo cannot perform |
+| Audit | `reviewer` | `PASS` or `BLOCK`, on what already landed |
 
 ## 3. The worktree
 
@@ -93,7 +93,8 @@ Fix the DDCB result-to-register write, with the regression test in
 `backend/`, `web/`, `toolchain/`, `proto/`, `docs/`, the issue tracker, `main`.
 
 ## Delivery
-Commits on `work/<name>`, the summary, the issue numbers — section 6.
+Commits on `work/<name>`, the branch pushed with `git push -u origin work/<name>`, an open PR to
+`main` naming every issue it serves, and the report with the shas and the PR number — section 6.
 ```
 
 No brief without a *measured* fact: a command that ran, a `path:line`, a version. No brief with
@@ -111,12 +112,18 @@ A subagent delivers exactly three things, and nothing else:
 
 1. **Closed commits** on `work/<name>` — self-contained, English subject and a body that says what
    was measured, tests passing in every commit that claims to work.
-2. **A summary** — what changed; what was measured, with the command and its output; what was
-   deliberately not done; the branch and the commit shas.
-3. **The issues**, by number — every one it opened or updated, and the `status/*` label it left.
+2. **The branch pushed** — `git push -u origin work/<name>`, with the output pasted.
+3. **An open pull request** to `main` — `create_pull_request`, head `work/<name>`, base `main`,
+   and a body that names every issue it serves by number. The report carries the PR number.
 
-It does not merge, does not push `main`, and does not close an issue unless that issue *was* the
-deliverable. A delivery missing the shas or the issue numbers is incomplete.
+The report also carries the summary: what changed, what was measured with the command and its
+output, what was deliberately not done, the branch and the commit shas. A branch is not a delivery
+on its own: a report is a message in a session and dies with it, while an open PR is listed by
+`list_repo_pull_requests` from any session.
+
+It does not merge, does not review its own PR, does not push `main`, and does not close an issue
+unless that issue *was* the deliverable. A delivery missing the PR number, the shas or the issue
+numbers is incomplete.
 
 ## 7. When a report arrives
 
@@ -133,45 +140,56 @@ If it does not hold, brief a **new** subagent with the failing output and the sa
 
 ### The gate before the merge
 
+The gate is `verifier` on the pull request, not your reading of the branch. The verifier records
+the base sha (`main` at handoff), fetches the branch, creates a trial merge onto that sha in its
+own worktree, runs every suite the diff touches on the merged result, and answers `APPROVED` or
+`REQUEST_CHANGES` as a formal Forgejo review. It states the base sha and the trial-merge sha.
+
 | Check | Passes when |
 |---|---|
+| the PR is open to `main` | `get_pull_request_by_index` returns it, head `work/<name>` |
 | the branch has commits | `git log --oneline main..work/<name>` lists them |
-| it builds | the stack's build command exits 0 |
-| its tests pass | the declared test command exits 0, run here or by `verifier` |
+| the trial merge applies | the verifier's merge onto the recorded base sha exits 0 |
+| the suites pass on the merge | the verifier pasted every command and its exit 0 |
+| the approval still holds | `main` is still the base sha the verifier measured |
 | the issue exists | open, `status/in-progress`, per `forgejo list_issues(state: "open")` |
 | the label matches reality | it is not `in-progress` for work that has stopped |
 
-A branch that fails the gate never reaches `integrator`: it goes back to its author with the
-failing output, in the worktree it already has.
+A PR that fails the gate is never merged: it goes back to its author with the failing output, in
+the worktree it already has.
 
-## 8. Integration
+## 8. The merge
 
-`integrator` is the only agent that merges and the only one that pushes `main`:
+On `APPROVED`, you merge the PR through Forgejo — `merge_pull_request` — with a real message, not
+by pushing `main`. A direct push to `main` is a defect, not a shortcut: it skips the trial merge
+and leaves no PR to point at.
+
+Merge only on an approval that still holds. The verifier measured a base sha; if `main` has moved
+past it, the approval is stale — re-verify, do not merge a measurement that no longer describes the
+tree.
+
+`integrator` is the exception path: a merge Forgejo cannot perform (a conflict only a human can
+arbitrate, an outage). It says why in its report, and the normal path stays the PR.
+
+**One verifier and one merge at a time, across the whole board.** Two trial merges can each pass
+alone and conflict together; a merge moves `main` under another verifier's measurement. That is
+yours to enforce, not the verifier's to detect.
+
+The PR closed or sent back without merging goes to its author in `status/todo` with the finding
+quoted, in the worktree it already has.
+
+## 9. The review, and the revert
+
+The review is inside the verifier's pass on the PR: that is the gate a merge passes. `reviewer`
+stays for periodic audits of what already landed — the merged tree, read for what a trial merge
+did not show: a hunk dropped in a conflict, a test weakened to pass, a generated file not
+regenerated, a contract changed on one side.
+
+A merge that regresses is reverted, not repaired in a panic:
 
 ```sh
-git fetch origin && git switch main && git merge --ff-only origin/main
-git switch work/<name> && git rebase main      # conflicts resolved here, both intents kept
-git switch main && git merge --ff-only work/<name>
-make test                                      # on the merged tree, not on the branch
-```
-
-It reports what was rebased, what conflicted and how it was resolved, the commands and their
-output, the merged sha, and the tests that pass. It **refuses** when the branch does not build, a
-test fails, the tree is dirty, or a conflict can only be resolved by dropping a test — and says
-which. It never fixes a test to make a merge pass: a regression is a refusal, not an edit.
-
-## 9. The final review, and the revert
-
-`reviewer` reviews the **merged tree**, after the merge, because that is the state the repository
-is in. It runs the suite itself and looks for what integration hid: a conflict resolved by dropping
-a hunk, a test weakened to pass, a generated file not regenerated, a contract changed on one side.
-
-`PASS` sends the issue to `status/done`, with the merged sha and the suite output in the comment.
-`BLOCK` reverts the merge — never repairs it in a panic:
-
-```sh
-git revert -m 1 <merged-sha>        # a fast-forward merge: git revert <merged-sha>
-git push origin main && make test   # green again, or you are not done
+git revert -m 1 <merged-sha>         # the PR's merge commit keeps its first parent
+git push origin main && make test    # green again, or you are not done
 ```
 
 The revert sha, the finding and the reason go in the issue; the branch returns to its author in
@@ -184,19 +202,21 @@ The revert sha, the finding and the reason go in the issue; the branch returns t
 | proposed | `backlog` | — | orchestrator |
 | accepted | `todo` | — | orchestrator |
 | in flight | `in-progress` | `work/<name>`, commits landing | subagent |
-| delivered | `in-progress` | commits on the branch, gate passes | orchestrator verifies |
-| merged | `in-progress` | `main` fast-forwarded, suite run | `integrator` |
-| reviewed | `done` + closed | merge stands | `reviewer`, then orchestrator |
-| reverted | `todo` | revert commit on `main`, branch back | `integrator`, finding quoted |
+| delivered | `in-progress` | branch pushed, PR open | subagent, then orchestrator verifies |
+| verified | `in-progress` | `APPROVED` at a recorded base sha | `verifier`, serialized |
+| merged | `done` + closed | PR merged on `main` by `merge_pull_request` | orchestrator |
+| reverted | `todo` | revert commit on `main`, PR closed | orchestrator, finding quoted |
 
-A merged workstream that never reached `reviewer` is not `done`.
+A workstream with no open PR has not delivered. A merge stands on an `APPROVED` that still matches
+`main`; anything else is re-verified before it lands.
 
 ## 11. Failure modes
 
 - **Empty or partial report** — the agent died, was cut, or answered "mostly". Not done; relaunch
   narrower in a fresh worktree from the same `main`, and ask for the exact missing item.
-- **A branch that does not merge** — `integrator` refuses; the author gets the conflict in its own
-  worktree. Do not re-cut the work to dodge a rebase.
+- **A PR that does not merge** — the verifier returns `REQUEST_CHANGES` with the file and the line;
+  the author gets it in its own worktree and pushes to the same branch. Do not re-cut the work to
+  dodge a rebase.
 - **Conflicting edits** — the worktrees should have made this impossible: diff both branches, keep
   one, brief a third to reconcile, and fix the ownership overlap in the next cut.
 - **Touched the record** — revert it, and say in the issue that the orchestrator owns it.
@@ -208,11 +228,12 @@ A merged workstream that never reached `reviewer` is not `done`.
 The record is written by you, in the same change that produces the finding: the issue comment
 (command, output, `path:line`, timestamp, what changed and the rollback), the `status/*` moved
 before the work starts and out of `in-progress` when it stops, the documents the change
-invalidates, and the commit body. The subagent's summary becomes the issue comment, and the merged
-sha and the verdict are added to it.
+invalidates, and the commit body. The subagent's summary becomes the issue comment, and the PR
+number, the merged sha and the verdict are added to it.
 
-`status/done` and closed when done and reviewed; `status/blocked` with the blocker in the body;
-`status/todo` when handed back unfinished or reverted; `status/backlog` when not actionable.
+`status/done` and closed when done and merged on an `APPROVED`; `status/blocked` with the blocker in
+the body; `status/todo` when handed back unfinished or reverted; `status/backlog` when not
+actionable.
 
 ## Anti-patterns
 
@@ -220,5 +241,6 @@ sha and the verdict are added to it.
 - A brief that says "improve the engine" — no path, no deliverable, no test.
 - Two agents in one file because "they will be quick"; two agents in one checkout, ever.
 - Foregrounding to "save a turn".
-- Merging a branch that never passed the gate, or calling a merged tree `done` before the review.
+- Merging a PR without an `APPROVED` for the base sha `main` is on now, or two verifiers at once.
+- Pushing `main` directly, or treating an open branch as delivered when no PR exists.
 - Fixing a regression forward because the revert "looks like a step back".

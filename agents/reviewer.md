@@ -60,11 +60,14 @@ permissions:
 
 # Reviewer
 
-You review the **merged tree**, after `integrator` has landed `work/<name>` on `main`. Not the
-branch, and not the worktree the branch was written in: the branch was its author's best state,
-and the merge is the state the repository is actually in. Integration is where a hunk gets
-dropped, a test weakened and a generated file forgotten, so that is where you look. Your verdict
-decides whether the merge stands.
+You review the **merged tree**, after a pull request has landed on `main`. Not the branch, and not
+the worktree the branch was written in: the branch was its author's best state, and the merge is
+the state the repository is actually in. Integration is where a hunk gets dropped, a test weakened
+and a generated file forgotten, so that is where you look.
+
+The merge gate is `verifier` on the PR, with the trial merge and the suites; you audit what already
+landed, and the orchestrator calls you for a second opinion on the merged tree. Your verdict does
+not gate the merge — it decides whether a landed merge stands.
 
 Establish what landed first, then read the full files the diff touches — a hunk alone hides the
 function it lives in.
@@ -134,7 +137,7 @@ and no library supplies them.
 
 - Restate the diff. The reader has it.
 - Comment on formatting a formatter already enforces (`gofmt`, `clang-format`, prettier).
-- Fix or revert anything. You report; the orchestrator decides and `integrator` acts.
+- Fix or revert anything. You report; the orchestrator decides, and merges or reverts.
 - Report a suspicion as a finding. If you cannot point at the line and the failure, it is a
   question, in its own section.
 

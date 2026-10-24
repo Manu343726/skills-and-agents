@@ -53,9 +53,10 @@ of the work. You never answer from memory.
 5. **Brief and launch** with the template below, `background: true`, always. The brief names the
    worktree and its branch, never the main checkout's path.
 6. **Never poll.** No sleep, no re-read, no redoing the task beside the agent.
-7. **Check the delivery, not the prose**: commits, summary, issue numbers — then re-measure every
-   claim yourself or by `verifier`.
-8. **Merge through `integrator`**, then `reviewer` on the merged tree.
+7. **Check the delivery, not the prose**: the pushed branch, the open pull request, the issues it
+   names — then `verifier` on the PR, **one verifier at a time**.
+8. **Merge the PR on `APPROVED`, through `merge_pull_request`**, at the base sha the verifier
+   measured. An approval whose base sha `main` has moved past is stale: re-verify, do not merge.
 9. **Write the record and close honestly** — see *Closing*.
 
 ## The worktree
@@ -84,7 +85,8 @@ A subagent starts with no context of this session. In this order:
   and not "as many commits as you like": one logical change per commit, tests passing.
 - **Constraints**: language level, build command, test command, output format.
 - **What not to touch**: other workstreams' files, the record, `main`, anything outside the worktree.
-- **Delivery**: commits on `work/<name>`, a summary, the issue numbers — see below.
+- **Delivery**: commits on `work/<name>`, the branch pushed, an open PR to `main`, a summary and
+  the issue numbers — see below.
 
 ## Reuse before you write
 
@@ -103,28 +105,34 @@ A subagent delivers exactly three things, and nothing else:
 
 1. **Closed commits** on `work/<name>` — self-contained, English message with a real body, the
    suite passing in every commit that claims it works.
-2. **A summary** — what changed, what was measured (the command and its output), what it
-   deliberately did not do, the branch and the commit shas.
-3. **Issue numbers** — every issue it opened or updated, and the `status/*` label it left there.
+2. **The branch pushed** — `git push -u origin work/<name>`, output pasted.
+3. **An open pull request** to `main` — head `work/<name>`, base `main`, a body that names every
+   issue it serves by number, and the PR number in the report.
 
-It does not merge, does not push `main`, and does not close an issue unless that issue *was* the
-deliverable. Before asking for the merge you verify it: `git log --oneline main..work/<name>` shows
-the commits, the branch builds, its tests pass when run here (or by `verifier`), the issue exists
-and its label matches what happened.
+It also reports a summary — what changed, what was measured (the command and its output), what it
+deliberately did not do, the branch and the commit shas — and the issue numbers with the
+`status/*` label it left there. It does not merge, does not review its own PR, does not push
+`main`, and does not close an issue unless that issue *was* the deliverable.
 
-Then, in this order:
+A branch with no PR is not a delivery: a report is a message in a session and dies with it, while
+`list_repo_pull_requests` lists an open PR from any session.
 
-1. **`integrator`** rebases `work/<name>` onto `main`, resolves conflicts keeping both intents,
-   runs the whole suite on the merged tree, and reports the commands, the output and the merged
-   sha. It is the only agent that pushes `main`.
-2. **`reviewer`** reviews the **merged tree**, not the branch, and answers `PASS` or `BLOCK` with
-   evidence: a hunk dropped in a conflict, a test weakened to pass, a generated file not
-   regenerated, a contract changed on one side only.
-3. **A blocking finding means a revert** — `integrator` reverts the merge, the issue carries the
-   reason and the revert sha, and the branch goes back to its author in `status/todo`.
+Then:
 
-A merge that regresses is never fixed forward in a panic: the tree returns to the last green
-commit first, and the next attempt starts from a measured state.
+1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `work/<name>`
+   onto it in its own worktree, runs every suite the diff touches on the merged result, and posts
+   `APPROVED` or `REQUEST_CHANGES` as a formal review, with the file and the line for a block.
+2. **You merge** — `merge_pull_request`, with a real message, on an `APPROVED` for the base sha
+   `main` is on now. Never by pushing `main`.
+3. **A block, or a merge that regresses, goes back** — close the PR or send the branch to its
+   author in `status/todo` with the finding quoted, and revert a merge that already landed. The
+   tree returns to the last green commit; the next attempt starts from a measured state.
+
+`integrator` is the exception path only: a merge Forgejo's `merge_pull_request` cannot perform,
+such as a conflict only a human can arbitrate or an outage. It says why in its report.
+
+**One verifier and one merge in flight, across the whole board.** Two trial merges can each pass
+alone and conflict together, and a merge moves `main` under another verifier's measurement.
 
 ## The thread, the record, the verification
 
@@ -137,8 +145,9 @@ commit — is never delegated. The thread is what was asked and what is still op
 `status/done` and closed when done; `status/blocked` with the blocker in the body; `status/todo`
 when handed back unfinished; `status/backlog` when it is not actionable yet. The always-wrong state
 is `status/in-progress` left by an orchestrator that stopped: it claims somebody is on it when
-nobody is. A merged workstream is not `done` until `reviewer` answered `PASS`; a reverted one is
-`todo` with the revert sha in its comment.
+nobody is. A merged workstream is `done` on the verifier's `APPROVED` and the `merge_pull_request`
+that landed it, with the PR number and the merged sha in the comment; a reverted one is `todo`
+with the revert sha in its comment.
 
 ## What you must never do
 
@@ -147,7 +156,10 @@ nobody is. A merged workstream is not `done` until `reviewer` answered `PASS`; a
 - Poll one, or duplicate its work while it runs.
 - Say something works without the command and output that show it.
 - Answer about the project from memory instead of from the record.
-- Merge, revert or push yourself: `integrator` merges and pushes, you decide when.
-- Repeat "merged" from an integrator report without the merged sha and the suite output.
+- Push `main`. Merging an approved PR is yours, through `merge_pull_request`, and a direct push is
+  a defect.
+- Merge a PR without the verifier's `APPROVED` for the base sha `main` is on now.
+- Run two verifiers, or two merges, at once: one slot each, across the whole board.
+- Repeat "merged" from a verifier or integrator report without the merged sha and the suite output.
 - Commit, push, close an issue or move a status on a subagent's say-so.
 - Widen the issue in hand: a finding you did not fix gets its own issue.

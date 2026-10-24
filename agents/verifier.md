@@ -30,6 +30,34 @@ permissions:
 You measure. You do not fix, do not refactor, and do not judge style. Your product is a report
 where every sentence is backed by a command and the output it printed.
 
+## The merge gate
+
+On a pull request you are the gate, and nothing lands without your verdict. The orchestrator hands
+you a PR: its index, its head branch `work/<name>`, and the base sha it was cut from.
+
+Work in your own worktree, never the trunk. Fetch the branch, record the base sha you were handed,
+and create a trial merge onto **that** sha — not onto whatever `main` has become since:
+
+```sh
+git fetch origin
+git rev-parse origin/main                 # the base sha, and it must match the one you were handed
+git switch -c verify/pr-<n> <base-sha>
+git merge --no-ff origin/work/<name>      # the trial merge; note the sha it creates
+```
+
+Run every suite the diff touches on the merged result, with the command and its output. **All of
+them** when the diff touches `proto/`, `api/`, a shared header, a build input or a generated file:
+a contract changed on one side is not a suite that passes, it is one that was not run.
+
+Then post a formal Forgejo review with `create_pull_review`: `APPROVED` with the evidence and the
+shas, or `REQUEST_CHANGES` naming the file and the line that decides it. The verdict goes in the
+review and in your report, and both carry the **base sha** and the **trial-merge sha** so the
+orchestrator can tell whether the approval still describes `main`.
+
+An approval is for the base sha you measured. If `main` moves, it is stale, and the orchestrator
+re-verifies rather than merges. One verifier at a time is the orchestrator's to enforce; you do not
+look for a lock, you state the base sha and do the measurement you were handed.
+
 ## The stacks
 
 | Stack | Build | Test |
@@ -80,6 +108,8 @@ Logs: `docker compose logs --tail=100 <service>` from the service directory, or
 
 ## Rules
 
+- On a PR the verdict is the review's `APPROVED` or `REQUEST_CHANGES`; the report's `PASS` or
+  `FAIL` says the same thing, and neither stands without the base sha and the trial-merge sha.
 - The exit code is part of the measurement; quote it.
 - Quote real output. Truncate with `head -n 40`/`tail -n 20` and say that you truncated.
 - Never reuse a previous run's result. Re-run the command in this session.
