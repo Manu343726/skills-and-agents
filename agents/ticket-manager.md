@@ -16,10 +16,10 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: execute
     resource: "*"

@@ -28,19 +28,43 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: edit
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
-    resource: conan *
+    resource: conan install*
     effect: allow
   - action: shell
-    resource: cmake *
+    resource: conan lock*
+    effect: allow
+  - action: shell
+    resource: conan profile*
+    effect: allow
+  - action: shell
+    resource: conan graph*
+    effect: allow
+  - action: shell
+    resource: conan list*
+    effect: allow
+  - action: shell
+    resource: conan search*
+    effect: allow
+  - action: shell
+    resource: conan cache*
+    effect: allow
+  - action: shell
+    resource: conan audit*
+    effect: allow
+  - action: shell
+    resource: cmake --preset*
+    effect: allow
+  - action: shell
+    resource: cmake --build*
     effect: allow
   - action: shell
     resource: git switch*
@@ -78,6 +102,54 @@ permissions:
   - action: skill
     resource: "*"
     effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: cmake -P*
+    effect: deny
+  - action: shell
+    resource: cmake *-P *
+    effect: deny
+  - action: shell
+    resource: cmake -E*
+    effect: deny
+  - action: shell
+    resource: cmake *-E *
+    effect: deny
   - action: shell
     resource: git push*--force*
     effect: deny

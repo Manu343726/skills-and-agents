@@ -16,10 +16,10 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
     resource: cd *
@@ -31,10 +31,16 @@ permissions:
     resource: git status*
     effect: allow
   - action: shell
-    resource: git stash*
+    resource: git stash push*
     effect: allow
   - action: shell
-    resource: git pull*
+    resource: git stash list*
+    effect: allow
+  - action: shell
+    resource: git stash pop*
+    effect: allow
+  - action: shell
+    resource: git pull --rebase*
     effect: allow
   - action: shell
     resource: git rebase --abort*
@@ -44,6 +50,45 @@ permissions:
     effect: allow
   - action: forgejo_*
     resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: "git * | head*"
     effect: allow
   - action: shell
     resource: git push*--force*

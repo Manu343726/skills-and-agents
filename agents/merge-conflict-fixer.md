@@ -19,17 +19,158 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: edit
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
     resource: "*"
     effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: cmake -P*
+    effect: deny
+  - action: shell
+    resource: cmake *-P *
+    effect: deny
+  - action: shell
+    resource: cmake -E*
+    effect: deny
+  - action: shell
+    resource: cmake *-E *
+    effect: deny
+  - action: shell
+    resource: sudo *
+    effect: deny
+  - action: shell
+    resource: sudo
+    effect: deny
+  - action: shell
+    resource: env *
+    effect: deny
+  - action: shell
+    resource: sh *
+    effect: deny
+  - action: shell
+    resource: bash *
+    effect: deny
+  - action: shell
+    resource: dash *
+    effect: deny
+  - action: shell
+    resource: zsh *
+    effect: deny
+  - action: shell
+    resource: eval *
+    effect: deny
+  - action: shell
+    resource: xargs*
+    effect: deny
+  - action: shell
+    resource: nohup*
+    effect: deny
+  - action: shell
+    resource: watch*
+    effect: deny
+  - action: shell
+    resource: parallel*
+    effect: deny
+  - action: shell
+    resource: nice *
+    effect: deny
+  - action: shell
+    resource: time *
+    effect: deny
+  - action: shell
+    resource: python -c*
+    effect: deny
+  - action: shell
+    resource: python3 -c*
+    effect: deny
+  - action: shell
+    resource: node -e*
+    effect: deny
+  - action: shell
+    resource: node --eval*
+    effect: deny
+  - action: shell
+    resource: perl -e*
+    effect: deny
+  - action: shell
+    resource: ruby -e*
+    effect: deny
+  - action: shell
+    resource: find *-exec*
+    effect: deny
+  - action: shell
+    resource: tar *--to-command*
+    effect: deny
+  - action: shell
+    resource: awk *system(*
+    effect: deny
+  - action: shell
+    resource: git commit*--amend*
+    effect: deny
+  - action: shell
+    resource: git -C * commit*--amend*
+    effect: deny
   - action: shell
     resource: git push*--force*
     effect: deny
@@ -53,12 +194,6 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny
-  - action: shell
-    resource: git commit*--amend*
-    effect: deny
-  - action: shell
-    resource: git -C * commit*--amend*
     effect: deny
 
 ---

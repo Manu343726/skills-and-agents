@@ -16,10 +16,10 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
     resource: git fetch*
@@ -46,10 +46,19 @@ permissions:
     resource: git log*
     effect: allow
   - action: shell
-    resource: cmake*
+    resource: cmake --preset*
     effect: allow
   - action: shell
-    resource: ctest*
+    resource: cmake --build*
+    effect: allow
+  - action: shell
+    resource: cmake --list-presets*
+    effect: allow
+  - action: shell
+    resource: ctest --preset*
+    effect: allow
+  - action: shell
+    resource: ctest --version*
     effect: allow
   - action: shell
     resource: go build*
@@ -67,19 +76,28 @@ permissions:
     resource: npm test*
     effect: allow
   - action: shell
-    resource: npm run *
+    resource: npm run build*
     effect: allow
   - action: shell
-    resource: make *
+    resource: make test*
     effect: allow
   - action: shell
-    resource: curl*
+    resource: curl -sS -X POST*
     effect: allow
   - action: shell
-    resource: timeout*
+    resource: curl -sS -o /dev/null*
     effect: allow
   - action: shell
-    resource: docker *
+    resource: timeout 5 curl*
+    effect: allow
+  - action: shell
+    resource: timeout 6 mosquitto_sub*
+    effect: allow
+  - action: shell
+    resource: docker compose logs*
+    effect: allow
+  - action: shell
+    resource: docker logs*
     effect: allow
   - action: shell
     resource: journalctl*
@@ -98,6 +116,99 @@ permissions:
     effect: allow
   - action: forgejo_*
     resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: cmake -P*
+    effect: deny
+  - action: shell
+    resource: cmake *-P *
+    effect: deny
+  - action: shell
+    resource: cmake -E*
+    effect: deny
+  - action: shell
+    resource: cmake *-E *
+    effect: deny
+  - action: shell
+    resource: make -f*
+    effect: deny
+  - action: shell
+    resource: make *-f *
+    effect: deny
+  - action: shell
+    resource: make *--eval*
+    effect: deny
+  - action: shell
+    resource: "timeout 5 curl * | head*"
+    effect: allow
+  - action: shell
+    resource: "git * | head*"
+    effect: allow
+  - action: shell
+    resource: "git * | tail*"
+    effect: allow
+  - action: shell
+    resource: "ctest --preset* | tail*"
+    effect: allow
+  - action: shell
+    resource: "go test* | tail*"
+    effect: allow
+  - action: shell
+    resource: "docker compose logs* | tail*"
     effect: allow
   - action: shell
     resource: git push*--force*

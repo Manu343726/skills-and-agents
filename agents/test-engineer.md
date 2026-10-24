@@ -34,22 +34,28 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: edit
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
-    resource: ctest*
+    resource: ctest
     effect: allow
   - action: shell
-    resource: cmake*
+    resource: ctest --preset*
     effect: allow
   - action: shell
-    resource: go *
+    resource: ctest --version*
+    effect: allow
+  - action: shell
+    resource: go test*
+    effect: allow
+  - action: shell
+    resource: go tool cover*
     effect: allow
   - action: shell
     resource: gofmt*
@@ -58,13 +64,10 @@ permissions:
     resource: gcovr*
     effect: allow
   - action: shell
-    resource: npm *
+    resource: npm test*
     effect: allow
   - action: shell
     resource: clang++*
-    effect: allow
-  - action: shell
-    resource: make *
     effect: allow
   - action: shell
     resource: git switch*
@@ -98,6 +101,69 @@ permissions:
     effect: allow
   - action: forgejo_*
     resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: gcovr*--gcov-executable*
+    effect: deny
+  - action: shell
+    resource: "go test* | tail*"
+    effect: allow
+  - action: shell
+    resource: "ctest* | tail*"
     effect: allow
   - action: shell
     resource: git push*--force*

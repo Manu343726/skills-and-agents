@@ -16,10 +16,10 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: read
-    resource: $HOME/.local/share/opencode/worktree/*
+    resource: "$HOME/.local/share/opencode/worktree/*"
     effect: allow
   - action: shell
     resource: git diff*
@@ -34,10 +34,10 @@ permissions:
     resource: git show*
     effect: allow
   - action: shell
-    resource: make *
+    resource: make test*
     effect: allow
   - action: shell
-    resource: ctest*
+    resource: ctest --preset*
     effect: allow
   - action: shell
     resource: cmake --build*
@@ -52,7 +52,79 @@ permissions:
     resource: npm test*
     effect: allow
   - action: shell
-    resource: npm run *
+    resource: npm run build*
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: make -f*
+    effect: deny
+  - action: shell
+    resource: make *-f *
+    effect: deny
+  - action: shell
+    resource: make *--eval*
+    effect: deny
+  - action: shell
+    resource: "git * | grep*"
+    effect: allow
+  - action: shell
+    resource: "git * | head*"
+    effect: allow
+  - action: shell
+    resource: "git * | tail*"
     effect: allow
   - action: shell
     resource: git push*--force*
