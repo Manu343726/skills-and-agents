@@ -89,7 +89,10 @@ Every brief names the library the workstream must use for each concern it touche
 the concern does not apply — read from the stack's quality skill, never from the agent's taste. An
 agent that finds itself writing a protocol, a parser, a CLI or a configuration resolver by hand
 stops and reports instead of finishing it; the brief's missing library is the orchestrator's defect,
-and the next brief names it.
+and the next brief names it. Domain code is exempt: the Z80 decoder, the assembler and
+disassembler, the netlist kernel, the ULA and PSG models are the product, and no library supplies
+them. A brief that asks a workstream to reuse a library for any of them is itself the defect — say
+so, and do not pass it on.
 
 ## Delivery, merge, review
 
