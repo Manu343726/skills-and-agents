@@ -85,8 +85,8 @@ evidence, what was measured, what changed, and how to get back. A document says 
 | `backlog` | `todo` | accepted, not started |
 | `todo` | `in-progress` | **before the first command of the work** |
 | `in-progress` | `blocked` | stopped; the body says what blocks it and who |
-| `in-progress` | `todo` | handed back unfinished |
-| `in-progress` | `done` | merged, evidenced |
+| `in-progress` | `todo` | handed back unfinished, or the pull request sent back with `REQUEST_CHANGES` |
+| `in-progress` | `done` | the pull request merged by the orchestrator, on an `APPROVED` verifier review for the base sha that was merged |
 | any | `backlog` | turns out not to be actionable yet |
 
 `in-progress` left behind by an agent that stopped is the one always-wrong state: it claims
@@ -94,9 +94,11 @@ somebody is on it when nobody is. Moving it is part of stopping, not optional bo
 
 ## Closing
 
-- Close only with evidence in a comment: the commit SHA, the command and its output, the PR, the
-  document revision.
-- Never close on a subagent's word. Re-measure, then write the comment.
+- Close only with evidence in a comment: the pull request number, the `verifier`'s `APPROVED`
+  review for the base sha that was merged, the merged sha, the command and its output, the document
+  revision.
+- Never close on a subagent's word. A comment carries the PR, the branch and the commit shas, the
+  measurement and what was not done; re-measure, then write it.
 - `Closing is not deleting`: a closed issue that turns out to be wrong is reopened or superseded
   with a link, never removed.
 - A finding that does not belong to the issue in hand gets **its own issue**, in the state it
