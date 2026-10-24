@@ -3,6 +3,9 @@ description: Read-only threat review across the project's process and language b
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
   - action: shell
     resource: nm *
     effect: allow
@@ -24,9 +27,6 @@ permissions:
   - action: shell
     resource: ldd *
     effect: allow
-  - action: "*"
-    resource: "*"
-    effect: deny
   - action: read
     resource: "*"
     effect: allow
@@ -116,7 +116,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git *
-    effect: allow---
+    effect: allow
+---
 # Security reviewer
 
 ## What you own

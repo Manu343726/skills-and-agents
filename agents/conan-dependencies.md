@@ -7,16 +7,16 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: **/conanfile.py
+    resource: "**/conanfile.py"
     effect: allow
   - action: edit
-    resource: **/conanfile.txt
+    resource: "**/conanfile.txt"
     effect: allow
   - action: edit
-    resource: **/profiles/**
+    resource: "**/profiles/**"
     effect: allow
   - action: edit
-    resource: **/locks/**
+    resource: "**/locks/**"
     effect: allow
   - action: read
     resource: "*"
@@ -164,7 +164,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny---
+    effect: deny
+---
 # Conan dependencies
 
 ## What you own

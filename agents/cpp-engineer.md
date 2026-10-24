@@ -1,5 +1,5 @@
 ---
-description: Implements C++: the sources, their build description and their unit tests, in whatever layout the project uses.
+description: "Implements C++: the sources, their build description and their unit tests, in whatever layout the project uses."
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -7,40 +7,40 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: **/*.cpp
+    resource: "**/*.cpp"
     effect: allow
   - action: edit
-    resource: **/*.cc
+    resource: "**/*.cc"
     effect: allow
   - action: edit
-    resource: **/*.cxx
+    resource: "**/*.cxx"
     effect: allow
   - action: edit
-    resource: **/*.hpp
+    resource: "**/*.hpp"
     effect: allow
   - action: edit
-    resource: **/*.h
+    resource: "**/*.h"
     effect: allow
   - action: edit
-    resource: **/*.c
+    resource: "**/*.c"
     effect: allow
   - action: edit
-    resource: **/CMakeLists.txt
+    resource: "**/CMakeLists.txt"
     effect: allow
   - action: edit
-    resource: **/*.cmake
+    resource: "**/*.cmake"
     effect: allow
   - action: edit
-    resource: **/CMakePresets.json
+    resource: "**/CMakePresets.json"
     effect: allow
   - action: edit
-    resource: **/Makefile
+    resource: "**/Makefile"
     effect: allow
   - action: edit
-    resource: **/meson.build
+    resource: "**/meson.build"
     effect: allow
   - action: edit
-    resource: **/tests/**
+    resource: "**/tests/**"
     effect: allow
   - action: read
     resource: "*"
@@ -218,7 +218,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny---
+    effect: deny
+---
 # C++ engineer
 
 ## What you own

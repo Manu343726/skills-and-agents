@@ -3,6 +3,9 @@ description: Final pass over the merged tree — reads the merge result, runs th
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
   - action: shell
     resource: nm *
     effect: allow
@@ -24,9 +27,6 @@ permissions:
   - action: shell
     resource: ldd *
     effect: allow
-  - action: "*"
-    resource: "*"
-    effect: deny
   - action: read
     resource: "*"
     effect: allow
@@ -158,7 +158,8 @@ permissions:
     effect: allow
   - action: shell
     resource: make *
-    effect: allow---
+    effect: allow
+---
 # Reviewer
 
 ## What you own

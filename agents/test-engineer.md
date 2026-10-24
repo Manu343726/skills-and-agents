@@ -7,22 +7,22 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: **/tests/**
+    resource: "**/tests/**"
     effect: allow
   - action: edit
-    resource: **/test/**
+    resource: "**/test/**"
     effect: allow
   - action: edit
-    resource: **/*_test.go
+    resource: "**/*_test.go"
     effect: allow
   - action: edit
-    resource: **/*.test.ts
+    resource: "**/*.test.ts"
     effect: allow
   - action: edit
-    resource: **/*.test.tsx
+    resource: "**/*.test.tsx"
     effect: allow
   - action: edit
-    resource: **/testdata/**
+    resource: "**/testdata/**"
     effect: allow
   - action: read
     resource: "*"
@@ -176,7 +176,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny---
+    effect: deny
+---
 # Test engineer
 
 ## What you own
