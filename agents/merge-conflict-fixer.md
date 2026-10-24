@@ -19,13 +19,13 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: "*"
@@ -195,7 +195,9 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny
-
+  - action: shell
+    resource: git *
+    effect: allow
 ---
 
 # Merge conflict fixer
@@ -207,9 +209,9 @@ needs, a conflict the platform will not resolve, or an outage of the Forgejo API
 says which, in one line, before anything else. A merge `merger` could have performed is not yours
 to take.
 
-The orchestrator hands you one branch — `work/<name>` — and the `main` it has to land on. The
+The orchestrator hands you one branch — `dev/<id>` — and the `main` it has to land on. The
 branch lives in its own worktree: work in the one the orchestrator created, or, if it did not,
-`git worktree add <dir> work/<name>` and report the path. Your deliverable is a merged tree a
+`git worktree add <dir> dev/<id>` and report the path. Your deliverable is a merged tree a
 stranger can rebuild, and a report that names every command you ran and what it printed.
 
 Pushing `main` belongs to the exception too: only in it, and only with the reason stated.
@@ -237,7 +239,7 @@ git fetch origin
 git switch main
 git merge --ff-only origin/main        # main is trunk: it fast-forwards, or the state is not yours
 git log --oneline -1                   # the base you are about to rebase onto
-git switch work/<name>
+git switch dev/<id>
 git rebase main
 ```
 
@@ -257,7 +259,7 @@ Then land it, linearly — no merge commit, no `main` merged into the branch:
 
 ```sh
 git switch main
-git merge --ff-only work/<name>
+git merge --ff-only dev/<id>
 git log --oneline -1                   # the merged tree's sha, which your report carries
 ```
 
@@ -294,17 +296,17 @@ finding: name it and unstage nothing by hand — report it.
 ## Report
 
 ```markdown
-## Merge: work/<name> → main
+## Merge: dev/<id> → main
 
 - Base: `main` @ <sha>, fast-forwarded from `origin/main` @ <sha>
 - Rebased: 3 commits, <first-sha>..<last-sha>
-- Conflicts: 1 — `engine/src/cpu.cpp:214`. Both sides changed the DDCB handler; kept the branch's
+- Conflicts: 1 — `src/decoder.cpp:214`. Both sides changed the same handler; kept the branch's
   destination write and `main`'s new `result` parameter. No hunk dropped, no test removed.
 - Merged tree: <sha>
 - Push: `git push origin main` → <output>
 
 ## Ran on the merged tree
-- `make test` → `ctest --preset conan-release` 418/418; `go test ./... -race` ok; `npm test -- --run`
+- the project's test command → 418/418; `go test ./... -race` ok; `npm test -- --run` ok
   71 passed; exit 0
 - `git status --short` → empty
 

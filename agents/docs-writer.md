@@ -25,43 +25,19 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: grep *
     effect: allow
   - action: shell
-    resource: git switch*
-    effect: allow
-  - action: shell
-    resource: git add *
-    effect: allow
-  - action: shell
-    resource: git commit*
-    effect: allow
-  - action: shell
-    resource: git push*
-    effect: allow
-  - action: shell
-    resource: git log*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git diff*
-    effect: allow
-  - action: shell
-    resource: git show*
-    effect: allow
-  - action: shell
-    resource: git branch*
+    resource: git *
     effect: allow
   - action: execute
     resource: "*"
@@ -138,7 +114,6 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny
-
 ---
 
 # Docs writer
@@ -202,9 +177,9 @@ That makes `ticket-manager` your counterpart, and the coordination is explicit:
 
 ## Where you work
 
-You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
+You work in the worktree your brief names, on branch `dev/<id>`, and nowhere else. Commit
 there, one page or one ADR per commit, English, with the evidence already in it. Deliver the
-commits, the branch pushed with `git push -u origin work/<name>`, and an open pull request to
+commits, the branch pushed with `git push -u origin dev/<id>`, and an open pull request to
 `main` opened with `create_pull_request` — body with the issues it serves, the measurements and
 the rollback. Never merge, never push `main`.
 
@@ -213,7 +188,7 @@ the rollback. Never merge, never push `main`.
 ```
 docs/architecture.md          the shape of the system and why
 docs/adr/NNNN-<slug>.md       one decision per file, never edited after acceptance
-docs/api/<stack>.md           REST, Connect, MQTT and SSE references
+docs/api/<stack>.md           the programmatic interfaces of each stack
 docs/runbooks/<task>.md       repeatable operational procedures
 ```
 
@@ -223,7 +198,7 @@ at the top. Nothing is deleted.
 ## ADR template
 
 ```markdown
-# ADR-0007: The engine speaks Connect unary, not gRPC
+# ADR-0007: The service speaks unary RPC, not a streaming variant
 
 - Status: accepted
 - Date: 2026-10-24
@@ -245,8 +220,8 @@ What becomes easy, what becomes hard, what must be revisited and when.
 - **Evidence beside the claim.** A number carries how it was obtained: `measured with
   `go test ./... -coverprofile` → 81.2 % on 2026-10-24`, not "good coverage". A version carries
   `conan list 'cmake/*'` or the `go.mod` line. A behaviour carries the test that asserts it.
-- **Every entity and file a link.** `engine/` → `[`engine/`](../engine)`, the board →
-  `https://git.manu343726.com/manu343726/z80-emulator/issues`, a service → its URL or its
+- **Every entity and file a link.** A directory → its path in the repository, the board → its URL,
+  a service → its endpoint or its document, a component → the page that documents it, and never a
   document. A bare path is a defect.
 - **Code that is quoted is real.** Open the file and copy the lines; do not paraphrase an API.
 - **`docs/` describes the repository, not the machine.** Host paths and local tools belong in a
@@ -258,7 +233,7 @@ What becomes easy, what becomes hard, what must be revisited and when.
 
 Required sections, in order: what the project is (one paragraph), the directory table, how to
 build and test (the four stack commands), how to run it, where the documentation lives, licence.
-A reader with no context must reach a running emulator from it.
+A reader with no context must reach a running system from it.
 
 ## Before reporting
 

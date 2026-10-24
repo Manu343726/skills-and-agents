@@ -1,110 +1,81 @@
 ---
 name: forgejo-ticketing
-description: The Forgejo board for manu343726/z80-emulator — label taxonomy, the issue body template, the status lifecycle the kanban reads, and comment-don't-duplicate.
+description: How a board carries a project's state — one issue per event, the label taxonomy the kanban reads, an issue body that keeps the finding and its evidence, status transitions that match what is actually happening, and comments instead of twins.
 ---
 
-# Forgejo ticketing
+# Ticketing on Forgejo
 
-Board: <https://git.manu343726.com/manu343726/z80-emulator/issues>. The **open** issues are the
-project's pending state; the kanban columns are derived from the `status/*` labels. Reach it with
-the `forgejo` MCP server, repo `manu343726/z80-emulator`.
+The board is not paperwork. **The open issues are the project's pending state**, and the closed ones
+are its history: whatever is not written there does not exist for the next session.
 
-## Read first
+## One issue per event
 
-```
-forgejo list_issues(state: "open")
-forgejo search_issues(q: "<the subject>")
-forgejo list_labels()
-```
+An incident, a feature, an improvement, a change, a removal, a security exposure, a proposal nobody
+has built yet. One issue each, filed **in the same change that produces it**, not remembered for
+later.
 
-If an issue already carries the subject, **comment there** and move its status. A twin splits the
-evidence across two threads and is deleted by the next person.
+- **The title is the event**, in the present tense and specific enough to recognise: `the loader
+  accepts a banked container it cannot boot`, not `loader bug`.
+- **Something found and not fixed gets its own issue**, with the evidence. Burying it in the body of
+  the issue in hand is how it is lost.
 
 ## Labels
 
-| Namespace | Values | Meaning |
+Four families, and an issue carries one of each:
+
+| Family | Values | Reads as |
 |---|---|---|
-| `type/*` | `feature` `improvement` `bug` `incident` `change` `removal` `security` | what kind of event |
-| `priority/*` | `critical` `high` `medium` `low` | how soon |
-| `status/*` | `backlog` `todo` `in-progress` `blocked` `done` | where it is (the kanban) |
-| `area/*` | `engine` `proto` `backend` `web` `toolchain` `roms` `docs` `build` | what it touches |
+| `type/*` | `incident`, `feature`, `improvement`, `change`, `removal`, `security`, `docs`, `test` | what kind of event this is |
+| `priority/*` | `high`, `medium`, `low` | needed next, should happen, eventually |
+| `status/*` | `backlog`, `todo`, `in-progress`, `blocked`, `done` | where it is — the kanban column |
+| `area/*` | one per stack or concern the project actually has | what it touches |
 
-Exactly one `type/*`, one `priority/*`, one `status/*`; one or more `area/*` for what the change
-actually touches (a `proto` change also carries `backend` and `engine`).
+The label set is the project's, in its own taxonomy; a label that exists but nobody reads is noise.
+Add one by convention, not per issue.
 
-## Body template
+## The body
 
-```markdown
-## What
-The event or the proposal, one paragraph, present tense.
+Ordered, so a reader can stop early:
 
-## Evidence
-- `$ go test ./... -race` → `FAIL backend/internal/stream (0.42s)` (2026-10-24 06:12)
-- `backend/internal/stream/sse.go:88` — `time.After` inside the heartbeat loop
+1. **What happened / what is wanted**, in one paragraph.
+2. **The measurement** — the command, the output, the file and line, the version, the date. For a
+   defect, the reproduction; for a feature, the requirement it serves.
+3. **Why it matters** — the consequence, not the sentiment.
+4. **The fix or the shape** — what would make it right, and the alternatives if there are two.
+5. **Acceptance** — the checks that would prove it done, each measurable.
+6. **Rollback** — how this is undone: a revert, a restore, a documented step.
 
-## Expected
-The smallest statement of the correct behaviour, with the test that will assert it.
+An issue whose acceptance cannot be checked is a wish.
 
-## Scope
-- In: `backend/internal/stream/**`
-- Out: `api/openapi.yaml`, `web/**`
+## Status is a promise
 
-## Rollback
-`git revert <sha>`, or the manual step that undoes it.
-
-## Definition of done
-- [ ] `TestSSE_Heartbeat` exists and passes
-- [ ] `docs/api/sse.md` states the heartbeat interval
-```
-
-An incident replaces `What` with `Impact`, `Cause` and `Fix`, and carries the timestamps in the
-body. The title names the event, not its date — an issue filed at the moment it happened is dated by
-its creation; only a write-up after the fact puts the date in the title.
-
-## Tickets are documentation
-
-An issue is the half of the record that says what *happened*: the ask, the finding with its
-evidence, what was measured, what changed, and how to get back. A document says what the system
-*is*. A change that alters behaviour needs both, and neither replaces the other.
-
-- **The document cites the issue**, and the issue names the document it invalidated. A closing
-  comment that says "documented" without the path is not a record.
-- **Evidence lives in the issue first** — the command, its output, the `path:line`, the timestamp —
-  and the document quotes it. A number that exists only in a page cannot be re-measured.
-- **The project declares where its documentation lives** (`AGENTS.md`, else `README.md`): `docs/`
-  by default, or an external system with its own tool. A link in an issue follows that declaration;
-  a repository path is never invented for a page that lives elsewhere.
-- **Who does what**: `docs-writer` owns the pages, `ticket-manager` owns the issues. Neither edits
-  the other's half, and each is the check on the other's drift.
-
-## Lifecycle
-
-| From | To | When |
+| State | Means | When you move it |
 |---|---|---|
-| — | `backlog` | a proposal nobody has picked up |
-| `backlog` | `todo` | accepted, not started |
-| `todo` | `in-progress` | **before the first command of the work** |
-| `in-progress` | `blocked` | stopped; the body says what blocks it and who |
-| `in-progress` | `todo` | handed back unfinished, or the pull request sent back with `REQUEST_CHANGES` |
-| `in-progress` | `done` | the pull request merged by the orchestrator, on an `APPROVED` verifier review for the base sha that was merged |
-| any | `backlog` | turns out not to be actionable yet |
+| `backlog` | proposed, not built, not scheduled | when it is filed as a proposal |
+| `todo` | actionable, not started | when it is agreed and queued |
+| `in-progress` | **someone is on it right now** | **before the first command** of the work |
+| `blocked` | stuck, and the body says what by | when it stops being actionable, with the reason |
+| `done` | finished, and the evidence is in the issue | with the closing comment |
 
-`in-progress` left behind by an agent that stopped is the one always-wrong state: it claims
-somebody is on it when nobody is. Moving it is part of stopping, not optional bookkeeping.
+- **Never leave an issue in progress when you stop.** Take it out in the same breath: done, blocked,
+  or back to todo. An issue in progress by an agent that stopped is worse than one never started —
+  it says someone is on it when nobody is.
+- **The label is the lifecycle**, and it is a lie the moment it drifts from what you are doing.
 
-## Closing
+## Comments, not twins
 
-- Close only with evidence in a comment: the pull request number, the `verifier`'s `APPROVED`
-  review for the base sha that was merged, the merged sha, the command and its output, the document
-  revision.
-- Never close on a subagent's word. A comment carries the PR, the branch and the commit shas, the
-  measurement and what was not done; re-measure, then write it.
-- `Closing is not deleting`: a closed issue that turns out to be wrong is reopened or superseded
-  with a link, never removed.
-- A finding that does not belong to the issue in hand gets **its own issue**, in the state it
-  belongs to (`backlog` for a proposal, `todo` for something found and queued).
+- **Something new about an existing issue is a comment** on it, with the evidence, and a status move
+  if the situation changed. Filing a second issue for the same event fragments the record.
+- **A closing comment carries the proof**: the commit, the merged sha, the command and its output,
+  what was deliberately left out, and the issue that carries what remains.
+- **Closing is never deleting.** A decision reversed later is a new issue that links the old one.
 
-## Kanban
+## Working the board as an agent
 
-Columns follow `status/*`: Backlog, Todo, In progress, Blocked, Done. Moving a card and relabelling
-the issue are the same action; the board is not a second source of truth.
+1. Read the open issues **before** proposing or changing anything: `backlog` is what is proposed,
+   `todo`/`in-progress` is what is in flight, `blocked` says what is stuck.
+2. Move the issue in hand to `in-progress` before the first command.
+3. When the work stops — whatever the reason — set the state that is true, and write the comment that
+   explains it.
+4. If the board does not answer, say so before doing anything else: without the board there is no
+   issue, and without an issue the work has no record.

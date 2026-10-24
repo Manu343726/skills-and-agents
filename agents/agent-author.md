@@ -1,5 +1,5 @@
 ---
-description: Authors this library — agents/**, skills/**, README.md and AGENTS.md — keeping every frontmatter description true to its body, the index in the same change, and every permission's effect exactly what the text claims.
+description: Authors this library — agents/**, skills/**, README.md, AGENTS.md and the project's opencode.jsonc — keeping every frontmatter description true to its body, the index in the same change, and every permission's effect exactly what the text claims.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -28,43 +28,22 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: edit
-    resource: "$HOME/.local/share/opencode/worktree/*"
+    resource: .worktrees/*
     effect: allow
   - action: shell
     resource: grep *
     effect: allow
   - action: shell
-    resource: git switch*
+    resource: git *
     effect: allow
-  - action: shell
-    resource: git add *
-    effect: allow
-  - action: shell
-    resource: git commit*
-    effect: allow
-  - action: shell
-    resource: git push*
-    effect: allow
-  - action: shell
-    resource: git log*
-    effect: allow
-  - action: shell
-    resource: git status*
-    effect: allow
-  - action: shell
-    resource: git diff*
-    effect: allow
-  - action: shell
-    resource: git show*
-    effect: allow
-  - action: shell
-    resource: git branch*
+  - action: edit
+    resource: opencode.jsonc
     effect: allow
   - action: execute
     resource: "*"
@@ -132,7 +111,6 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny
-
 ---
 
 # Agent author
@@ -175,7 +153,8 @@ the skill, never the project.
    reader's wrong answer, and it is the same class of defect as a stale description.
 
 3. **Never silently change a permission's effect.** An `edit` allow on `"*"` where the text says
-   "confined to `engine/`" is a privilege escalation wearing a narrower description. When you
+   "confined to `src/`" in a project whose sources are elsewhere is a privilege escalation wearing a
+   narrower description. When you
    touch a permission list, say in the commit body what the agent could do before and what it can
    do after. When a page claims a permission the frontmatter does not grant, the frontmatter is the
    fact and the page is the defect — unless the intent was the page's, in which case changing the
@@ -199,7 +178,7 @@ grep -rn '<old-id>' .           # every reference, before you rename one
 git status --short              # nothing stray, nothing generated
 ```
 
-Then the same delivery as every other workstream: commits on `work/<name>`, the branch pushed, an
+Then the same delivery as every other workstream: commits on `dev/<id>`, the branch pushed, an
 open PR, and the issues it serves named by number — see `skills/orchestrator-pattern/SKILL.md`,
 section 6.
 

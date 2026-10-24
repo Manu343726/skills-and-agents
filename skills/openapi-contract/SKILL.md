@@ -1,136 +1,77 @@
 ---
 name: openapi-contract
-description: OpenAPI-first REST for the Go backend — api/openapi.yaml as the only source of routes and types, the oapi-codegen invocation, request validation, the error envelope, versioning, pagination and the SSE endpoint.
+description: OpenAPI-first REST — the document is the only source of routes and types, the server and client are generated from it in the same change, request validation and a single error envelope, versioning that does not break a deployed client, pagination, and streaming that a browser can consume.
 ---
 
-# OpenAPI contract
+# OpenAPI-first REST
 
-`api/openapi.yaml` is the source of truth for the REST surface. Handlers are generated from it;
-a hand-written type that mirrors a generated one is a defect.
+## The document is the contract
 
-## The document
+- **`api/openapi.yaml` is the only source of routes, parameters and types.** A handler that accepts a
+  field the document does not declare is a second contract, and it will drift.
+- **A hand-written type that mirrors a generated one is a defect**, in either language. Regenerate;
+  never patch the generated file.
+- **One change, both sides**: the document, the generated server interfaces, the generated client,
+  and the code that uses them. A contract change that lands half-way is an outage waiting for a
+  deploy order.
 
-```yaml
-openapi: 3.1.0
-info: { title: z80-emulator backend, version: 1.0.0 }
-servers: [{ url: http://localhost:8081 }]
-paths:
-  /sessions:
-    post:
-      operationId: createSession
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CreateSessionRequest' }
-      responses:
-        '201': { description: created, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
-        '400': { $ref: '#/components/responses/BadRequest' }
-  /sessions/{id}/events:
-    get:
-      operationId: streamSession
-      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { '200': { description: SSE stream, content: { text/event-stream: { schema: { type: string } } } } }
-```
-
-Rules:
-
-- **3.1**, not 3.0. `operationId` on every operation — it names the generated Go method and is
-  the stable handle in review.
-- Every request and response is a `$ref` to `components/schemas`; no anonymous inline object.
-- Every operation declares its `4xx`/`5xx` responses, at least via the shared
-  `components/responses` entries.
-- `additionalProperties: false` on request bodies: an unknown field is a 400, not silently ignored.
-- Types are precise: `format: int64` for T-states, `format: uuid` for ids, `enum` for a closed set,
-  `nullable`/`type: [string, "null"]` for an optional field.
-
-## Code generation
+## Generating
 
 ```sh
-oapi-codegen -config cfg.yaml api/openapi.yaml
+# server: types and handlers from the document
+oapi-codegen -config <project's config> api/openapi.yaml
+
+# client: the same document, the frontend's language
+npm run gen:api      # or the project's generator script
 ```
 
-`cfg.yaml`:
+- **The generator version is pinned** and its invocation is in the repository, so a clone reproduces
+  the output byte for byte.
+- **Generated files are not hand-edited and not reviewed line by line.** The document and the config
+  are what is reviewed.
 
-```yaml
-package: api
-generate:
-  chi-server: false
-  std-http-server: true
-  models: true
-  client: true
-output: backend/internal/api/generated.go
-```
+## Shape
 
-- Commit the generated file **and** the config, in the same change as the document.
-- Never edit `generated.go`. Regenerate: `go generate ./...` or the `make api` target.
-- A new module only when `cfg.yaml` needs it; `oapi-codegen` is pinned in `go.mod`.
-
-## Validation
-
-- Request bodies decode with `http.MaxBytesReader` (1 MiB) and `DisallowUnknownFields`.
-- The generated types are validated by a `Validate()` per request, called by the handler wrapper —
-  required fields, ranges, enum membership. A missing `name` is a 400 with
-  `{"error":{"code":"invalid_request","message":"name is required"}}`, not a nil dereference.
-- Path parameters are parsed, not trusted: an id that is not a UUID is a 404 (or 400, but choose
-  one and document it in the operation).
-
-## Error envelope
-
-Every non-2xx body is exactly:
-
-```json
-{"error": {"code": "invalid_request", "message": "human sentence", "details": [{"field": "name"}]}}
-```
-
-`code` is a stable machine string (`invalid_request`, `not_found`, `conflict`, `unavailable`,
-`internal`). `message` never carries internal error text; `details` is optional and
-structurally typed. 500 means a bug and is logged with the request id.
+- **Resources in the path, verbs in the method.** `/machines/{id}/roms`, not `/loadRom`.
+- **One error envelope**, the same for every failure, with a stable machine-readable code and a human
+  message: `{ "code": "not_found", "message": "…", "details": […] }`.
+- **Status codes are the protocol**: `201` with `Location` for creation, `204` for a delete, `409` for
+  a state conflict, `422` for a body that parsed but cannot be honoured, `400` only for a malformed
+  request.
+- **Validation happens at the edge**, generated from the schema where possible; the handler receives
+  something already valid, and does not repeat the checks.
+- **Enums are additive.** A client that does not know a new value must not crash on it — say so in
+  the document, and mean it.
 
 ## Versioning
 
-- The URL carries no version while the project is pre-1.0; `info.version` documents the shape.
-- A breaking change bumps `info.version` and lands with the client regenerated in the same change.
-  A field is removed only after a release that stopped returning it.
-- A deprecated operation carries `deprecated: true` and a `sunset` header on its responses.
+- **Additive by default**: a new optional field, a new endpoint, a new enum value. It is not a break.
+- **A removal or a rename is a version**, and the old one keeps working until its consumers have
+  moved. A `400` for a field the document still declares is a contract bug, not a validation win.
+- **Deprecation is announced in the document** (`deprecated: true`), with the replacement named.
 
-## Pagination
+## Lists and long responses
 
-Collection endpoints take `limit` (default 20, max 100) and `cursor` (opaque base64 of the last
-id), and return `{"items": [...], "next_cursor": "..." | null}`. Offset pagination is not used —
-it skips rows when the collection changes under the reader.
+- **Cursor pagination** for anything that can grow: `limit`, `cursor`, and a response that carries
+  `nextCursor` — a page number over a mutating collection loses rows silently.
+- **A default page size and a maximum**, both in the document, because the client will assume them.
+- **`ETag`/`If-None-Match`** where a client polls a representation that rarely changes.
 
-## The SSE endpoint
+## Streaming
 
-`GET /sessions/{id}/events` is the one non-JSON response:
+- **Server-sent events for one-way streams** (a state, a frame, an event), chunked binary for bulk
+  bytes. Both are HTTP/1.1, and both need the document to describe them: the event type, the payload,
+  the reconnect behaviour.
+- **Backpressure is designed, not discovered**: a slow consumer drops a frame or falls behind and is
+  told, rather than growing a buffer until the process dies.
+- **The document says what happens on reconnect** — resume from a cursor, or start again — because the
+  client has to implement one of them.
 
-```
-HTTP/1.1 200 OK
-Content-Type: text/event-stream
-Cache-Control: no-cache
-X-Accel-Buffering: no
+## Review checklist
 
-: ping
-
-id: 42
-event: state
-data: {"pc":4133,"frame":42}
-
-```
-
-- One event per machine state, `event: state`; a heartbeat comment (`: ping`) every 15 s.
-- `id` is monotonic per session, so a reconnect can send `Last-Event-ID` and resume.
-- The handler returns when `r.Context().Done()` closes; it never holds an unbounded buffer.
-- Documented in the spec as `text/event-stream`; the generated server interface carries it, the
-  body is written by hand.
-
-## Before reporting
-
-```sh
-oapi-codegen -config cfg.yaml api/openapi.yaml   # regenerates without diff
-git diff --stat api/openapi.yaml backend/internal/api/generated.go
-go build ./... && go test ./... -race -count=1
-```
-
-A document change with no regenerated code, or a generated file edited by hand, is a failing
-change.
+- [ ] Every route and type comes from the document; nothing hand-written mirrors it.
+- [ ] The generated server and client are regenerated in this change, deterministically.
+- [ ] Errors use the one envelope; no handler invents a shape.
+- [ ] The change is additive, or it is a version with its deprecation announced.
+- [ ] Validation is at the edge; the handler trusts its input.
+- [ ] Lists paginate; streams document their backpressure and their reconnect.
