@@ -28,70 +28,87 @@ part of the project.
 
 ## The `.rom` container
 
-All integers little endian except the trailing CRC32.
+Little endian throughout. These offsets are the implementation in
+`toolchain/internal/rom/format.go`, not a sketch: the engine reads them, so they are a
+contract, and `roms/README.md` repeats the table for a human.
 
 ```
-offset  size  field
-0       4     magic "Z80R"
-4       1     version (currently 1)
-5       1     flags   bit0: banked, bit1: host module, bits 2-7 reserved and zero
-6       2     entry point
-8       2     load address (binary and assembly kinds)
-10      1     bank count (0 ⇒ flat 64 KiB image, or a single payload for a host module)
-11      1     reserved, zero
-12      ...   bank table, one 12-byte record per bank, ascending bank index:
-              4 bytes offset into the payload
-              4 bytes length
-              2 bytes bank index
-              2 bytes CRC32 of the bank payload
-...           payload, banks concatenated in index order
-last 4        4  CRC32 (IEEE 802.3, polynomial 0xEDB88320) of every preceding byte,
-                stored big endian
+offset   size  field
+0        4     magic "Z80R"
+4        2     format version, currently 1
+6        2     flags: bit 0 host module, bit 1 checksum present, bits 2-15 reserved (an
+               unknown bit is an error, not something to ignore)
+8        4     load address
+12       4     entry point
+16       4     payload length in bytes
+20       4     bank count N
+24       8*N   bank table: per bank {offset: u32, length: u32}, offsets relative to the
+               payload start
+24+8*N   4     CRC32 (IEEE, polynomial 0xEDB88320) of the payload, when flags bit 1 is
+               set, else 0
+...      0-7   zero padding to the next 8-byte boundary
+...      ...   the payload, banks concatenated in index order
 ```
 
-Rules that make it a contract:
+The bank record is **8 bytes**, not 4: `{offset, length}` is two 32-bit fields, so the
+checksum lands at `24 + 8*N`. A spec that says `24 + 4*N` is arithmetically impossible
+with that record and was the first thing the implementation had to correct.
 
-- `len(payload) >= end of the last bank`, `offset + length <= len(payload)`; a violation is an
-  error, never a panic or a slice out of range.
-- Bank indices are unique and contiguous from 0 when `banked`. Total payload ≤ 64 KiB for a flat
-  image unless `banked`; a bank ≤ 16 KiB.
-- The whole-file CRC32 covers everything before the last four bytes. Verify **before** parsing the
-  bank table.
-- `version` unknown ⇒ error naming the version, never a best-effort parse.
-- `unsafe` is not allowed in `toolchain/internal/rom`.
+Rules, each one an error that names its offset — never a panic, never a slice out of
+range, never a best-effort parse:
+
+- Magic and version are checked first; an unknown version is refused.
+- Reserved flag bits are refused.
+- `offset + length` of every bank fits the payload; a bank is at most 16 KiB; a flat
+  payload is at most 64 KiB; a container declares at most 256 banks.
+- The CRC32 covers the payload only, and it is verified before the bank table is trusted.
+- A truncated file is an error at **every** prefix length — which is what the fuzzer
+  exercises (over a million executions of the decoder in ten seconds is the bar a
+  reader of untrusted ROM files should meet).
 
 ## The host-module ABI
 
-A C++ or Go host module exports exactly these `extern "C"` / `//export` symbols; nothing else is
-resolved:
+A C++ or Go host module exports exactly three `extern "C"` / `//export` symbols, and the
+loader resolves nothing else:
 
 ```c
-uint32_t rom_abi_version(void);          /* must equal 1 */
-const char *rom_name(void);              /* NUL-terminated, owned by the module */
-int  rom_init(const uint8_t *rom, uint32_t len);
-void rom_reset(void);
-void rom_step(uint64_t tstates);          /* called once per instruction boundary */
-uint8_t rom_io_read(uint16_t port);       /* 0 when the module does not decode it */
-void rom_io_write(uint16_t port, uint8_t value);
+uint32_t z80rom_abi_version(void);                  /* must equal 1 */
+void     z80rom_init(void);                         /* called once, before any frame */
+void     z80rom_frame(uint8_t *pixels, int w, int h); /* gray8, row-major, once a frame */
 ```
 
-- No exception may cross the boundary: every entry point is `noexcept` / wrapped in
-  `defer recover()` that aborts the module and records the failure.
-- `rom_abi_version` is checked at load; a mismatch is refused with both versions in the error.
-- Loading a host module is **an explicit opt-in** of the operator. Never load one from a downloaded
-  ROM by default (see `security-reviewer`).
+`roms/examples/z80rom.h` is the header a C++ module includes, so the prototypes exist in
+one place instead of being repeated per example. The container's flags have bit 0 set and
+the payload is a small manifest — ABI version, module file name, entry symbol — that the
+engine turns into a `dlopen`.
+
+**What is not implemented yet, and is filed as its own issue:** nothing on the engine side
+`dlopen`s the module. The toolchain compiles it, reads its dynamic symbol table to verify
+the three exports, and emits the manifest; `roms/README.md` says so in the ABI section. A
+skill that promised the engine half worked would be lying, and the next agent would spend
+an afternoon on it.
 
 ## The build pipeline
 
+These are the commands that run today, with the paths the repository actually has:
+
 ```sh
-romc build roms/pong/pong.asm -o build/roms/pong.rom      # assemble and wrap
-romc build roms/boot/boot.cpp  -o build/roms/boot.rom     # compile the host module, record .so
-romc build roms/hello/hello.bin -o build/roms/hello.rom   # wrap
-romc disasm build/roms/pong.rom > build/roms/pong.asm     # back to source
-romc catalog list --json                                  # the catalog, for the backend
+cd toolchain
+go run ./cmd/romc build ../roms/examples/hello.asm     # assemble and wrap
+go run ./cmd/romc build ../roms/examples/blink.cpp     # compile the host module, record the .so
+go run ./cmd/romc build ../roms/examples/hello.bin     # wrap raw bytes
+go run ./cmd/romc disasm ../roms/build/hello.rom       # back to source, with bytes and T-states
+cd ../roms && go run ../toolchain/cmd/romc catalog verify
 ```
 
-`build/roms/` is build output and is gitignored; `roms/` holds sources and the catalog only.
+The default artefact is `roms/build/<name>.rom`. A host module writes `<name>-host.rom` and
+`<name>-host.so` beside it, because an assembly and a Go example can share a stem and would
+otherwise overwrite each other's container. `roms/build/` is gitignored; `roms/` holds sources and
+the catalog only.
+
+`roms/` is its own small Go module with a `replace` to `../toolchain`, which is what makes
+`cd roms && go run ../toolchain/cmd/romc …` work as written; without it Go answers "cannot find
+main module".
 
 ## Round-trip guarantee (the definition of done)
 
