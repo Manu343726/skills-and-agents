@@ -3,26 +3,26 @@ description: Writes and repairs test suites only — Go _test.go, engine/tests/,
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
   - action: edit
-    resource: "engine/tests/**"
+    resource: engine/tests/**
     effect: allow
   - action: edit
     resource: "**/*_test.go"
     effect: allow
   - action: edit
-    resource: "web/src/**/*.test.tsx"
+    resource: web/src/**/*.test.tsx
     effect: allow
   - action: edit
-    resource: "web/src/**/*.test.ts"
+    resource: web/src/**/*.test.ts
     effect: allow
   - action: edit
-    resource: "web/src/test/**"
+    resource: web/src/test/**
     effect: allow
   - action: edit
-    resource: "toolchain/**/testdata/**"
+    resource: toolchain/**/testdata/**
     effect: allow
   - action: read
     resource: "*"
@@ -33,9 +33,157 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: read
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: edit
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
   - action: shell
+    resource: ctest
+    effect: allow
+  - action: shell
+    resource: ctest --preset*
+    effect: allow
+  - action: shell
+    resource: ctest --version*
+    effect: allow
+  - action: shell
+    resource: go test*
+    effect: allow
+  - action: shell
+    resource: go tool cover*
+    effect: allow
+  - action: shell
+    resource: gofmt*
+    effect: allow
+  - action: shell
+    resource: gcovr*
+    effect: allow
+  - action: shell
+    resource: npm test*
+    effect: allow
+  - action: shell
+    resource: clang++*
+    effect: allow
+  - action: shell
+    resource: git switch*
+    effect: allow
+  - action: shell
+    resource: git add *
+    effect: allow
+  - action: shell
+    resource: git commit*
+    effect: allow
+  - action: shell
+    resource: git push*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git show*
+    effect: allow
+  - action: shell
+    resource: git branch*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: gcovr*--gcov-executable*
+    effect: deny
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Test engineer

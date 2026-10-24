@@ -3,13 +3,7 @@ description: Measures builds, tests, endpoints, logs and MQTT traffic; reports e
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
-    resource: "*"
-    effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
+  - action: "*"
     resource: "*"
     effect: deny
   - action: read
@@ -21,9 +15,202 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: read
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
   - action: shell
+    resource: git fetch*
+    effect: allow
+  - action: shell
+    resource: git rev-parse*
+    effect: allow
+  - action: shell
+    resource: git switch*
+    effect: allow
+  - action: shell
+    resource: git merge*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git show*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: git branch --show-current*
+    effect: allow
+  - action: shell
+    resource: cmake --preset*
+    effect: allow
+  - action: shell
+    resource: cmake --build*
+    effect: allow
+  - action: shell
+    resource: cmake --list-presets*
+    effect: allow
+  - action: shell
+    resource: ctest --preset*
+    effect: allow
+  - action: shell
+    resource: ctest --version*
+    effect: allow
+  - action: shell
+    resource: go build*
+    effect: allow
+  - action: shell
+    resource: go test*
+    effect: allow
+  - action: shell
+    resource: go vet*
+    effect: allow
+  - action: shell
+    resource: npm ci*
+    effect: allow
+  - action: shell
+    resource: npm test*
+    effect: allow
+  - action: shell
+    resource: npm run build*
+    effect: allow
+  - action: shell
+    resource: make test*
+    effect: allow
+  - action: shell
+    resource: curl -sS -X POST*
+    effect: allow
+  - action: shell
+    resource: curl -sS -o /dev/null*
+    effect: allow
+  - action: shell
+    resource: curl -sSN --max-time*
+    effect: allow
+  - action: shell
+    resource: docker compose logs*
+    effect: allow
+  - action: shell
+    resource: docker logs*
+    effect: allow
+  - action: shell
+    resource: journalctl*
+    effect: allow
+  - action: shell
+    resource: mosquitto_sub*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-and-test*
+    effect: deny
+  - action: shell
+    resource: ctest*--build-command*
+    effect: deny
+  - action: shell
+    resource: go test*-exec*
+    effect: deny
+  - action: shell
+    resource: go test* -exec*
+    effect: deny
+  - action: shell
+    resource: go test*-toolexec*
+    effect: deny
+  - action: shell
+    resource: go test* -toolexec*
+    effect: deny
+  - action: shell
+    resource: cmake -P*
+    effect: deny
+  - action: shell
+    resource: cmake *-P *
+    effect: deny
+  - action: shell
+    resource: cmake -E*
+    effect: deny
+  - action: shell
+    resource: cmake *-E *
+    effect: deny
+  - action: shell
+    resource: make -f*
+    effect: deny
+  - action: shell
+    resource: make *-f *
+    effect: deny
+  - action: shell
+    resource: make *--eval*
+    effect: deny
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Verifier
@@ -100,10 +287,10 @@ curl -sS -X POST http://localhost:8080/emulator.engine.v1.EngineService/Reset \
 
 # backend REST and SSE
 curl -sS -o /dev/null -w '%{http_code}\n' http://localhost:8081/healthz
-timeout 5 curl -sSN http://localhost:8081/sessions/<id>/events | head -n 20
+curl -sSN --max-time 5 http://localhost:8081/sessions/<id>/events
 
 # MQTT: watch the session's events for 5s, stop after 10 messages
-timeout 6 mosquitto_sub -h localhost -t 'emulator/#' -v -C 10
+mosquitto_sub -h localhost -t 'emulator/#' -v -C 10 -W 6
 ```
 
 Logs: `docker compose logs --tail=100 <service>` from the service directory, or
@@ -135,7 +322,8 @@ Trial-merge sha: `<sha>`
   the review body and in the report; neither stands without the base sha and the trial-merge sha.
   `INCONCLUSIVE` is for a check a dead service made unmeasurable, and it is not an approval.
 - The exit code is part of the measurement; quote it.
-- Quote real output. Truncate with `head -n 40`/`tail -n 20` and say that you truncated.
+- Quote real output. When a run is long, use the command's own limiter (`journalctl -n 40`,
+  `docker compose logs --tail=100`) or name the lines you dropped — and say that you truncated.
 - Never reuse a previous run's result. Re-run the command in this session.
 - A service that is down makes the check **INCONCLUSIVE**, not failed — give the probe that
   showed it down (port closed, container exited, `up{job=...} == 0`).

@@ -3,13 +3,7 @@ description: Performs the merge the orchestrator has decided on — merges an ap
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
-    resource: "*"
-    effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
+  - action: "*"
     resource: "*"
     effect: deny
   - action: read
@@ -21,9 +15,103 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: read
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
   - action: shell
+    resource: cd *
+    effect: allow
+  - action: shell
+    resource: git rev-parse*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git stash push*
+    effect: allow
+  - action: shell
+    resource: git stash list*
+    effect: allow
+  - action: shell
+    resource: git stash pop*
+    effect: allow
+  - action: shell
+    resource: git pull --rebase*
+    effect: allow
+  - action: shell
+    resource: git rebase --abort*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Merger
@@ -140,7 +228,7 @@ git rev-parse --abbrev-ref HEAD          # must be 'main', else refuse and repor
 git status --porcelain                   # note the dirty paths: this is the baseline
 
 git stash push -m "merger: autostash before sync to <merged-sha> at <iso-8601>"
-git stash list | head -1                 # capture the exact ref, e.g. stash@{0}
+git stash list                           # capture the exact ref, e.g. stash@{0}
 
 git pull --rebase
 git stash pop

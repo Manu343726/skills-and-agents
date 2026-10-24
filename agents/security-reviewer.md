@@ -3,27 +3,9 @@ description: Read-only threat review across the engine/backend boundary, ROM fil
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "git diff*"
-    effect: allow
-  - action: shell
-    resource: "git status*"
-    effect: allow
-  - action: shell
-    resource: "git log*"
-    effect: allow
   - action: read
     resource: "*"
     effect: allow
@@ -33,6 +15,97 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: read
+    resource: "$HOME/.local/share/opencode/worktree/*"
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: git grep*
+    effect: allow
+  - action: shell
+    resource: grep *
+    effect: allow
+  - action: shell
+    resource: conan audit list*
+    effect: allow
+  - action: shell
+    resource: "*|*"
+    effect: deny
+  - action: shell
+    resource: "*>*"
+    effect: deny
+  - action: shell
+    resource: "*$(*"
+    effect: deny
+  - action: shell
+    resource: "*`*"
+    effect: deny
+  - action: shell
+    resource: git -c *
+    effect: deny
+  - action: shell
+    resource: git -C * -c *
+    effect: deny
+  - action: shell
+    resource: git difftool*
+    effect: deny
+  - action: shell
+    resource: git -C * difftool*
+    effect: deny
+  - action: shell
+    resource: git *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git -C * *--upload-pack*
+    effect: deny
+  - action: shell
+    resource: git *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: git -C * *--ext-diff*
+    effect: deny
+  - action: shell
+    resource: "git *--open-files-in-pager*"
+    effect: deny
+  - action: shell
+    resource: git -C * *--open-files-in-pager*
+    effect: deny
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Security reviewer
@@ -63,7 +136,7 @@ git diff --name-only main...HEAD
 
 ## Also check
 
-- **Secrets**: `git diff main...HEAD | grep -nEi 'password|secret|token|api[_-]?key|BEGIN .*PRIVATE'`
+- **Secrets**: `git grep -nEi -e password -e secret -e token -e api_key -e 'BEGIN .*PRIVATE'`
   and that `.env` is gitignored while `.env.example` carries only keys.
 - **Supply chain**: a new `requires(...)` in `engine/conanfile.py` or a new `go.mod`/`package.json`
   entry lands with its lockfile (`engine/locks/*.lock`, `go.sum`, `package-lock.json`) in the same
