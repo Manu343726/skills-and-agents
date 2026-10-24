@@ -8,6 +8,34 @@ description: C++20 conventions for the emulation core — ownership and RAII, er
 The core is a library that must be fast, deterministic and safe on untrusted input. These rules are
 checked in review; a deviation is a finding, not a preference.
 
+## Reuse before you write
+
+**Before implementing a mechanism, name the library that already implements it, and use that
+library.** Writing the mechanism instead is a recorded decision with a reason — no maintained
+library, a licence that forbids it, a measured cost that rules it out — carried in the commit body.
+It is never the default, and "it was quick to write" is not a reason.
+
+- **The standard library before a third-party one**: `<chrono>`, `<random>`, `<filesystem>`,
+  `<format>`, `<span>`, `<expected>`, `<string_view>` before a hand-rolled or imported equivalent.
+- **Conan before vendoring**: a dependency is a `requires()` in `conanfile.py` with its version,
+  its lockfile entry and its licence. No header is pasted into `third_party/` without an ADR.
+- **JSON and serialisation**: `google::protobuf::util::JsonStringToMessage` and
+  `MessageToJsonString` on the message types generated from `engine.proto`. A hand-written JSON
+  codec beside a protobuf schema is a defect, not a shortcut.
+- **HTTP**: a maintained HTTP library for the Connect unary server. A hand-written HTTP/1.1 parser
+  and serialiser over raw sockets is the same defect — `engine/src/server/http.cpp` was it.
+- **Tests**: GoogleTest from Conan (`GTest::gtest_main`), never a bespoke main-and-assert harness.
+- **Also in scope**: CLI parsing, configuration, logging and log rotation, retries and backoff,
+  assertions and mocking, process supervision, date and time handling, UUIDs, globbing, test
+  fixtures. Each of them has a library; find it before you write it.
+
+**Out of scope: domain code.** The Z80 decoder, the assembler and disassembler, the netlist kernel,
+the ULA and PSG models are the product. No library supplies them and writing them is the work — this
+rule is not "never write code".
+
+In review, a reinvented library is a **`BLOCK`** finding, and the evidence names the library that
+should have been used.
+
 ## Language and standard
 
 - **C++20**, declared once per target: `target_compile_features(z80_core PUBLIC cxx_std_20)`.

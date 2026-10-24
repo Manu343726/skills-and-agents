@@ -8,6 +8,47 @@ description: Go conventions for the backend and toolchain — package layout, co
 Two Go programs: `backend/` (network service) and `toolchain/` (CLI and libraries). Same rules;
 the backend adds the HTTP and MQTT boundaries.
 
+## Reuse before you write
+
+**Before implementing a mechanism, name the library that already implements it, and use that
+library.** Writing it instead is a recorded decision with a reason — no maintained library, a
+licence, a measured cost — carried in the commit body, never the default. This is the same rule as
+"add a module only when the stdlib cannot do the job", with the library named in advance.
+
+| Concern | Library |
+|---|---|
+| CLI, subcommands, help, shell completion | `github.com/spf13/cobra` |
+| Configuration: flags, environment, optional file, one precedence | `github.com/spf13/viper` |
+| Assertions | `github.com/stretchr/testify/require` and `assert` |
+| Expectations on collaborator calls, mocks | `github.com/stretchr/testify/mock` |
+| Fan-out to several log sinks | `github.com/samber/slog-multi` |
+| Log rotation | `gopkg.in/natefinch/lumberjack.v2` |
+| Human log handler with colour on a terminal | a maintained coloured `slog.Handler` (e.g. `github.com/lmittmann/tint`); never hand-written ANSI |
+| Machine-readable log handler for Loki | the standard `slog.JSONHandler` |
+
+The table is the default answer. A subcommand tree, or a flags-then-environment precedence chain,
+written on top of the `flag` package is exactly the reinvented mechanism this section forbids —
+`cobra` and `viper` are the libraries. `net/http`, `encoding/json` and `log/slog` are libraries
+too: they are the first choice where they suffice, and the table does not send you past them.
+
+The rest of the concerns are in scope as well, each with a library or a stdlib package: HTTP
+(`net/http`, `httptest`), JSON (`encoding/json`, never a hand-rolled encoder), retries and backoff,
+process supervision, date and time (`time`, `time/tzdata`), UUIDs (`github.com/google/uuid`),
+globbing (`path/filepath.Match`, `io/fs.Glob`) and test fixtures (`testdata/`). Name the one you
+will use before you write the code.
+
+**The logging shape, always**: `log/slog` only — no `log`, no third-party logger API — with at
+least two sinks: a coloured human handler on stdout when stdout is a terminal, and structured JSON
+to stderr and to a `lumberjack` rotating file. The level comes from configuration, and the rotation
+limits (size, backups, age) are configurable with documented defaults.
+
+**Out of scope: domain code.** The Z80 decoder, the assembler and disassembler, the netlist kernel,
+the ULA and PSG models are the product; a library cannot supply them, and writing them is the work.
+This rule is not "never write code".
+
+In review, a reinvented library is a **`BLOCK`** finding, and the evidence names the library that
+should have been used.
+
 ## Layout
 
 ```

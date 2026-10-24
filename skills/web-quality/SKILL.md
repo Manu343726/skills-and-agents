@@ -8,6 +8,34 @@ description: React 19 and strict TypeScript conventions for the emulator fronten
 React 19 + TypeScript strict + Vite + Tailwind, state in zustand, tests in Vitest with Testing
 Library. The browser talks to the backend's REST API and one SSE stream per session.
 
+## Reuse before you write
+
+**Before implementing a mechanism, name the library that already implements it, and use that
+library.** A hand-written mechanism is a recorded decision with a reason — no maintained package, a
+licence, a measured cost such as bundle size or a browser API that does not fit — carried in the
+commit body, never the default.
+
+- **The wire layer is generated**: `fetch` for the request, `EventSource` for the stream, and the
+  client generated from `api/openapi.yaml` (`npm run gen:api`) for the types. A fetch wrapper that
+  re-declares the response envelope, or an `EventSource` replaced by a hand-rolled reconnect loop,
+  is the reinvented mechanism.
+- **State**: React's built-ins, then zustand, then TanStack Query where the problem is a server
+  cache. A bespoke state machine is a decision with a reason, not a first move.
+- **Tests**: Vitest + Testing Library (`render`, `screen`, `userEvent`) before a custom renderer, a
+  hand-rolled DOM helper or a home-made assertion library.
+- **Also in scope**: HTTP and JSON through `fetch` and the generated types, routing, form
+  validation, date and time formatting (`Intl` before a dependency), UUIDs (`crypto.randomUUID`),
+  retries and backoff, globbing, test fixtures. Process supervision and log rotation do not arise
+  in a browser; do not build them there either. A dependency added to `package.json` lands with a
+  refreshed lockfile in the same change.
+
+**Out of scope: domain code.** The Z80 decoder, the assembler and disassembler, the netlist kernel,
+the ULA and PSG models are the product; no package supplies them, and writing them is the work.
+This rule is not "never write code".
+
+In review, a reinvented library is a **`BLOCK`** finding, and the evidence names the library that
+should have been used.
+
 ## TypeScript
 
 - `web/tsconfig.json` keeps `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride`,
