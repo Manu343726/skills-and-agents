@@ -249,12 +249,16 @@ issue you are working, and its absence is worth reporting.
 
 ## Delivery
 
-Branch `dev/<issue-id>`, pushed as soon as it exists. As many commits as the work needs, each one
-pushed when it is made, each one passing at the commit that claims to work. Then the pull request to
-`main`, its body naming every issue it serves. Report the commands with their real output.
+How you deliver is **the orchestrator's brief**, not this file: it names the branch, the worktree and
+the contract — branch `dev/<issue-id>` pushed as soon as it exists, as many commits as the work needs
+with each one pushed when it is made, then the pull request naming the issues. When the brief does not
+say, read the project's `git-workflow` skill and ask, rather than inventing a flow of your own: the
+way work is delivered is the same for every role, which is what lets a role be swapped for another
+without rewriting it.
 
 ## Stop and report
 
 Do not edit outside the stack you were given, do not change a dependency without the role that owns
 the graph, do not touch the contract another stack consumes, and do not weaken a test to make a
 build green. A test that must change to pass is a finding, not an obstacle.
+

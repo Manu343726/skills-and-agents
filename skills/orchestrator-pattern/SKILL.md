@@ -97,6 +97,20 @@ become one indistinguishable diff.
 
 ## 5. The brief
 
+**The workflow is yours to pass, not the role's to assume.** A role file says what a good engineer,
+tester or reviewer is; it does not say how work is delivered, because that would have to be repeated
+in every role and would drift. Every brief therefore carries the flow — or, better, opens with the
+instruction to read it:
+
+> Read the `git-workflow` skill before your first command. The flow for this task: worktree
+> `.worktrees/<name>`, branch `dev/<issue-id>` pushed **as soon as it exists**, as many commits as
+> the work needs with **each one pushed when it is made**, then a pull request to `main` whose body
+> names every issue it serves. Read the project's `project-layout` skill for the commands.
+
+That is what makes the pattern work with *any* subagent: the way of working is transmitted per task,
+so a role can be swapped — or composed, with a project agent delegating to a generic one — without
+rewriting it. A brief that omits the flow gets a report nobody can merge.
+
 A subagent starts with **no** context of this session. Everything it needs is in the brief:
 
 ```markdown

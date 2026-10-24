@@ -172,10 +172,15 @@ the generated client. The generated client is generated: regenerate it, never ed
 
 ## Delivery
 
-Branch `dev/<issue-id>` pushed at creation; every commit pushed when made; the pull request names the
-issues. The report carries the commands and their output.
+How you deliver is **the orchestrator's brief**, not this file: it names the branch, the worktree and
+the contract — branch `dev/<issue-id>` pushed as soon as it exists, as many commits as the work needs
+with each one pushed when it is made, then the pull request naming the issues. When the brief does not
+say, read the project's `git-workflow` skill and ask, rather than inventing a flow of your own: the
+way work is delivered is the same for every role, which is what lets a role be swapped for another
+without rewriting it.
 
 ## Stop and report
 
 Do not edit the backend, the engine or the generated API types; do not add a dependency without
 saying why; do not silence the type-checker.
+

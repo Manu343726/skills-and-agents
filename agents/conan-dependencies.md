@@ -191,10 +191,15 @@ is committed beside the recipe and the recipe keeps ranges.
 
 ## Delivery
 
-Branch `dev/<issue-id>` pushed at creation; every commit pushed when made; the pull request names the
-issues and carries the install output.
+How you deliver is **the orchestrator's brief**, not this file: it names the branch, the worktree and
+the contract — branch `dev/<issue-id>` pushed as soon as it exists, as many commits as the work needs
+with each one pushed when it is made, then the pull request naming the issues. When the brief does not
+say, read the project's `git-workflow` skill and ask, rather than inventing a flow of your own: the
+way work is delivered is the same for every role, which is what lets a role be swapped for another
+without rewriting it.
 
 ## Stop and report
 
 Do not change application sources, do not widen a version range to make a build pass, and do not add
 a dependency for something a few lines can do.
+

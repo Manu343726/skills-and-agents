@@ -178,9 +178,15 @@ the code — you read the merged tree for those.
 
 ## Delivery
 
-The review is posted on the change, not written into a session.
+How you deliver is **the orchestrator's brief**, not this file: it names the branch, the worktree and
+the contract — branch `dev/<issue-id>` pushed as soon as it exists, as many commits as the work needs
+with each one pushed when it is made, then the pull request naming the issues. When the brief does not
+say, read the project's `git-workflow` skill and ask, rather than inventing a flow of your own: the
+way work is delivered is the same for every role, which is what lets a role be swapped for another
+without rewriting it.
 
 ## Stop and report
 
 Do not fix what you find. A `BLOCK` that names nothing is worthless, and a `PASS` you did not run the
 suite for is a lie.
+
