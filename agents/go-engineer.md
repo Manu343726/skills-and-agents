@@ -1,5 +1,5 @@
 ---
-description: Implements Go: packages, their tests, the module files and the build the project uses.
+description: "Implements Go: packages, their tests, the module files and the build the project uses."
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -7,16 +7,16 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: **/*.go
+    resource: "**/*.go"
     effect: allow
   - action: edit
-    resource: **/go.mod
+    resource: "**/go.mod"
     effect: allow
   - action: edit
-    resource: **/go.sum
+    resource: "**/go.sum"
     effect: allow
   - action: edit
-    resource: **/Makefile
+    resource: "**/Makefile"
     effect: allow
   - action: read
     resource: "*"
@@ -173,7 +173,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny---
+    effect: deny
+---
 # Go engineer
 
 ## What you own
