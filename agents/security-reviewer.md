@@ -76,6 +76,12 @@ permissions:
     resource: git -C * *--ext-diff*
     effect: deny
   - action: shell
+    resource: "git *--open-files-in-pager*"
+    effect: deny
+  - action: shell
+    resource: git -C * *--open-files-in-pager*
+    effect: deny
+  - action: shell
     resource: git push*--force*
     effect: deny
   - action: shell
