@@ -3,11 +3,11 @@ description: Implements the Go control plane in backend/ — OpenAPI-generated R
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
   - action: edit
-    resource: "backend/**"
+    resource: backend/**
     effect: allow
   - action: read
     resource: "*"
@@ -18,9 +18,85 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: edit
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
   - action: shell
+    resource: go *
+    effect: allow
+  - action: shell
+    resource: gofmt*
+    effect: allow
+  - action: shell
+    resource: make *
+    effect: allow
+  - action: shell
+    resource: git switch*
+    effect: allow
+  - action: shell
+    resource: git add *
+    effect: allow
+  - action: shell
+    resource: git commit*
+    effect: allow
+  - action: shell
+    resource: git push*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git show*
+    effect: allow
+  - action: shell
+    resource: git branch*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Go engineer

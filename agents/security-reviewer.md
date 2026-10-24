@@ -3,27 +3,9 @@ description: Read-only threat review across the engine/backend boundary, ROM fil
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "git diff*"
-    effect: allow
-  - action: shell
-    resource: "git status*"
-    effect: allow
-  - action: shell
-    resource: "git log*"
-    effect: allow
   - action: read
     resource: "*"
     effect: allow
@@ -33,6 +15,28 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: grep *
+    effect: allow
+  - action: shell
+    resource: conan audit list*
+    effect: allow
+
 ---
 
 # Security reviewer

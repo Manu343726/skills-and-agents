@@ -3,13 +3,7 @@ description: Measures builds, tests, endpoints, logs and MQTT traffic; reports e
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
-    resource: "*"
-    effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
+  - action: "*"
     resource: "*"
     effect: deny
   - action: read
@@ -21,9 +15,115 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
   - action: shell
+    resource: git fetch*
+    effect: allow
+  - action: shell
+    resource: git rev-parse*
+    effect: allow
+  - action: shell
+    resource: git switch*
+    effect: allow
+  - action: shell
+    resource: git merge*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git show*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: cmake*
+    effect: allow
+  - action: shell
+    resource: ctest*
+    effect: allow
+  - action: shell
+    resource: go build*
+    effect: allow
+  - action: shell
+    resource: go test*
+    effect: allow
+  - action: shell
+    resource: go vet*
+    effect: allow
+  - action: shell
+    resource: npm ci*
+    effect: allow
+  - action: shell
+    resource: npm test*
+    effect: allow
+  - action: shell
+    resource: npm run *
+    effect: allow
+  - action: shell
+    resource: make *
+    effect: allow
+  - action: shell
+    resource: curl*
+    effect: allow
+  - action: shell
+    resource: timeout*
+    effect: allow
+  - action: shell
+    resource: docker *
+    effect: allow
+  - action: shell
+    resource: journalctl*
+    effect: allow
+  - action: shell
+    resource: mosquitto_sub*
+    effect: allow
+  - action: shell
+    resource: head*
+    effect: allow
+  - action: shell
+    resource: tail*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Verifier

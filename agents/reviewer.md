@@ -3,51 +3,9 @@ description: Final pass over the merged tree — reads the merge result, runs th
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "*"
-    effect: deny
-  - action: shell
-    resource: "git diff*"
-    effect: allow
-  - action: shell
-    resource: "git status*"
-    effect: allow
-  - action: shell
-    resource: "git log*"
-    effect: allow
-  - action: shell
-    resource: "git show*"
-    effect: allow
-  - action: shell
-    resource: "make *"
-    effect: allow
-  - action: shell
-    resource: "ctest*"
-    effect: allow
-  - action: shell
-    resource: "cmake --build*"
-    effect: allow
-  - action: shell
-    resource: "go test*"
-    effect: allow
-  - action: shell
-    resource: "go build*"
-    effect: allow
-  - action: shell
-    resource: "npm test*"
-    effect: allow
-  - action: shell
-    resource: "npm run *"
-    effect: allow
   - action: read
     resource: "*"
     effect: allow
@@ -57,6 +15,70 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: shell
+    resource: git diff*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git log*
+    effect: allow
+  - action: shell
+    resource: git show*
+    effect: allow
+  - action: shell
+    resource: make *
+    effect: allow
+  - action: shell
+    resource: ctest*
+    effect: allow
+  - action: shell
+    resource: cmake --build*
+    effect: allow
+  - action: shell
+    resource: go test*
+    effect: allow
+  - action: shell
+    resource: go build*
+    effect: allow
+  - action: shell
+    resource: npm test*
+    effect: allow
+  - action: shell
+    resource: npm run *
+    effect: allow
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Reviewer

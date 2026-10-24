@@ -3,7 +3,7 @@ description: Maintains the Forgejo board for manu343726/z80-emulator — labels,
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
+  - action: "*"
     resource: "*"
     effect: deny
   - action: read
@@ -15,9 +15,22 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: execute
+    resource: "*"
+    effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
   - action: shell
     resource: "*"
     effect: deny
+
 ---
 
 # Ticket manager

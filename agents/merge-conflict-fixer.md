@@ -3,15 +3,12 @@ description: Resolves a merge the platform cannot — a rebase, a conflict, the 
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
   - action: edit
     resource: "*"
     effect: allow
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
-    resource: "*"
-    effect: deny
   - action: read
     resource: "*"
     effect: allow
@@ -21,9 +18,49 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: edit
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
   - action: shell
     resource: "*"
     effect: allow
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+  - action: shell
+    resource: git commit*--amend*
+    effect: deny
+  - action: shell
+    resource: git -C * commit*--amend*
+    effect: deny
+
 ---
 
 # Merge conflict fixer

@@ -3,13 +3,7 @@ description: Performs the merge the orchestrator has decided on — merges an ap
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: edit
-    resource: "*"
-    effect: deny
-  - action: webfetch
-    resource: "*"
-    effect: deny
-  - action: websearch
+  - action: "*"
     resource: "*"
     effect: deny
   - action: read
@@ -21,9 +15,61 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
+  - action: read
+    resource: $HOME/.local/share/opencode/worktree/*
+    effect: allow
   - action: shell
+    resource: cd *
+    effect: allow
+  - action: shell
+    resource: git rev-parse*
+    effect: allow
+  - action: shell
+    resource: git status*
+    effect: allow
+  - action: shell
+    resource: git stash*
+    effect: allow
+  - action: shell
+    resource: git pull*
+    effect: allow
+  - action: shell
+    resource: git rebase --abort*
+    effect: allow
+  - action: execute
     resource: "*"
     effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: git push*--force*
+    effect: deny
+  - action: shell
+    resource: git push -f*
+    effect: deny
+  - action: shell
+    resource: git -C * push*--force*
+    effect: deny
+  - action: shell
+    resource: git -C * push -f*
+    effect: deny
+  - action: shell
+    resource: git reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git -C * reset*--hard*
+    effect: deny
+  - action: shell
+    resource: git clean*
+    effect: deny
+  - action: shell
+    resource: git -C * clean*
+    effect: deny
+
 ---
 
 # Merger
