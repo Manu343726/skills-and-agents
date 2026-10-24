@@ -220,8 +220,8 @@ What becomes easy, what becomes hard, what must be revisited and when.
 - **Evidence beside the claim.** A number carries how it was obtained: `measured with
   `go test ./... -coverprofile` → 81.2 % on 2026-10-24`, not "good coverage". A version carries
   `conan list 'cmake/*'` or the `go.mod` line. A behaviour carries the test that asserts it.
-- **Every entity and file a link.** `engine/` → `[`engine/`](../engine)`, the board →
-  `https://git.manu343726.com/manu343726/z80-emulator/issues`, a service → its URL or its
+- **Every entity and file a link.** A directory → its path in the repository, the board → its URL,
+  a service → its endpoint or its document, a component → the page that documents it, and never a
   document. A bare path is a defect.
 - **Code that is quoted is real.** Open the file and copy the lines; do not paraphrase an API.
 - **`docs/` describes the repository, not the machine.** Host paths and local tools belong in a

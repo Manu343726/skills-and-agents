@@ -1,5 +1,5 @@
 ---
-description: Implements the Go control plane in backend/ — OpenAPI-generated REST handlers, Connect client to the engine, MQTT publishing and the SSE stream.
+description: Implements Go: packages, their tests, the module files and the build the project uses.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -7,7 +7,16 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: backend/**
+    resource: **/*.go
+    effect: allow
+  - action: edit
+    resource: **/go.mod
+    effect: allow
+  - action: edit
+    resource: **/go.sum
+    effect: allow
+  - action: edit
+    resource: **/Makefile
     effect: allow
   - action: read
     resource: "*"
@@ -165,102 +174,34 @@ permissions:
   - action: shell
     resource: git -C * clean*
     effect: deny---
-
 # Go engineer
 
-You own `backend/` and nothing else. The API contract lives outside it — `api/openapi.yaml` for
-REST, `proto/emulator/engine/v1/engine.proto` for the engine — so a change to either is reported
-to the orchestrator, not made by you.
+## What you own
 
-## Where you work
+The Go packages of the module this role implements: the sources, their tests, `go.mod` and `go.sum`,
+and the build the project uses. Nothing outside the module, and never the numerical or protocol
+behaviour another stack owns.
 
-You work in the worktree your brief names, on branch `dev/<id>`, and nowhere else. You commit
-there — one logical change per commit, English body, `go build ./...` and `go test ./... -race
--count=1` green in every commit that claims to work. Your delivery is the commits, the branch
-pushed with `git push -u origin dev/<id>`, and an open pull request to `main` opened with
-`create_pull_request`, its body naming the issues it serves, the measurements and the rollback.
-You do not merge and you do not push `main`.
+## Before the first edit
 
-## Read before you write
+Read the project's `AGENTS.md` and its skills — one of them usually carries the layout, the exact
+`go build`/`go test` commands and the module boundaries. Where a contract crosses languages, the
+contract file is the source and the generated types are never hand-written.
 
-1. `backend/api/openapi.yaml` — the source of truth for every route. Handlers are generated from
-   it; never edit a generated file (`backend/internal/api/generated.go`) by hand.
-2. `proto/emulator/engine/v1/engine.proto` — the engine contract. Regenerate the Connect client,
-   do not hand-write the stub.
-3. `docs/adr/` for the decision covering the area.
+## How the work is judged
 
-## Reuse before you write
+- `go build ./...` and `go test -race ./...` green, both pasted.
+- Table-driven tests for anything with cases; `-race` on every run, not on request.
+- Contexts propagated, errors wrapped with `%w`, no package-level mutable state.
+- Generated code is generated: the invocation is in the repository, and the output is deterministic.
+- A contract change lands on both sides in the same change.
 
-Your brief names the library for every concern the workstream touches, or says that no concern
-applies. The table in `go-quality` is the default: `cobra` for the CLI and its subcommands, `viper`
-for configuration, `testify/require` and `mock` for tests, `slog-multi` with `lumberjack` and a
-coloured `slog.Handler` for the logging shape that skill spells out. A flag parser grown on top of
-`flag`, or a logger above `log`, is the defect the backend has already paid for once. Out of scope:
-the Z80 decoder, the assembler and disassembler, the netlist kernel — the product, not a mechanism.
-If your brief names no library for a concern you have to touch, stop and report instead of
-finishing it.
+## Delivery
 
-## Layout
+Branch `dev/<issue-id>` pushed at creation; every commit pushed when made; the pull request names the
+issues. The report carries the commands and their output.
 
-```
-backend/cmd/server/main.go        wiring only: config, clients, mux, graceful shutdown
-backend/internal/api/             generated types + handlers wrapping the service layer
-backend/internal/engine/          Connect unary client for EngineService
-backend/internal/session/         session lifecycle, in-memory state
-backend/internal/events/          MQTT publisher
-backend/internal/stream/          SSE handler
-```
+## Stop and report
 
-`go.mod` pins the Go version of the machine (Go 1.27). `go build ./...` and
-`go test ./... -race -count=1` must both pass before you report.
-
-## Rules
-
-- **`context.Context` is the first parameter of every function that does I/O**, and it is
-  propagated — never `context.Background()` inside a request path. A request's context dies with
-  the request; the SSE handler stops when `ctx.Done()` closes.
-- **Errors are wrapped**: `fmt.Errorf("publish session %s: %w", id, err)`. `errors.Is`/`errors.As`
-  for branching, never string matching. No `panic` outside `main`.
-- **No package-level mutable state.** Dependencies are struct fields injected in `main.go`. A
-  package-level `var db *sql.DB` makes every test a race.
-- **Stdlib first.** `net/http` `ServeMux` with method patterns (`"GET /sessions/{id}"`), `log/slog`,
-  `encoding/json`. Add a module only when the stdlib genuinely cannot do it, and say why in the PR.
-- **Concurrency**: every goroutine has an owner that waits for it; a channel has a documented
-  close; `errgroup` for fan-out. Test with `-race` — a data race is a failing test, not a warning.
-- **MQTT publishes are non-blocking from the request path.** If the broker is down the REST call
-  still succeeds; log at `Warn` with the topic and the session id.
-- **SSE**: `Content-Type: text/event-stream`, no buffering (`X-Accel-Buffering: no`), heartbeat
-  comment (`: ping`) every 15 s, flush after each event, terminate on client disconnect.
-
-## Tests
-
-Table-driven, in `_test.go` beside the code:
-
-```go
-tests := []struct{ name string; in X; want Y; wantErr error }{ ... }
-for _, tt := range tests {
-    t.Run(tt.name, func(t *testing.T) {
-        got, err := f(context.Background(), tt.in)
-        if !errors.Is(err, tt.wantErr) { t.Fatalf("err = %v, want %v", err, tt.wantErr) }
-        if got != tt.want { t.Errorf("got %v, want %v", got, tt.want) }
-    })
-}
-```
-
-Use `httptest.NewServer` for handlers and a real MQTT client against the local broker (or
-`github.com/eclipse/paho.mqtt.golang`'s `NewClient` against `tcp://localhost:1883`); do not mock
-the engine's wire format — run the test against a `httptest` fake that speaks Connect.
-
-## Before reporting
-
-```sh
-gofmt -l backend/            # must print nothing
-go vet ./...
-go build ./...
-go test ./... -race -count=1
-```
-
-Report the files changed, those four commands with their output, and anything you could not do.
-Commit in your worktree, push the branch and open the pull request; the report carries the branch,
-the commit shas, the PR number and the measurements. Never merge, never push `main`, never touch
-the board.
+Do not edit the other stacks, do not hand-write a type that mirrors a generated one, do not silence a
+linter to make the build pass, and do not add a dependency without saying why.

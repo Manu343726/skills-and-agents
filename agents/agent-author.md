@@ -153,7 +153,8 @@ the skill, never the project.
    reader's wrong answer, and it is the same class of defect as a stale description.
 
 3. **Never silently change a permission's effect.** An `edit` allow on `"*"` where the text says
-   "confined to `engine/`" is a privilege escalation wearing a narrower description. When you
+   "confined to `src/`" in a project whose sources are elsewhere is a privilege escalation wearing a
+   narrower description. When you
    touch a permission list, say in the commit body what the agent could do before and what it can
    do after. When a page claims a permission the frontmatter does not grant, the frontmatter is the
    fact and the page is the defect — unless the intent was the page's, in which case changing the

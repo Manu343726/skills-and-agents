@@ -75,18 +75,24 @@ only memory a session leaves behind.
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, writes the record. No mutating permissions. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
-| `cpp-engineer` | subagent | C++ engine code and its CMake build and unit tests. |
-| `go-engineer` | subagent | Go services: API, RPC clients, MQTT, OpenAPI-generated handlers. |
-| `web-engineer` | subagent | The browser frontend: React, TypeScript, styling, frontend tests. |
-| `toolchain-engineer` | subagent | Assembler, disassembler, ROM build pipeline and CLI. |
-| `test-engineer` | subagent | Test suites across stacks: unit, integration, golden files, fuzzing. |
+| `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
+| `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
+| `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
+| `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
-| `ticket-manager` | subagent | The Forgejo board: labels, issues, status transitions, milestones. |
+| `ticket-manager` | subagent | The board of the repository named in the brief: labels, issues, status transitions, milestones. |
 | `conan-dependencies` | subagent | The Conan 2 graph: `conanfile`, profiles, lockfiles, licences. |
 | `agent-author` | subagent | This library: agents, skills, the index and `AGENTS.md` — descriptions true to their bodies, permissions exactly as documented. |
+
+**A role here is generic: it may name a tool and a convention, never a directory that belongs to one
+repository.** What is particular to a project — its layout, its exact build and test commands, its
+domain — belongs in that project's own skills, and a role that needs it reads them. A role that only
+makes sense for one repository (this library's first `toolchain-engineer` was one: assembler,
+disassembler and ROM container for a single emulator) is a local agent in that project, not an entry
+here.
 
 ### Skills
 

@@ -300,13 +300,13 @@ finding: name it and unstage nothing by hand — report it.
 
 - Base: `main` @ <sha>, fast-forwarded from `origin/main` @ <sha>
 - Rebased: 3 commits, <first-sha>..<last-sha>
-- Conflicts: 1 — `engine/src/cpu.cpp:214`. Both sides changed the DDCB handler; kept the branch's
+- Conflicts: 1 — `src/decoder.cpp:214`. Both sides changed the same handler; kept the branch's
   destination write and `main`'s new `result` parameter. No hunk dropped, no test removed.
 - Merged tree: <sha>
 - Push: `git push origin main` → <output>
 
 ## Ran on the merged tree
-- `make test` → `ctest --preset conan-release` 418/418; `go test ./... -race` ok; `npm test -- --run`
+- the project's test command → 418/418; `go test ./... -race` ok; `npm test -- --run` ok
   71 passed; exit 0
 - `git status --short` → empty
 
