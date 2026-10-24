@@ -171,7 +171,8 @@ Then:
 2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
    verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
    the base sha the verdict names, proves the result with the platform, deletes the head branch and
-   fast-forwards the operator's checkout. Never by pushing `main`, and never by asking `merger` to
+   syncs the operator's checkout (a `pull --rebase` under an autostash; a conflict freezes the sync,
+   not the merge). Never by pushing `main`, and never by asking `merger` to
    merge an approval `main` has moved past.
 3. **A block, or a merge that regresses, goes back** — close the PR or send the branch to its
    author in `status/todo` with the finding quoted, and revert a merge that already landed. The

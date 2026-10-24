@@ -231,8 +231,9 @@ and say the verdict is current. It checks the three conditions itself — the PR
 newest review body's first line `## Verdict: APPROVED`, and the base sha that verdict names equal
 to the sha `main` is on now — and either merges with `merge_pull_request` or refuses, naming
 which. It then proves the result with `get_pull_request_by_index` and `list_branches`, deletes the
-head branch, and fast-forwards the operator's checkout, which is the one documented exception to
-"nobody writes in the main checkout".
+head branch, and syncs the operator's checkout — `pull --rebase` under a stash of that checkout's
+own dirty paths, popped back after; a conflict writes `.git/merger-sync-frozen` and stops the sync,
+never the merge. That sync is the one documented exception to "nobody writes in the main checkout".
 
 Never push `main` to land it: a direct push skips the trial merge and leaves no PR to point at.
 

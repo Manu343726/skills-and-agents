@@ -53,7 +53,8 @@ it merges, and how to close.
    verifier trial-merges the branch onto the base sha it measured, runs the whole suite on the
    merged result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha
    and the trial-merge sha. `merger` then performs `merge_pull_request` on an approval that still
-   describes `main`, proves the result with the platform, and fast-forwards the operator's checkout.
+   describes `main`, proves the result with the platform, and syncs the operator's checkout to the
+   merged sha with an autostashed rebase.
    Nobody pushes `main`. A branch that does not build or whose tests fail is refused, and a test is
    never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
@@ -73,7 +74,7 @@ only memory a session leaves behind.
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, writes the record. No mutating permissions. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
-| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout fast-forwarded. |
+| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
 | `cpp-engineer` | subagent | C++ engine code and its CMake build and unit tests. |
 | `go-engineer` | subagent | Go services: API, RPC clients, MQTT, OpenAPI-generated handlers. |
 | `web-engineer` | subagent | The browser frontend: React, TypeScript, styling, frontend tests. |
