@@ -1,6 +1,7 @@
 ---
 description: Authors this library — agents/**, skills/**, README.md and AGENTS.md — keeping every frontmatter description true to its body, the index in the same change, and every permission's effect exactly what the text claims.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

@@ -1,6 +1,7 @@
 ---
 description: Read-only threat review across the engine/backend boundary, ROM files as untrusted input, MQTT and REST network edges, secrets and the Conan/NPM supply chain.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

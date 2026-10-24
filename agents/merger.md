@@ -1,6 +1,7 @@
 ---
 description: Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch, and fast-forwards the operator's checkout to the merged sha.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

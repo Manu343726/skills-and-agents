@@ -1,6 +1,7 @@
 ---
 description: Implements the C++20 emulation core, its CMake build and its GoogleTest unit tests, confined to engine/, proto/ and the top-level build files.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

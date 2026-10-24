@@ -1,6 +1,7 @@
 ---
 description: Final pass over the merged tree — reads the merge result, runs the suite itself, and answers PASS or BLOCK with the evidence, in severity order.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

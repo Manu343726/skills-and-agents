@@ -1,6 +1,7 @@
 ---
 description: Implements the browser frontend in web/ — React 19, strict TypeScript, Vite, Tailwind, zustand state, canvas screen and Vitest tests.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

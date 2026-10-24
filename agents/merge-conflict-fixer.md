@@ -1,6 +1,7 @@
 ---
 description: Resolves a merge the platform cannot — a rebase, a conflict, the suite on the result, and a refusal when the only way through would drop a test.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

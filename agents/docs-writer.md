@@ -1,6 +1,7 @@
 ---
 description: Writes and maintains a project's documentation wherever that project keeps it — docs/ by default, or the external system its AGENTS.md names — in English, with evidence beside every claim, coordinating with the ticket agent because tickets are documentation too.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

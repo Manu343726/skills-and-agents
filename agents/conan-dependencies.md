@@ -1,6 +1,7 @@
 ---
 description: Owns the Conan 2 dependency graph of the C++ engine — conanfile, profiles, lockfiles, CMake presets integration and the licence audit — confined to engine/conanfile.*, engine/profiles/ and engine/locks/.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

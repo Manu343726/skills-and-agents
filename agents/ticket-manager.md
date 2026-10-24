@@ -1,6 +1,7 @@
 ---
 description: Maintains the Forgejo board for manu343726/z80-emulator — labels, issue bodies, status transitions and the kanban — using the forgejo MCP tools only.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

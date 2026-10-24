@@ -1,6 +1,7 @@
 ---
 description: Measures builds, tests, endpoints, logs and MQTT traffic; reports exact commands and their output, and never fixes anything.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

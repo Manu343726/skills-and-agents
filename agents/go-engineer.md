@@ -1,6 +1,7 @@
 ---
 description: Implements the Go control plane in backend/ — OpenAPI-generated REST handlers, Connect client to the engine, MQTT publishing and the SSE stream.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

@@ -1,6 +1,7 @@
 ---
 description: Implements the Go ROM toolchain in toolchain/ and the ROM catalog in roms/ — assembler, disassembler, .rom container and the four ROM source kinds.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

@@ -1,6 +1,7 @@
 ---
 description: Holds the task context and delegates every task to a background subagent — never edits, never runs a command, owns the record.
 mode: primary
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"

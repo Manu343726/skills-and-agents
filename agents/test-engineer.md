@@ -1,6 +1,7 @@
 ---
 description: Writes and repairs test suites only — Go _test.go, engine/tests/, web tests and toolchain testdata — and raises coverage and fuzzing where it is thin.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
