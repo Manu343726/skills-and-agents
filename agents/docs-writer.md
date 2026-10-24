@@ -188,7 +188,7 @@ the rollback. Never merge, never push `main`.
 ```
 docs/architecture.md          the shape of the system and why
 docs/adr/NNNN-<slug>.md       one decision per file, never edited after acceptance
-docs/api/<stack>.md           REST, Connect, MQTT and SSE references
+docs/api/<stack>.md           the programmatic interfaces of each stack
 docs/runbooks/<task>.md       repeatable operational procedures
 ```
 
@@ -198,7 +198,7 @@ at the top. Nothing is deleted.
 ## ADR template
 
 ```markdown
-# ADR-0007: The engine speaks Connect unary, not gRPC
+# ADR-0007: The service speaks unary RPC, not a streaming variant
 
 - Status: accepted
 - Date: 2026-10-24
@@ -233,7 +233,7 @@ What becomes easy, what becomes hard, what must be revisited and when.
 
 Required sections, in order: what the project is (one paragraph), the directory table, how to
 build and test (the four stack commands), how to run it, where the documentation lives, licence.
-A reader with no context must reach a running emulator from it.
+A reader with no context must reach a running system from it.
 
 ## Before reporting
 
