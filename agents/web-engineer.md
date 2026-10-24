@@ -1,5 +1,5 @@
 ---
-description: Implements the browser frontend: components, state, the data layer and its tests, in whatever framework the project uses.
+description: "Implements the browser frontend: components, state, the data layer and its tests, in whatever framework the project uses."
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -10,25 +10,25 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: **/*.ts
+    resource: "**/*.ts"
     effect: allow
   - action: edit
-    resource: **/*.tsx
+    resource: "**/*.tsx"
     effect: allow
   - action: edit
-    resource: **/*.css
+    resource: "**/*.css"
     effect: allow
   - action: edit
-    resource: **/*.html
+    resource: "**/*.html"
     effect: allow
   - action: edit
-    resource: **/package.json
+    resource: "**/package.json"
     effect: allow
   - action: edit
-    resource: **/vite.config.*
+    resource: "**/vite.config.*"
     effect: allow
   - action: edit
-    resource: **/tsconfig*.json
+    resource: "**/tsconfig*.json"
     effect: allow
   - action: read
     resource: "*"
@@ -146,7 +146,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git -C * clean*
-    effect: deny---
+    effect: deny
+---
 # Web engineer
 
 ## What you own
