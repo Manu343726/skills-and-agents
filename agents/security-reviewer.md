@@ -116,7 +116,8 @@ permissions:
     effect: deny
   - action: shell
     resource: git *
-    effect: allow---
+    effect: allow
+---
 # Security reviewer
 
 ## What you own
