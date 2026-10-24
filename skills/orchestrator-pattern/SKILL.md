@@ -1,6 +1,6 @@
 ---
 name: orchestrator-pattern
-description: How to cut a task into bounded background workstreams, isolate each in its own worktree, brief each subagent with measured facts and disjoint file ownership, verify every claim, merge through the integrator, review the merged tree, and keep the record honest.
+description: How to cut a task into bounded background workstreams, isolate each in its own worktree, brief each subagent with measured facts and disjoint file ownership, verify every claim, gate the merge on a verifier's verdict at a recorded base sha, merge only an approval that still describes main, audit what already landed, and keep the record honest.
 ---
 
 # The orchestrator pattern

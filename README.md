@@ -43,14 +43,19 @@ it merges, and how to close.
 1. **A workstream is cut and isolated.** The orchestrator reads the board, opens or moves the issue,
    then creates a git worktree per workstream (`opencode worktree_create <name>`), branch
    `work/<name>`. The brief names the path and the branch; no subagent works in the main checkout.
-2. **A subagent delivers three things.** Closed commits on its branch, a summary (what changed,
-   what was measured, what it did not do, the shas), and the Forgejo issues it touched, by number,
-   with their `status/*` label. It never merges, never pushes `main`, and never closes an issue
-   that was not its deliverable.
-3. **`integrator` merges.** It rebases the branch onto `main`, resolves conflicts keeping both
-   intents, runs the whole suite on the merged tree, and reports the commands and their output. It
-   refuses a branch that does not build or whose tests fail, and it never fixes a test to pass.
-4. **`reviewer` makes the final pass over the merged tree** — not the branch — and answers `PASS`
+2. **A subagent delivers a pushed branch and a pull request.** Closed commits on its branch, the
+   branch pushed with `git push -u origin work/<name>`, an open PR to `main` naming every issue it
+   serves — and a summary (what changed, what was measured, what it did not do, the shas) with the
+   Forgejo issues it touched, by number, with their `status/*` label. It never merges, never pushes
+   `main`, and never closes an issue that was not its deliverable. A branch nobody pushed and a PR
+   nobody opened have delivered nothing.
+3. **The verifier gates the merge, and the orchestrator decides when.** The verifier trial-merges
+   the branch onto the base sha it measured, runs the whole suite on the merged result, and answers
+   `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha and the trial-merge sha.
+   The merge itself is `merge_pull_request`, on an approval that still describes `main`; nobody
+   pushes `main`. It refuses a branch that does not build or whose tests fail, and it never fixes a
+   test to pass.
+4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
    file not regenerated, a contract changed on one side only.
 5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
@@ -65,14 +70,14 @@ only memory a session leaves behind.
 
 | Agent | Mode | Owns |
 |---|---|---|
-| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, merges through `integrator`, writes the record. No mutating permissions. |
+| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, writes the record. No mutating permissions. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits. |
 | `cpp-engineer` | subagent | C++ engine code and its CMake build and unit tests. |
 | `go-engineer` | subagent | Go services: API, RPC clients, MQTT, OpenAPI-generated handlers. |
 | `web-engineer` | subagent | The browser frontend: React, TypeScript, styling, frontend tests. |
 | `toolchain-engineer` | subagent | Assembler, disassembler, ROM build pipeline and CLI. |
 | `test-engineer` | subagent | Test suites across stacks: unit, integration, golden files, fuzzing. |
-| `integrator` | subagent | Merges a branch onto `main`: rebase, conflicts, the full suite on the merged tree. The only agent that pushes `main`. |
+| `integrator` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
