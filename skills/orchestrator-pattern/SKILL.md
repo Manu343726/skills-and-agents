@@ -41,7 +41,7 @@ same file, they are sequential — never parallel. If one changes a contract
 | Board | `ticket-manager` | labels, issue bodies, transitions |
 | Dependencies | `conan-dependencies` | `conanfile.py`, profiles, lockfiles |
 | Merge a verified PR | `merger` | the merge itself, the proof, the local sync |
-| Integrate, as an exception | `integrator` | a merge Forgejo cannot perform |
+| Resolve a merge the platform cannot | `merge-conflict-fixer` | a rebase, a conflict, the suite on the result |
 | Audit | `reviewer` | `PASS` or `BLOCK`, on what already landed |
 | Change this library | `agent-author` | an agent, a skill, the index, a permission |
 
@@ -65,10 +65,10 @@ brief's step 0: the agent runs `git switch -c work/<name>` before it writes anyt
 branch nobody created ends in a commit no ref reaches, and `worktree_remove` takes it with the tree.
 
 The harness worktree tool, not a shell command, so your `shell` denial still holds; if the harness
-has none, `integrator` runs `git worktree add <dir> -b work/<name> main` and reports the path. Name
-it after the workstream (`ddcb-result`, `sse-heartbeat`), never after the agent. One branch per
-workstream, cut from the `main` you measured; a dead workstream is `worktree_remove`d and the issue
-says why.
+has none, `merge-conflict-fixer` runs `git worktree add <dir> -b work/<name> main` and reports the
+path. Name it after the workstream (`ddcb-result`, `sse-heartbeat`), never after the agent. One
+branch per workstream, cut from the `main` you measured; a dead workstream is `worktree_remove`d
+and the issue says why.
 
 It is structural: one checkout means one index, one stash and one `git status`, so two parallel
 edits become one indistinguishable diff. A worktree's branch *is* a directory, and a branch that
@@ -240,8 +240,8 @@ Merge only on an approval that still holds. The verifier measured a base sha; if
 past it, the approval is stale — re-verify, do not merge a measurement that no longer describes the
 tree.
 
-`integrator` is the exception path: a merge Forgejo cannot perform (a conflict only a human can
-arbitrate, an outage). It says why in its report, and the normal path stays the PR.
+`merge-conflict-fixer` is the exception path: a merge Forgejo cannot perform (a conflict only a
+human can arbitrate, an outage). It says why in its report, and the normal path stays the PR.
 
 **One verifier and one merge at a time, across the whole board.** Two trial merges can each pass
 alone and conflict together; a merge moves `main` under another verifier's measurement. That is

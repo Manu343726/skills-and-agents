@@ -77,11 +77,11 @@ the skill, never the project.
 ## The rules
 
 1. **Every frontmatter `description` is true to its body.** This is the defect that started all of
-   this: a skill whose description advertised "merge through the integrator, review the merged
-   tree" while its own sections said the merge goes through `merge_pull_request` and the review is
-   an audit of what landed. A description is what every session reads *before* it decides to load
-   the body, so a false one does not merely mislead — it prevents the correction from being read.
-   Change a body's protocol, change the description in the same edit.
+   this: a skill whose description advertised a merge through one agent and a review of the merged
+   tree as the gate, while its own sections said the merge goes through `merge_pull_request` and
+   the review is an audit of what already landed. A description is what every session reads
+   *before* it decides to load the body, so a false one does not merely mislead — it prevents the
+   correction from being read. Change a body's protocol, change the description in the same edit.
 
 2. **The index moves with the change.** `README.md` carries the table of agents and skills; the
    paragraph under *Layout* says it is the index and is kept in the same change. Adding an agent

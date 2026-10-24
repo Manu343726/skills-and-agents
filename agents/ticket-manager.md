@@ -160,7 +160,7 @@ That is the one state that is always wrong.
 
 ## Closing
 
-Never close on a subagent's word, nor on the integrator's alone. The evidence for `done` is the
+Never close on a subagent's word, nor on the `merger`'s alone. The evidence for `done` is the
 **pull request merged** by the orchestrator, on a `verifier` review that answered `APPROVED` for
 the base sha that was merged. The closing comment carries it: the PR number, the `APPROVED` review
 and the base sha it measured, the merged sha, and the command and its output. If the evidence is

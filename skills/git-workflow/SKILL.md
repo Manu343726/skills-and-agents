@@ -46,7 +46,7 @@ cd ../wt-ddcb-result && git status --short                    # its own index, i
   `git fetch origin && git rebase origin/main`. A merge commit in the branch is rewritten by the
   rebase anyway.
 - **No force-push, and nobody pushes `main`, ever.** `git push --force` is a rewrite of somebody
-  else's reference. `main` moves only through `merge_pull_request`; the `integrator` is the
+  else's reference. `main` moves only through `merge_pull_request`; `merge-conflict-fixer` is the
   exception path for a merge the platform cannot perform, not the normal way work lands.
 - **A finished workstream is removed**: `git worktree remove <dir>` after the merge, or
   `opencode worktree_remove <dir>`. Its branch stays until the merge lands, then it is deleted.

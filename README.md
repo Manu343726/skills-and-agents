@@ -79,7 +79,7 @@ only memory a session leaves behind.
 | `web-engineer` | subagent | The browser frontend: React, TypeScript, styling, frontend tests. |
 | `toolchain-engineer` | subagent | Assembler, disassembler, ROM build pipeline and CLI. |
 | `test-engineer` | subagent | Test suites across stacks: unit, integration, golden files, fuzzing. |
-| `integrator` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
+| `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |

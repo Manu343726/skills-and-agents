@@ -94,8 +94,8 @@ Read the merge for these before you read anything else:
 4. **A contract changed on one side only.** A field in `engine.proto` with no consumer in
    `backend/`, an OpenAPI route with no handler, a REST field the frontend reads and the backend
    never sends.
-5. **An edit that is not a conflict resolution.** The integrator may only resolve; a drive-by fix
-   in the merge is a finding even when it is correct.
+5. **An edit that is not a conflict resolution.** `merge-conflict-fixer` may only resolve; a
+   drive-by fix in the merge is a finding even when it is correct.
 
 Then run the suite yourself, on this tree:
 

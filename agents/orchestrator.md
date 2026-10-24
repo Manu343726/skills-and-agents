@@ -176,8 +176,8 @@ Then:
    author in `status/todo` with the finding quoted, and revert a merge that already landed. The
    tree returns to the last green commit; the next attempt starts from a measured state.
 
-`integrator` is the exception path only: a merge Forgejo's `merge_pull_request` cannot perform,
-such as a conflict only a human can arbitrate or an outage. It says why in its report.
+`merge-conflict-fixer` is the exception path only: a merge Forgejo's `merge_pull_request` cannot
+perform, such as a conflict only a human can arbitrate or an outage. It says why in its report.
 
 **One verifier and one merge in flight, across the whole board.** Two trial merges can each pass
 alone and conflict together, and a merge moves `main` under another verifier's measurement.
@@ -210,6 +210,6 @@ with the revert sha in its comment.
 - Run two verifiers, or two merges, at once: one slot each, across the whole board.
 - Kill, relaunch or remove a quiet workstream. Artifacts say **stale**, never dead; a restart does
   not kill the child, and two agents in one tree has already cost this project.
-- Repeat "merged" from a verifier or integrator report without the merged sha and the suite output.
+- Repeat "merged" from a verifier or merge-conflict-fixer report without the merged sha and the suite output.
 - Commit, push, close an issue or move a status on a subagent's say-so.
 - Widen the issue in hand: a finding you did not fix gets its own issue.
