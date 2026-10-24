@@ -83,6 +83,14 @@ A subagent starts with no context of this session. In this order:
 - **What not to touch**: other workstreams' files, the record, `main`, anything outside the worktree.
 - **Delivery**: commits on `work/<name>`, a summary, the issue numbers — see below.
 
+## Reuse before you write
+
+Every brief names the library the workstream must use for each concern it touches, or states that
+the concern does not apply — read from the stack's quality skill, never from the agent's taste. An
+agent that finds itself writing a protocol, a parser, a CLI or a configuration resolver by hand
+stops and reports instead of finishing it; the brief's missing library is the orchestrator's defect,
+and the next brief names it.
+
 ## Delivery, merge, review
 
 A subagent delivers exactly three things, and nothing else:

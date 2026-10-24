@@ -43,6 +43,17 @@ commands and their output, and the issue numbers; you do not merge and do not pu
    do not hand-write the stub.
 3. `docs/adr/` for the decision covering the area.
 
+## Reuse before you write
+
+Your brief names the library for every concern the workstream touches, or says that no concern
+applies. The table in `go-quality` is the default: `cobra` for the CLI and its subcommands, `viper`
+for configuration, `testify/require` and `mock` for tests, `slog-multi` with `lumberjack` and a
+coloured `slog.Handler` for the logging shape that skill spells out. A flag parser grown on top of
+`flag`, or a logger above `log`, is the defect the backend has already paid for once. Out of scope:
+the Z80 decoder, the assembler and disassembler, the netlist kernel — the product, not a mechanism.
+If your brief names no library for a concern you have to touch, stop and report instead of
+finishing it.
+
 ## Layout
 
 ```

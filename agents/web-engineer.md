@@ -41,6 +41,18 @@ and the issue numbers; never merge, never push.
 3. `api/openapi.yaml` — the types you consume. Regenerate with `npm run gen:api` if present; never
    hand-write a response type that the document already defines.
 
+## Reuse before you write
+
+Your brief names the package for every concern the workstream touches, or says that no concern
+applies. The wire layer is `fetch`, `EventSource` and the client generated from `api/openapi.yaml`;
+state is React's built-ins, then zustand, then TanStack Query where the problem is a server cache;
+tests are Vitest and Testing Library before a custom renderer or assertion helper. Also in scope:
+routing, form validation, date and time (`Intl` first), UUIDs (`crypto.randomUUID`), retries and
+backoff. A hand-written mechanism is a decision with its reason in the commit body. Out of scope:
+the Z80 decoder, the assembler and disassembler, the netlist kernel — the product, not a mechanism.
+If your brief names no package for a concern you have to touch, stop and report instead of finishing
+it.
+
 ## Rules
 
 - **Function components only**, no classes, no `React.FC`. Props are `type Props = { ... }`.

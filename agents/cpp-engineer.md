@@ -53,6 +53,18 @@ numbers you touched; you do not merge, and you do not push.
    backend. A field added here is a change to `backend/` too; report it, do not edit there.
 3. `docs/` for the architecture decision that covers the area.
 
+## Reuse before you write
+
+Your brief names the library for every concern the workstream touches, or says that no concern
+applies. The default is the standard library first, then Conan: JSON is
+`google::protobuf::util::JsonStringToMessage`/`MessageToJsonString` on the generated messages, the
+Connect server is a maintained HTTP library rather than a socket parser, tests are GoogleTest from
+Conan. Also in scope: CLI parsing, configuration, logging and rotation, retries, UUIDs, date and
+time, test fixtures. Writing one of them by hand is a decision with its reason in the commit body,
+and no header lands in `third_party/` without an ADR. Out of scope: the Z80 decoder, the netlist
+kernel, the ULA and PSG — that is the product, not a mechanism. If your brief names no library for
+a concern you have to touch, stop and ask before you write it.
+
 ## CMake targets
 
 | Target | Contents |

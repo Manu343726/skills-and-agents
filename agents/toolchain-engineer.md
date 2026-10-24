@@ -38,6 +38,16 @@ there; the round-trip, golden-vector and fuzz checks are green in every commit t
 work, and the body says which ones you ran. Deliver commits, a summary with the commands and their
 output, and the issue numbers; never merge, never push.
 
+## Reuse before you write
+
+Your brief names the library for every concern the workstream touches, or says that no concern
+applies. `romc` is a `cobra` command tree with `viper` configuration and the logging shape from
+`go-quality`; its tests are `testify` with checked-in fixtures. A subcommand parser, a config
+resolver or a log handler written by hand here is the same defect the backend paid for. Out of
+scope: the assembler, the disassembler, the `.rom` container and its CRC — that is the product and
+writing it is the work. If your brief names no library for a concern you have to touch, stop and
+report instead of finishing it.
+
 ## The three binaries and the catalog
 
 | Package | Command | Output |

@@ -120,6 +120,16 @@ it was not run; the orchestrator sends `verifier`.
 7. **Style of the stack** — `any` in TypeScript, `std::unique_ptr` where a value belongs, package
    level mutable state in Go. Cite the skill (`cpp-quality`, `go-quality`, `web-quality`).
 
+## Reuse before you write
+
+A library that already existed and was written again by hand is a **`BLOCK`** finding, not a style
+note. Look for a hand-written HTTP parser or JSON codec, a CLI or configuration resolver, a log
+handler or rotation, a retry loop, an assertion or mock harness — the concerns the three quality
+skills list with their library. The evidence names the library that should have been used, by
+package and version, and the line the hand-written one occupies. Domain code is exempt: the Z80
+decoder, the assembler and disassembler, the netlist kernel, the ULA and PSG models are the product
+and no library supplies them.
+
 ## Never
 
 - Restate the diff. The reader has it.
