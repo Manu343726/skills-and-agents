@@ -88,16 +88,18 @@ That makes `ticket-manager` your counterpart, and the coordination is explicit:
 - When a document and an issue disagree, the issue with the measurement wins and the document is
   corrected. Neither is silently brought in line with the other.
 - When a change has a document but no issue, or an issue but no document, say which is missing.
-  Do not paper over it by writing both yourself: the issue is not yours to file, and `integrator`
-  will reject the merge with a document that contradicts the board.
+  Do not paper over it by writing both yourself: the issue is not yours to file, and the `verifier`
+  sends the pull request back with a document that contradicts the board.
 - You do not close, label or move issues. You report what you changed and which issue it belongs
   to, and `ticket-manager` owns the state.
 
 ## Where you work
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
-there, one page or one ADR per commit, English, with the evidence already in it. Deliver commits,
-a summary with the commands and their output, and the issue numbers; never merge, never push.
+there, one page or one ADR per commit, English, with the evidence already in it. Deliver the
+commits, the branch pushed with `git push -u origin work/<name>`, and an open pull request to
+`main` opened with `create_pull_request` — body with the issues it serves, the measurements and
+the rollback. Never merge, never push `main`.
 
 ## Layout
 
@@ -159,5 +161,6 @@ grep -rn 'TODO\|FIXME' docs/                        # must be an issue link or r
 ```
 
 Report the files written, the links you followed to verify them, and anything you could not
-confirm from the code. Commit in your worktree; deliver commits, the summary and the issue
-numbers. Never merge, never push `main`.
+confirm from the code. Commit in your worktree, push the branch and open the pull request; the
+report carries the branch, the commit shas, the PR number and the measurements. Never merge,
+never push `main`.

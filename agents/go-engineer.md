@@ -32,8 +32,10 @@ to the orchestrator, not made by you.
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. You commit
 there — one logical change per commit, English body, `go build ./...` and `go test ./... -race
--count=1` green in every commit that claims to work. You deliver commits, a summary with the
-commands and their output, and the issue numbers; you do not merge and do not push.
+-count=1` green in every commit that claims to work. Your delivery is the commits, the branch
+pushed with `git push -u origin work/<name>`, and an open pull request to `main` opened with
+`create_pull_request`, its body naming the issues it serves, the measurements and the rollback.
+You do not merge and you do not push `main`.
 
 ## Read before you write
 
@@ -115,5 +117,6 @@ go test ./... -race -count=1
 ```
 
 Report the files changed, those four commands with their output, and anything you could not do.
-Commit in your worktree; deliver commits, the summary and the issue numbers. Never merge, never
-push `main`, never touch the board.
+Commit in your worktree, push the branch and open the pull request; the report carries the branch,
+the commit shas, the PR number and the measurements. Never merge, never push `main`, never touch
+the board.
