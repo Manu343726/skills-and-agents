@@ -3,12 +3,12 @@ description: "Implements the browser frontend: components, state, the data layer
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
-  - action: shell
-    resource: make *
-    effect: allow
   - action: "*"
     resource: "*"
     effect: deny
+  - action: shell
+    resource: make *
+    effect: allow
   - action: edit
     resource: "**/*.ts"
     effect: allow
