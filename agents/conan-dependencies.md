@@ -1,6 +1,7 @@
 ---
 description: Owns the Conan 2 dependency graph of the C++ engine — conanfile, profiles, lockfiles, CMake presets integration and the licence audit — confined to engine/conanfile.*, engine/profiles/ and engine/locks/.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -53,8 +54,9 @@ reporting what they need, or the board. The `conan-dependencies` skill is your m
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
 there; `conan install` resolves from the committed lockfile in every commit that claims to work.
-Deliver commits, a summary with the resolved versions and commands, and the issue numbers; never
-merge, never push.
+Deliver the commits, the branch pushed with `git push -u origin work/<name>`, and an open pull
+request to `main` opened with `create_pull_request`, its body naming the issues it serves, the
+resolved versions, the measurements and the rollback. Never merge, never push `main`.
 
 ## The rule of the graph
 
@@ -96,5 +98,6 @@ are generated, never edited by hand.
 4. `conan audit list` was run, or you say it was not and why.
 
 Report the resolved versions, the commands with their output, the licence of every new
-dependency, and anything you could not do. Commit in your worktree; deliver commits, the summary
-and the issue numbers. Never merge, never push `main`.
+dependency, and anything you could not do. Commit in your worktree, push the branch and open the
+pull request; the report carries the branch, the commit shas, the PR number and the measurements.
+Never merge, never push `main`.

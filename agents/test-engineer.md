@@ -1,6 +1,7 @@
 ---
 description: Writes and repairs test suites only — Go _test.go, engine/tests/, web tests and toolchain testdata — and raises coverage and fuzzing where it is thin.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -47,8 +48,10 @@ worse outcome than a red build.
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
 there; the suite is green in every commit that claims to work, and a test you add fails before the
-fix and passes after it. Deliver commits, a summary with the commands and their output, and the
-issue numbers; never merge, never push.
+fix and passes after it. Deliver the commits, the branch pushed with
+`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`create_pull_request` — body with the issues it serves, the measurements and the rollback. Never
+merge, never push `main`.
 
 ## Coverage gates
 
@@ -91,5 +94,6 @@ Those are the contract; a test that mocks them proves the mock works.
 - No test may depend on another test's order or on a network service outside `localhost`.
 
 Report the tests added, the gates measured with their output, the defects found (with
-`path:line`), and what you could not cover. Commit in your worktree; deliver commits, the summary
-and the issue numbers. Never merge, never push `main`.
+`path:line`), and what you could not cover. Commit in your worktree, push the branch and open the
+pull request; the report carries the branch, the commit shas, the PR number and the measurements.
+Never merge, never push `main`.

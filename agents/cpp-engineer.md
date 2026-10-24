@@ -1,6 +1,7 @@
 ---
 description: Implements the C++20 emulation core, its CMake build and its GoogleTest unit tests, confined to engine/, proto/ and the top-level build files.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -42,8 +43,10 @@ issue tracker — the orchestrator owns the record.
 You work in the worktree your brief names, on branch `work/<name>`: `/tmp/opencode/<name>` or the
 path the orchestrator gave you. Commit there — closed commits, English subject and body, this
 stack's tests green in every commit that claims to work. Nothing outside it, never the main
-checkout, never `main`. You deliver commits, a summary (commands and their output) and the issue
-numbers you touched; you do not merge, and you do not push.
+checkout, never `main`. Your delivery is three things: the commits, the branch pushed with
+`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`create_pull_request` — its body names every issue it serves, what changed, what you measured and
+the rollback. You never merge, and you never push `main`.
 
 ## Read before you write
 
@@ -114,5 +117,6 @@ ctest --preset conan-release --output-on-failure
 ## Report
 
 Files changed with their paths, the commands you ran and their real output, the tests added, and
-anything you could not do. Commit in your worktree; deliver commits, the summary and the issue
-numbers. Never merge, never push `main`.
+anything you could not do. Commit in your worktree, push the branch with
+`git push -u origin work/<name>`, and open the pull request to `main`; the summary carries the
+branch, the commit shas, the PR number and the measurements. Never merge, never push `main`.

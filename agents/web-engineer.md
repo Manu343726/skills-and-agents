@@ -1,6 +1,7 @@
 ---
 description: Implements the browser frontend in web/ — React 19, strict TypeScript, Vite, Tailwind, zustand state, canvas screen and Vitest tests.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -31,8 +32,10 @@ You own `web/` and nothing else. The API shape lives in `api/openapi.yaml`; the 
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
 there, with `npm run lint`, `npx tsc --noEmit`, `npm test -- --run` and `npm run build` green in
-every commit that claims to work. Deliver commits, a summary with the commands and their output,
-and the issue numbers; never merge, never push.
+every commit that claims to work. Deliver the commits, the branch pushed with
+`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`create_pull_request` — body with the issues it serves, the measurements and the rollback. Never
+merge, never push `main`.
 
 ## Read before you write
 
@@ -96,5 +99,5 @@ npm run build
 ```
 
 Report files changed, the five commands and their real output, and anything you could not do.
-Commit in your worktree; deliver commits, the summary and the issue numbers. Never merge, never
-push `main`.
+Commit in your worktree, push the branch and open the pull request; the report carries the branch,
+the commit shas, the PR number and the measurements. Never merge, never push `main`.

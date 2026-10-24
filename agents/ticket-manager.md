@@ -1,6 +1,7 @@
 ---
 description: Maintains the Forgejo board for manu343726/z80-emulator — labels, issue bodies, status transitions and the kanban — using the forgejo MCP tools only.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -49,12 +50,13 @@ comment on the issue that triggered the work to say the workstream existed witho
 
 ## The summary is the comment
 
-A subagent delivers commits, a summary and the numbers of the issues it touched. That summary is
-the issue comment — verbatim, and in this order:
+A subagent delivers commits, a **pushed** branch, an **open pull request**, and the numbers of the
+issues it touched. That summary is the issue comment — verbatim, and in this order:
 
 ```markdown
 ## Delivered
-- branch `work/<name>`, <first-sha>..<last-sha>, <n> commits
+- branch `work/<name>`, <first-sha>..<last-sha>, <n> commits, pushed to origin
+- PR #<n> — <title>, base `main`, head `work/<name>`
 - `path/to/file`: what changed, and the test that asserts it
 
 ## Measured
@@ -145,21 +147,25 @@ body because the title carries it only when the issue was written after the fact
 | `todo` → `in-progress` | **before the first command of the workstream**, never after |
 | `in-progress` → `blocked` | stopped, and the body says what blocks it |
 | `in-progress` → `todo` | handed back unfinished, or merged and then reverted |
-| `in-progress` → `done` + close | merged, `reviewer` answered `PASS` on the merged tree, with the merge sha and the test output in a comment |
+| `in-progress` → `done` + close | the PR merged by the orchestrator, on a `verifier` review that answered `APPROVED` for the base sha that was merged, with the merged sha and the test output in a comment |
 | any → `backlog` | turns out not to be actionable yet |
 
 A reverted merge is `todo`, not `done`: the branch went back to its author with the revert sha in
 the comment, so the work is queued again and the reason survives.
+
+A pull request the `verifier` sent back with `REQUEST_CHANGES` is `todo` too, with the reason and
+the `path:line` it names — the work is not done, and the issue says why it is not.
 
 An issue left in `in-progress` by an agent that stopped claims somebody is on it when nobody is.
 That is the one state that is always wrong.
 
 ## Closing
 
-Never close on a subagent's word, nor on the integrator's alone: the merge has to be `PASS` from
-`reviewer` on the merged tree. The closing comment carries the evidence: the commit shas, the
-merged sha, the command and its output. If the evidence is missing, leave the issue `in-progress`
-or `blocked` and say what is missing.
+Never close on a subagent's word, nor on the `merger`'s alone. The evidence for `done` is the
+**pull request merged** by the orchestrator, on a `verifier` review that answered `APPROVED` for
+the base sha that was merged. The closing comment carries it: the PR number, the `APPROVED` review
+and the base sha it measured, the merged sha, and the command and its output. If the evidence is
+missing, leave the issue `in-progress` or `blocked` and say what is missing.
 
 ## Report
 

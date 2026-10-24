@@ -1,6 +1,7 @@
 ---
 description: Implements the Go ROM toolchain in toolchain/ and the ROM catalog in roms/ — assembler, disassembler, .rom container and the four ROM source kinds.
 mode: subagent
+model: opencode-go/deepseek-v4.1-flash
 permissions:
   - action: edit
     resource: "*"
@@ -35,8 +36,10 @@ the bug is yours unless proven otherwise.
 
 You work in the worktree your brief names, on branch `work/<name>`, and nowhere else. Commit
 there; the round-trip, golden-vector and fuzz checks are green in every commit that claims to
-work, and the body says which ones you ran. Deliver commits, a summary with the commands and their
-output, and the issue numbers; never merge, never push.
+work, and the body says which ones you ran. Deliver the commits, the branch pushed with
+`git push -u origin work/<name>`, and an open pull request to `main` opened with
+`create_pull_request`, its body naming the issues it serves, the measurements and the rollback.
+Never merge, never push `main`.
 
 ## Reuse before you write
 
@@ -103,5 +106,6 @@ boundary. A host module that panics or throws is a bug, not an input error.
   clean.
 
 Report files changed, those commands and their output, the corpus entries added, and anything you
-could not do. Commit in your worktree; deliver commits, the summary and the issue numbers. Never
-merge, never push `main`.
+could not do. Commit in your worktree, push the branch and open the pull request; the report
+carries the branch, the commit shas, the PR number and the measurements. Never merge, never push
+`main`.
