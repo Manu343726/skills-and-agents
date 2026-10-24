@@ -61,6 +61,22 @@ An incident replaces `What` with `Impact`, `Cause` and `Fix`, and carries the ti
 body. The title names the event, not its date — an issue filed at the moment it happened is dated by
 its creation; only a write-up after the fact puts the date in the title.
 
+## Tickets are documentation
+
+An issue is the half of the record that says what *happened*: the ask, the finding with its
+evidence, what was measured, what changed, and how to get back. A document says what the system
+*is*. A change that alters behaviour needs both, and neither replaces the other.
+
+- **The document cites the issue**, and the issue names the document it invalidated. A closing
+  comment that says "documented" without the path is not a record.
+- **Evidence lives in the issue first** — the command, its output, the `path:line`, the timestamp —
+  and the document quotes it. A number that exists only in a page cannot be re-measured.
+- **The project declares where its documentation lives** (`AGENTS.md`, else `README.md`): `docs/`
+  by default, or an external system with its own tool. A link in an issue follows that declaration;
+  a repository path is never invented for a page that lives elsewhere.
+- **Who does what**: `docs-writer` owns the pages, `ticket-manager` owns the issues. Neither edits
+  the other's half, and each is the check on the other's drift.
+
 ## Lifecycle
 
 | From | To | When |

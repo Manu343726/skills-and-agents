@@ -75,7 +75,7 @@ only memory a session leaves behind.
 | `integrator` | subagent | Merges a branch onto `main`: rebase, conflicts, the full suite on the merged tree. The only agent that pushes `main`. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
-| `docs-writer` | subagent | README, `docs/`, ADRs, API references. |
+| `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `ticket-manager` | subagent | The Forgejo board: labels, issues, status transitions, milestones. |
 | `conan-dependencies` | subagent | The Conan 2 graph: `conanfile`, profiles, lockfiles, licences. |
 
@@ -90,7 +90,7 @@ only memory a session leaves behind.
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |
 | `rom-toolchain` | ROM source kinds, assembler/disassembler contract, build pipeline. |
 | `testing-strategy` | What to test at which level, golden files, coverage gates, fuzzing. |
-| `documentation-standards` | Document set, template, links, evidence beside claims. |
+| `documentation-standards` | Where a project's documentation lives (declared by the project; `docs/` Markdown when nothing is said), the layout, the ADR format, links, evidence beside claims, and the document-versus-ticket split. |
 | `forgejo-ticketing` | Label taxonomy, issue template, board flow, PR flow. |
 | `connect-rpc` | Protobuf contract, Connect server/client, error model, codegen. |
 | `openapi-contract` | OpenAPI-first REST, generated handlers, validation, versioning. |

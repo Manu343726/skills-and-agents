@@ -1,6 +1,6 @@
 ---
 name: documentation-standards
-description: The docs/ layout, the ADR format, README requirements, link conventions for every file and entity, evidence beside every claim, and the English-only rule.
+description: Where a project's documentation lives and why the project says so, the docs/ layout when it is the default, the ADR format, README requirements, link conventions, evidence beside every claim, the English-only rule, and the split between a document and a ticket.
 ---
 
 # Documentation standards
@@ -8,7 +8,59 @@ description: The docs/ layout, the ADR format, README requirements, link convent
 The documentation is part of the change, not a follow-up. A document that no longer describes the
 code is a bug with a `path:line` on each side.
 
-## Layout
+## Where the documentation lives
+
+**A project declares its documentation system in `AGENTS.md` (or, failing that, `README.md`), and
+the declaration is part of the repository's contract.** The reason is that projects do not agree:
+one keeps hierarchical Markdown under `docs/`, another edits pages in an external system through an
+API, a third has a single README and means it.
+
+| Declared as | What it means | Where you write |
+|---|---|---|
+| `docs/` (Markdown, hierarchical) | one topic per file, the tree below | the repository |
+| a generated site over `docs/` | the Markdown is the source, the HTML is built | the repository |
+| an external system, named | the pages live there with their own tool | **that tool**, never a Markdown copy |
+| a mirror of an external system | the repository copy is generated | the external source |
+| a single `README.md` | sections, not pages | the repository |
+
+**With nothing declared, assume `docs/` with hierarchical Markdown** — it is the least surprising
+default, it needs no service, and it survives the project. Then *declare it*: add the sentence to
+`AGENTS.md` in the same change, so the next session reads the answer instead of inventing one.
+
+```markdown
+## Where the documentation lives
+
+This project documents in `docs/`, hierarchical Markdown, one topic per file. Nothing is kept in
+an external system, and nothing under `docs/` is generated.
+
+<!-- or: -->
+## Where the documentation lives
+
+Machines, services and networks are documented in **Homelable**, not here; the
+`homelable-docs` skill carries its conventions. This repository keeps only
+`docs/adr/` and the API references, which are generated from `api/openapi.yaml`.
+```
+
+A declaration that is wrong is worse than none: a writer told "external system" who finds Markdown
+edits the wrong copy. When the two disagree, the system with the read-write tool wins and the
+declaration is corrected in the same change.
+
+### Documents and tickets are one record
+
+| | The document | The ticket |
+|---|---|---|
+| Answers | what the system **is**, now | what **happened**, what was measured, how to get back |
+| Lives | the project's documentation system | the tracker (`type/*`, `status/*`) |
+| Written | after the change, describing the result | with the change, closing when verified |
+| Owner | `docs-writer` | `ticket-manager` |
+
+A change that alters behaviour needs both, and neither substitutes for the other: a page with no
+issue has no evidence, and an issue with no page leaves the system describing itself wrongly. When
+they disagree, **the issue with the measurement wins** and the document is corrected. `docs-writer`
+never files, closes or labels an issue; it says which issue its page belongs to and `ticket-manager`
+owns the state.
+
+## Layout (when the project documents in `docs/`)
 
 ```
 docs/architecture.md            the shape of the system and why it is that shape

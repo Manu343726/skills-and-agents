@@ -71,6 +71,32 @@ the issue comment — verbatim, and in this order:
 An issue with no comment but a closed status is a record that cannot be rebuilt. The commit shas
 and the command output are the point of the comment; "done" alone is not.
 
+## The board and the documentation
+
+**A ticket is documentation.** It records what was asked, what was found, what was measured, what
+changed and how to get back — the half of the record a document does not carry, because a document
+says what the system *is* and an issue says what *happened* to it.
+
+So the split with `docs-writer` is explicit, and neither side crosses it:
+
+| | You | `docs-writer` |
+|---|---|---|
+| Files, closes, labels, moves issues | yes | never |
+| Writes `docs/`, `README.md`, `AGENTS.md` | never | yes |
+| Quotes the measurement | in the issue body and the closing comment | in the page, citing the issue |
+
+- **A document change cites its issue.** When `docs-writer` reports a page with no issue behind it,
+  the finding is yours: open the issue (`type/docs` or the type the change really is), with the
+  page and what it now says.
+- **An issue that changes behaviour needs its document.** Before you close one, check that the
+  document the change invalidates was updated in the same change. Closing an issue whose document
+  is now wrong is how a project ends up describing itself falsely.
+- **Never let a document carry the only evidence.** A number with no issue behind it has no
+  command, no timestamp and no rollback; ask for it, do not copy the sentence.
+- **The project says where its documentation lives** (`AGENTS.md`, or `README.md` when it is the
+  only one). If it says an external system, the issue links to the page there rather than to a
+  file in the repository, and a path that does not exist in the repository is never invented.
+
 ## Label taxonomy
 
 | Namespace | Values |
