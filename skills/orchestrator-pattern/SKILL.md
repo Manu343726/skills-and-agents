@@ -100,8 +100,10 @@ Fix the DDCB result-to-register write, with the regression test in
 `backend/`, `web/`, `toolchain/`, `proto/`, `docs/`, the issue tracker, `main`.
 
 ## Delivery
-Commits on `work/<name>`, the branch pushed with `git push -u origin work/<name>`, an open PR to
-`main` naming every issue it serves, and the report with the shas and the PR number — section 6.
+Commit early and push early: a `wip:` commit and `git push -u origin work/<name>` as soon as there
+is anything, so liveness is readable from the branch; squash your own `wip:` commits before the PR.
+Then commits on `work/<name>`, the branch pushed, an open PR to `main` naming every issue it
+serves, and the report with the shas and the PR number — section 6.
 ```
 
 No brief without a *measured* fact: a command that ran, a `path:line`, a version. No brief with
@@ -111,7 +113,51 @@ the main checkout's path in it: an agent told where `main` lives works in `main`
 
 `subagent`, `background: true`, always — never foreground. Launch independent workstreams in one
 burst, each in its own worktree, then work on something that does not overlap (the next issue, the
-record skeleton). Do not poll, and do not redo the task beside the agent.
+record skeleton). Do not poll the session, and do not redo the task beside the agent.
+
+### Liveness is read from artifacts
+
+The harness exposes **no child-session state**: `search "session"` returns `session_move` and
+`session_rename` only. There is no "is it running", no progress, no error channel. Message silence
+is therefore not evidence of anything — a healthy agent that is reading code is silent, and a dead
+one is silent the same way. **Never infer liveness from message silence.**
+
+Read it from artifacts instead, all of which survive independently of the session:
+
+| Artifact | What it says |
+|---|---|
+| `.git/worktrees/<name>/logs/HEAD` | when HEAD last moved, and to what |
+| the branch tip's committer date (`git log -1 --format=%cI work/<name>`) | when a commit last landed |
+| the newest mtime under the worktree (`find <dir> -newer …`) | when a file was last written |
+| `git ls-remote origin work/<name>` | when the branch was last pushed |
+
+**Warn at 45 minutes** with no HEAD movement and no working-tree write. The threshold is a
+measurement, not a preference: the startup window before a first commit was **35m48s** and
+**40m43s** on this machine on 2026-10-24. Below 45 minutes you would be warning about the normal
+case.
+
+The warning **names the measurement** and goes to the operator:
+
+```
+work/ddcb-result: no HEAD movement since 10:02:55, no working-tree write since 10:31 —
+stale 45m. The worktree is intact; nothing was stopped.
+```
+
+Say **stale**, never "dead". A stale artifact means nobody has written recently; dead is a claim
+about a process you cannot see.
+
+**Never kill, relaunch or remove a quiet workstream.** A session restart does not kill the child —
+so a "restart" produces two agents in one tree, which has already cost this project one workstream's
+files picked up by a stray `git add -A`. If the worktree must be removed, the operator says so and
+`git status --porcelain` is read first.
+
+### An early `wip:` commit and an early push
+
+Every brief asks for a `wip:` commit and an early `git push -u origin work/<name>` as soon as there
+is anything at all, and a squash before delivery. Liveness needs an artifact to read, and a
+worktree that has never committed has none — the same 40 minutes of honest work and forty minutes
+of nothing look identical from outside. The `wip:` commit is squashed away before the PR; it exists
+to make progress visible while it is progress.
 
 ## 6. The delivery contract
 
@@ -127,6 +173,9 @@ The report also carries the summary: what changed, what was measured with the co
 output, what was deliberately not done, the branch and the commit shas. A branch is not a delivery
 on its own: a report is a message in a session and dies with it, while an open PR is listed by
 `list_repo_pull_requests` from any session.
+
+The `wip:` commits written to make liveness readable are squashed before the PR: what arrives is
+the logical change, not the trail of it.
 
 It does not merge, does not review its own PR, does not push `main`, and does not close an issue
 unless that issue *was* the deliverable. A delivery missing the PR number, the shas or the issue
@@ -149,8 +198,14 @@ If it does not hold, brief a **new** subagent with the failing output and the sa
 
 The gate is `verifier` on the pull request, not your reading of the branch. The verifier records
 the base sha (`main` at handoff), fetches the branch, creates a trial merge onto that sha in its
-own worktree, runs every suite the diff touches on the merged result, and answers `APPROVED` or
-`REQUEST_CHANGES` as a formal Forgejo review. It states the base sha and the trial-merge sha.
+own worktree, runs every suite the diff touches on the merged result, and posts a verdict whose
+**first line** is `## Verdict: APPROVED` or `## Verdict: REQUEST_CHANGES`, carrying the base sha and
+the trial-merge sha.
+
+That verdict is a review **body**, because the platform will not give us a formal state on a
+self-authored PR — measured, verbatim `MCPError: create pull review err: reject your own pull is
+not allowed`. The formal state stays whatever Forgejo accepts; the body is what `merger` reads, and
+the base sha in it is what decides whether the approval still describes `main`.
 
 | Check | Passes when |
 |---|---|

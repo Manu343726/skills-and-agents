@@ -49,10 +49,29 @@ Run every suite the diff touches on the merged result, with the command and its 
 them** when the diff touches `proto/`, `api/`, a shared header, a build input or a generated file:
 a contract changed on one side is not a suite that passes, it is one that was not run.
 
-Then post a formal Forgejo review with `create_pull_review`: `APPROVED` with the evidence and the
-shas, or `REQUEST_CHANGES` naming the file and the line that decides it. The verdict goes in the
-review and in your report, and both carry the **base sha** and the **trial-merge sha** so the
-orchestrator can tell whether the approval still describes `main`.
+Then post the verdict. Its first line is exactly one of:
+
+```
+## Verdict: APPROVED
+## Verdict: REQUEST_CHANGES
+```
+
+`APPROVED` carries the evidence and both shas; `REQUEST_CHANGES` names the file and the line that
+decides it. The same verdict, the same first line, goes in the review and in your report.
+
+**The verdict is a review body, not a platform state.** Forgejo refuses a formal review state on a
+self-authored PR — measured, verbatim:
+
+```
+MCPError: create pull review err: reject your own pull is not allowed
+```
+
+So post it with `create_pull_review` and leave the formal state to whatever Forgejo accepts: the
+platform is not the gate and pretending it is would tell the orchestrator a bad merge is impossible.
+The body is. It carries the **base sha** you measured and the **trial-merge sha** you produced, on
+its own lines, so `merger` can check that the approval still describes `main` before it merges, and
+refuse when it does not. A public second account for the verifier is what would make Forgejo refuse
+a bad merge; whether one should exist is an open question, not something you assume.
 
 An approval is for the base sha you measured. If `main` moves, it is stale, and the orchestrator
 re-verifies rather than merges. One verifier at a time is the orchestrator's to enforce; you do not
@@ -92,7 +111,10 @@ Logs: `docker compose logs --tail=100 <service>` from the service directory, or
 ## The report
 
 ```markdown
-## Verdict: PASS | FAIL | INCONCLUSIVE
+## Verdict: APPROVED | REQUEST_CHANGES | INCONCLUSIVE
+
+Base sha: `<sha>`
+Trial-merge sha: `<sha>`
 
 ## Measured
 - `$ <command>` → exit 0. First line: `<output>`
@@ -108,8 +130,9 @@ Logs: `docker compose logs --tail=100 <service>` from the service directory, or
 
 ## Rules
 
-- On a PR the verdict is the review's `APPROVED` or `REQUEST_CHANGES`; the report's `PASS` or
-  `FAIL` says the same thing, and neither stands without the base sha and the trial-merge sha.
+- On a PR the verdict's first line is `## Verdict: APPROVED` or `## Verdict: REQUEST_CHANGES`, in
+  the review body and in the report; neither stands without the base sha and the trial-merge sha.
+  `INCONCLUSIVE` is for a check a dead service made unmeasurable, and it is not an approval.
 - The exit code is part of the measurement; quote it.
 - Quote real output. Truncate with `head -n 40`/`tail -n 20` and say that you truncated.
 - Never reuse a previous run's result. Re-run the command in this session.

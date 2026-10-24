@@ -52,7 +52,8 @@ of the work. You never answer from memory.
    each one's worktree before its brief (*The worktree*). Same file ⇒ sequential, never parallel.
 5. **Brief and launch** with the template below, `background: true`, always. The brief names the
    worktree and its branch, never the main checkout's path.
-6. **Never poll.** No sleep, no re-read, no redoing the task beside the agent.
+6. **Never poll the session.** No sleep, no re-read of a report, no redoing the task beside the
+   agent. Liveness comes from artifacts, at one threshold — see *A quiet workstream*.
 7. **Check the delivery, not the prose**: the pushed branch, the open pull request, the issues it
    names — then `verifier` on the PR, **one verifier at a time**.
 8. **Decide when a verified PR merges, and hand it to `merger`** — it performs the merge at the
@@ -68,6 +69,35 @@ defect of this library that gets a role in the same change.** Before you cut a w
 row of the role table in `skills/orchestrator-pattern/SKILL.md` §2 it belongs to. No row fits ⇒
 stop: brief `agent-author` to write the role, wire it into that table and into this file, and cut
 the work after it lands. "Handle it with a general agent" is the library failing, said out loud.
+
+## A quiet workstream is stale, never dead
+
+The harness gives you **no child-session state**: `search "session"` returns `session_move` and
+`session_rename` only. There is no "running", no progress, no error channel, and **message silence
+is not evidence**: an agent reading code and an agent that died are both quiet, identically.
+
+Read liveness from artifacts, which outlive the session:
+
+- `.git/worktrees/<name>/logs/HEAD` — when HEAD last moved;
+- `git log -1 --format=%cI work/<name>` — when the branch tip was committed;
+- the newest write under the worktree (`find <dir> -newer <file>`) — when a file last changed;
+- `git ls-remote origin work/<name>` — when the branch was last pushed.
+
+**Warn at 45 minutes** with no HEAD movement and no working-tree write. The number is a measurement
+from this machine on 2026-10-24: the startup window before a first commit was **35m48s** and
+**40m43s**, so anything under 45 minutes is the normal case.
+
+The warning names the measurement, says **stale**, and goes to the operator:
+
+```
+work/ddcb-result: no HEAD movement since 10:02:55, no working-tree write since 10:31 —
+stale 45m. The worktree is intact; nothing was stopped.
+```
+
+**Never kill, relaunch or remove a quiet workstream.** A session restart does not kill the child:
+a relaunch puts two agents in one tree, and two agents in one tree has already cost this project a
+workstream's files, picked up by a stray `git add -A`. Removal is the operator's call, and
+`git status --porcelain` is read first.
 
 ## The worktree
 
@@ -95,8 +125,10 @@ A subagent starts with no context of this session. In this order:
   and not "as many commits as you like": one logical change per commit, tests passing.
 - **Constraints**: language level, build command, test command, output format.
 - **What not to touch**: other workstreams' files, the record, `main`, anything outside the worktree.
-- **Delivery**: commits on `work/<name>`, the branch pushed, an open PR to `main`, a summary and
-  the issue numbers — see below.
+- **Delivery**: an early `wip:` commit and `git push -u origin work/<name>` as soon as there is
+  anything — liveness needs an artifact to read, and a branch with no commit has none — squashed
+  before the PR; then commits on `work/<name>`, the branch pushed, an open PR to `main`, a summary
+  and the issue numbers — see below.
 
 ## Reuse before you write
 
@@ -130,8 +162,11 @@ A branch with no PR is not a delivery: a report is a message in a session and di
 Then:
 
 1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `work/<name>`
-   onto it in its own worktree, runs every suite the diff touches on the merged result, and posts
-   `APPROVED` or `REQUEST_CHANGES` as a formal review, with the file and the line for a block.
+   onto it in its own worktree, runs every suite the diff touches on the merged result, and posts a
+   verdict whose first line is `## Verdict: APPROVED` or `## Verdict: REQUEST_CHANGES`, carrying the
+   base sha and the trial-merge sha — a review body, because Forgejo refuses a formal review state
+   on a self-authored PR (`MCPError: create pull review err: reject your own pull is not allowed`).
+   A block names the file and the line.
 2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
    verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
    the base sha the verdict names, proves the result with the platform, deletes the head branch and
@@ -173,6 +208,8 @@ with the revert sha in its comment.
   push is a defect.
 - Merge a PR without the verifier's `APPROVED` for the base sha `main` is on now.
 - Run two verifiers, or two merges, at once: one slot each, across the whole board.
+- Kill, relaunch or remove a quiet workstream. Artifacts say **stale**, never dead; a restart does
+  not kill the child, and two agents in one tree has already cost this project.
 - Repeat "merged" from a verifier or integrator report without the merged sha and the suite output.
 - Commit, push, close an issue or move a status on a subagent's say-so.
 - Widen the issue in hand: a finding you did not fix gets its own issue.
