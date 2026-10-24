@@ -84,7 +84,6 @@ only memory a session leaves behind.
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `ticket-manager` | subagent | The board of the repository named in the brief: labels, issues, status transitions, milestones. |
-| `conan-dependencies` | subagent | The Conan 2 graph: `conanfile`, profiles, lockfiles, licences. |
 | `agent-author` | subagent | This library: agents, skills, the index and `AGENTS.md` — descriptions true to their bodies, permissions exactly as documented. |
 
 **A role here is generic: it may name a tool and a convention, never a directory that belongs to one
@@ -99,20 +98,13 @@ here.
 | Skill | For |
 |---|---|
 | `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing. |
-| `z80-isa` | The Z80 instruction set, flags, timing, interrupts, undocumented behaviour. |
 | `cpp-quality` | C++20 conventions, ownership, error handling, sanitizers, CMake. |
 | `go-quality` | Go conventions, context, errors, concurrency, package layout. |
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |
-| `rom-toolchain` | ROM source kinds, assembler/disassembler contract, build pipeline. |
-| `testing-strategy` | What to test at which level, golden files, coverage gates, fuzzing. |
 | `documentation-standards` | Where a project's documentation lives (declared by the project; `docs/` Markdown when nothing is said), the layout, the ADR format, links, evidence beside claims, and the document-versus-ticket split. |
 | `forgejo-ticketing` | Label taxonomy, issue template, board flow, PR flow. |
-| `connect-rpc` | Protobuf contract, Connect server/client, error model, codegen. |
 | `openapi-contract` | OpenAPI-first REST, generated handlers, validation, versioning. |
-| `mqtt-events` | Topic taxonomy, payload schemas, QoS, retained state. |
 | `git-workflow` | Branches, worktrees, conventional commits, PR size, review, merge. |
-| `conan-dependencies` | Conan 2: the compiler, cmake and ninja from Conan, `conanfile.py`, profiles, lockfiles, audit. |
-| `parallel-execution` | Where the cores go, the delta barrier that keeps it reproducible, the atomics and padding rules, and how a parallel change is measured. |
 
 ## Layout
 
