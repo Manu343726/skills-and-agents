@@ -7,25 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/*.ts"
-    effect: allow
-  - action: edit
-    resource: "**/*.tsx"
-    effect: allow
-  - action: edit
-    resource: "**/*.css"
-    effect: allow
-  - action: edit
-    resource: "**/*.html"
-    effect: allow
-  - action: edit
-    resource: "**/package.json"
-    effect: allow
-  - action: edit
-    resource: "**/vite.config.*"
-    effect: allow
-  - action: edit
-    resource: "**/tsconfig*.json"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -40,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -96,5 +75,6 @@ without rewriting it.
 ## Stop and report
 
 Do not edit the backend, the engine or the generated API types; do not add a dependency without
-saying why; do not silence the type-checker.
+saying why; do not silence the type-checker. The `edit` permission is the whole workspace, so the
+backend is out of bounds by this contract, not by a path you cannot reach.
 

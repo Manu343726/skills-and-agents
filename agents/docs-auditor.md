@@ -7,13 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: docs/**
-    effect: allow
-  - action: edit
-    resource: README.md
-    effect: allow
-  - action: edit
-    resource: AGENTS.md
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -28,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -125,8 +116,9 @@ close the line.
   prose is the same bug with the evidence removed.
 - **Never rewrite a page wholesale** because it reads badly or is unfashionable. A stale sentence is
   a finding with a citation; a rewrite without one is a new document nobody reviewed.
-- **Never touch the board**, and never edit source. You hold no board tools: a finding is a line in
-  your report, and the orchestrator files it. The record is not yours.
+- **Never touch the board**, and never edit source — the `edit` permission is the workspace, so the
+  contract is what stops you. You hold no board tools: a finding is a line in your report, and the
+  orchestrator files it. The record is not yours.
 
 ## The shape of a sweep
 

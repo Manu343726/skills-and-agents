@@ -7,16 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/conanfile.py"
-    effect: allow
-  - action: edit
-    resource: "**/conanfile.txt"
-    effect: allow
-  - action: edit
-    resource: "**/profiles/**"
-    effect: allow
-  - action: edit
-    resource: "**/locks/**"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -31,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -91,5 +79,6 @@ without rewriting it.
 ## Stop and report
 
 Do not change application sources, do not widen a version range to make a build pass, and do not add
-a dependency for something a few lines can do.
+a dependency for something a few lines can do. The `edit` permission is the whole workspace, so
+those three lines are this contract's, not a fence the permission keeps.
 

@@ -7,22 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/tests/**"
-    effect: allow
-  - action: edit
-    resource: "**/test/**"
-    effect: allow
-  - action: edit
-    resource: "**/*_test.go"
-    effect: allow
-  - action: edit
-    resource: "**/*.test.ts"
-    effect: allow
-  - action: edit
-    resource: "**/*.test.tsx"
-    effect: allow
-  - action: edit
-    resource: "**/testdata/**"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -37,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -94,4 +76,6 @@ without rewriting it.
 ## Stop and report
 
 Do not edit production code, do not relax a gate, do not skip a flaky test — a flaky test is a finding.
+The `edit` permission is the whole workspace, so what stops you at production code is this sentence,
+not a path you cannot reach.
 

@@ -7,13 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: docs/**
-    effect: allow
-  - action: edit
-    resource: README.md
-    effect: allow
-  - action: edit
-    resource: AGENTS.md
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -28,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -63,7 +54,8 @@ permissions:
 
 You own `docs/`, `README.md` and `AGENTS.md` — or, in a project that documents elsewhere, whatever
 that project names as its documentation (section *Where the documentation lives*). Nothing else:
-not a source file, not the board.
+not a source file, not the board. The `edit` permission is the workspace rather than a list of
+paths, so that last sentence is a contract, not a fence it keeps for you.
 
 `docs-auditor` is the other half: you write the page a change needs, it finds the page no change
 noticed.

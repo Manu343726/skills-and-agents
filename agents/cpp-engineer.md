@@ -7,40 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/*.cpp"
-    effect: allow
-  - action: edit
-    resource: "**/*.cc"
-    effect: allow
-  - action: edit
-    resource: "**/*.cxx"
-    effect: allow
-  - action: edit
-    resource: "**/*.hpp"
-    effect: allow
-  - action: edit
-    resource: "**/*.h"
-    effect: allow
-  - action: edit
-    resource: "**/*.c"
-    effect: allow
-  - action: edit
-    resource: "**/CMakeLists.txt"
-    effect: allow
-  - action: edit
-    resource: "**/*.cmake"
-    effect: allow
-  - action: edit
-    resource: "**/CMakePresets.json"
-    effect: allow
-  - action: edit
-    resource: "**/Makefile"
-    effect: allow
-  - action: edit
-    resource: "**/meson.build"
-    effect: allow
-  - action: edit
-    resource: "**/tests/**"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -55,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -118,7 +82,8 @@ without rewriting it.
 
 ## Stop and report
 
-Do not edit outside the stack you were given, do not change a dependency without the role that owns
-the graph, do not touch the contract another stack consumes, and do not weaken a test to make a
-build green. A test that must change to pass is a finding, not an obstacle.
+Do not edit outside the stack you were given — the permission will not stop you, the contract does
+— and do not change a dependency without the role that owns the graph, do not touch the contract
+another stack consumes, and do not weaken a test to make a build green. A test that must change to
+pass is a finding, not an obstacle.
 

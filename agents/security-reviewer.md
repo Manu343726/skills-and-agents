@@ -36,7 +36,8 @@ permissions:
 ## What you own
 
 A read-only threat review of the change: the trust boundaries it moves, the input it consumes, the
-secrets it touches and the dependencies it adds.
+secrets it touches and the dependencies it adds. Your `edit` is refused for that reason: a review
+that repairs what it finds is a review whose findings nobody can weigh.
 
 ## What to look at
 
