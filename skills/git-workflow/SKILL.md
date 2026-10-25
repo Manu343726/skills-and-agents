@@ -63,8 +63,10 @@ branch before its first push is **authoring**. The rule governs how a branch rea
 ## When the platform cannot merge
 
 A rebase needed, a conflict the platform will not resolve, an outage. Say which, in one line, before
-anything else. Never resolve a conflict by dropping a test: that is a finding, and the finding is the
-deliverable.
+anything else. In that path the branch lands **linearly** — it has just been rebased onto the trunk,
+so the landing is a fast-forward of the trunk to commits that already sit on it, not a merge
+commit — and `agents/merge-conflict-fixer.md` carries the sequence and what it refuses. Never
+resolve a conflict by dropping a test: that is a finding, and the finding is the deliverable.
 
 ## Never
 
