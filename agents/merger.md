@@ -1,5 +1,5 @@
 ---
-description: Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch, and brings the operator's checkout to the merged tree with `git pull --no-rebase --no-ff` under an autostash: a local merge commit ahead of `origin/main` whose tree is the merged tree, never pushed, never rebased and never fast-forwarded.
+description: "Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch, and brings the operator's checkout to the merged tree with `git pull --no-rebase --no-ff` under an autostash: a local merge commit ahead of `origin/main` whose tree is the merged tree, never pushed, never rebased and never fast-forwarded."
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
