@@ -192,11 +192,33 @@ here.
 agents/<id>.md                 the agent, discovered by the plugin from agents/
 skills/<id>/SKILL.md           the skill, discovered by the plugin
 skills/<id>/references/*.md    long material a skill loads on demand
+scripts/check-agent-frontmatter.py   parses every agents/*.md frontmatter as YAML
 ```
 
 The plugin reads `agents/` before any other root, so a repository that follows this layout needs
 no manifest. Adding an entry is adding a directory or a file; the tables under *Contents* are the
 index and are kept in the same change.
+
+**Every frontmatter is machine-checked before it is believed.** `#44` is the reason: `#43` rewrote
+`merger`'s `description` with an unquoted `: ` in it (`under an autostash: a local merge commit`),
+which YAML reads as a nested mapping inside a plain scalar. The block stopped parsing, OpenCode fell
+back to treating the role as `primary`, and `mode: subagent` three lines below never counted — so
+every session that tried to launch it was answered `Agent merger cannot run as a subagent`, and the
+role was dead for every project loading this library. Two verifications read the sentence and none
+parsed it. The check is therefore a program, and it prints each role beside the mode it resolves to:
+
+```sh
+python3 -m venv /tmp/opencode/venv-frontmatter          # once — the system python3 has no PyYAML
+/tmp/opencode/venv-frontmatter/bin/pip install pyyaml
+/tmp/opencode/venv-frontmatter/bin/python scripts/check-agent-frontmatter.py
+```
+
+It exits non-zero when a frontmatter does not parse, when it parses to something that is not a
+mapping, when `mode` is missing or is not one of `primary`/`subagent`/`all`, or when `description`
+is missing or did not come out a string. It exits `2` and says how to fix it when PyYAML is absent,
+because a weaker hand-rolled parser would miss exactly the defect it exists to catch. A description
+whose YAML spelling changes is not a description whose text changes: quoting it is the fix, and the
+value must stay word for word what it was.
 
 ## Licence
 
