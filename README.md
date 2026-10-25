@@ -72,7 +72,7 @@ only memory a session leaves behind.
 
 | Agent | Mode | Owns |
 |---|---|---|
-| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, writes the record. No mutating permissions. |
+| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. No `edit`, no shell. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
@@ -84,7 +84,7 @@ only memory a session leaves behind.
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
-| `ticket-manager` | subagent | The board of the repository named in the brief: labels, issues, status transitions, milestones. |
+| `ticket-manager` | subagent | The board of the repository named in the brief: issues, labels, status transitions, the kanban, and the comments that carry a finding. |
 | `agent-author` | subagent | This library: agents, skills, the index and `AGENTS.md` — descriptions true to their bodies, permissions exactly as documented. |
 
 **A role here is generic: it may name a tool and a convention, never a directory that belongs to one
