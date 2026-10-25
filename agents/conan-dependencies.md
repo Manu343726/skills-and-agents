@@ -7,16 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/conanfile.py"
-    effect: allow
-  - action: edit
-    resource: "**/conanfile.txt"
-    effect: allow
-  - action: edit
-    resource: "**/profiles/**"
-    effect: allow
-  - action: edit
-    resource: "**/locks/**"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -31,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
