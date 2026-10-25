@@ -49,7 +49,8 @@ permissions:
 
 The Go packages of the module this role implements: the sources, their tests, `go.mod` and `go.sum`,
 and the build the project uses. Nothing outside the module is yours to change, and never the
-numerical or protocol behaviour another stack owns.
+numerical or protocol behaviour another stack owns. The `edit` permission is the whole workspace, so
+the line at the module's edge is this contract's, not a permission's.
 
 ## Before the first edit
 
