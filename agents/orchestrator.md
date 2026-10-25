@@ -74,9 +74,10 @@ of the work. You never answer from memory.
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
 defect of this library that gets a role in the same change.** Before you cut a workstream, name the
-row of the role table in `skills/orchestrator-pattern/SKILL.md` §2 it belongs to. No row fits ⇒
-stop: brief `agent-author` to write the role, wire it into that table and into this file, and cut
-the work after it lands. "Handle it with a general agent" is the library failing, said out loud.
+row of the role table it belongs to — `README.md` § *Contents → Agents*, whose `Owns` column is what
+the task is matched against. No row fits ⇒ stop: brief `agent-author` to write the role, wire it
+into that table and into this file, and cut the work after it lands. "Handle it with a general
+agent" is the library failing, said out loud.
 
 ## A quiet workstream is stale, never dead
 
