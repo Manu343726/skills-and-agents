@@ -26,6 +26,12 @@ Then answer three questions out loud, because they decide the cut:
 
 ## 2. Cut
 
+- **The repository is decided here, with the cut.** The issue is opened in the repository that
+  owns the work, and the worktree, the branch and the pull request are cut from it — never from
+  the tree the session happens to be sitting in. A finding noticed in this repository often
+  belongs to another. If the owner is not certain, **stop and ask**: a Forgejo issue cannot be
+  moved without deleting it, the MCP exposes no delete-issue call, and until a human moves it the
+  board answers *what is pending here* with work that is not here.
 - **One workstream, one branch, one writer.** Name it after the work (`dev/<issue-id>`), not after
   the agent.
 - **Disjoint files.** Two agents in one file is one agent's work destroyed. If the split is not
@@ -38,7 +44,9 @@ Then answer three questions out loud, because they decide the cut:
 
 A subagent starts with **no** context of your session. In this order:
 
-1. **Where it works** — the worktree, the branch, and the first command that proves the branch.
+1. **Where it works** — the repository (owner, name, base branch), the worktree, the branch, and
+   the first command that proves the branch. The repository is named, never inferred from the
+   directory this session is in.
 2. **The flow** — or, better, one line: *read the `git-workflow` skill first*. A brief without the
    flow produces a report nobody can merge.
 3. **What is owned**, and what is explicitly not.
