@@ -19,6 +19,22 @@ they behave differently:
 
 A page that is neither is a page nobody will find.
 
+## The three kinds
+
+A project's documentation is three things, and a writer should be able to say which one is in hand:
+
+| Kind | What it is | Where it lives |
+|---|---|---|
+| **Technical** | implementation detail, design, architecture, the decisions and why | the project's `docs/`, in the shape § *Where it lives* just described |
+| **Product** | what the thing does and how to use it — the manual a reader arrives at | `README.md`, and whatever else the project publishes for its users |
+| **Work tracking** | what is in flight, pending, done; the bug, the suggestion, the proposal | the board — one issue per event |
+
+**Work tracking is not this skill's.** An issue records an event and `forgejo-ticketing` is its
+rulebook; the open issues are the project's pending state, not its description. This skill is about
+the other two, and one change can need both: a new capability usually invalidates a technical page
+and adds a product one. A page that reads as both is two pages wearing one hat — § *One page, one
+topic*.
+
 ## One page, one topic
 
 - **A file answers one question** and its title says which. Systems that mixes an architectural
