@@ -60,75 +60,6 @@ permissions:
   - action: edit
     resource: .worktrees/*
     effect: allow
-  - action: shell
-    resource: conan install*
-    effect: allow
-  - action: shell
-    resource: cmake --preset*
-    effect: allow
-  - action: shell
-    resource: cmake --build*
-    effect: allow
-  - action: shell
-    resource: cmake --list-presets*
-    effect: allow
-  - action: shell
-    resource: ctest --preset*
-    effect: allow
-  - action: shell
-    resource: ctest --version*
-    effect: allow
-  - action: shell
-    resource: clang-tidy -p*
-    effect: allow
-  - action: shell
-    resource: git *
-    effect: allow
-  - action: shell
-    resource: ninja *
-    effect: allow
-  - action: shell
-    resource: make *
-    effect: allow
-  - action: shell
-    resource: gcc*
-    effect: allow
-  - action: shell
-    resource: g++*
-    effect: allow
-  - action: shell
-    resource: cc *
-    effect: allow
-  - action: shell
-    resource: c++ *
-    effect: allow
-  - action: shell
-    resource: ar *
-    effect: allow
-  - action: shell
-    resource: ld *
-    effect: allow
-  - action: shell
-    resource: nm *
-    effect: allow
-  - action: shell
-    resource: objdump *
-    effect: allow
-  - action: shell
-    resource: readelf *
-    effect: allow
-  - action: shell
-    resource: addr2line *
-    effect: allow
-  - action: shell
-    resource: size *
-    effect: allow
-  - action: shell
-    resource: strings *
-    effect: allow
-  - action: shell
-    resource: ldd *
-    effect: allow
   - action: execute
     resource: "*"
     effect: allow
@@ -138,87 +69,15 @@ permissions:
   - action: skill
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: /tmp/opencode/*
+    effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/log/*"
+    effect: allow
   - action: shell
-    resource: "*|*"
-    effect: deny
-  - action: shell
-    resource: "*>*"
-    effect: deny
-  - action: shell
-    resource: "*$(*"
-    effect: deny
-  - action: shell
-    resource: "*`*"
-    effect: deny
-  - action: shell
-    resource: git -c *
-    effect: deny
-  - action: shell
-    resource: git -C * -c *
-    effect: deny
-  - action: shell
-    resource: git difftool*
-    effect: deny
-  - action: shell
-    resource: git -C * difftool*
-    effect: deny
-  - action: shell
-    resource: git *--upload-pack*
-    effect: deny
-  - action: shell
-    resource: git -C * *--upload-pack*
-    effect: deny
-  - action: shell
-    resource: git *--ext-diff*
-    effect: deny
-  - action: shell
-    resource: git -C * *--ext-diff*
-    effect: deny
-  - action: shell
-    resource: cmake -P*
-    effect: deny
-  - action: shell
-    resource: cmake *-P *
-    effect: deny
-  - action: shell
-    resource: cmake -E*
-    effect: deny
-  - action: shell
-    resource: cmake *-E *
-    effect: deny
-  - action: shell
-    resource: ctest*--build-and-test*
-    effect: deny
-  - action: shell
-    resource: ctest*--build-command*
-    effect: deny
-  - action: shell
-    resource: clang-tidy*-load*
-    effect: deny
-  - action: shell
-    resource: git push*--force*
-    effect: deny
-  - action: shell
-    resource: git push -f*
-    effect: deny
-  - action: shell
-    resource: git -C * push*--force*
-    effect: deny
-  - action: shell
-    resource: git -C * push -f*
-    effect: deny
-  - action: shell
-    resource: git reset*--hard*
-    effect: deny
-  - action: shell
-    resource: git -C * reset*--hard*
-    effect: deny
-  - action: shell
-    resource: git clean*
-    effect: deny
-  - action: shell
-    resource: git -C * clean*
-    effect: deny
+    resource: "*"
+    effect: allow
 ---
 # C++ engineer
 
