@@ -7,16 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/*.go"
-    effect: allow
-  - action: edit
-    resource: "**/go.mod"
-    effect: allow
-  - action: edit
-    resource: "**/go.sum"
-    effect: allow
-  - action: edit
-    resource: "**/Makefile"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -31,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
@@ -60,8 +48,8 @@ permissions:
 ## What you own
 
 The Go packages of the module this role implements: the sources, their tests, `go.mod` and `go.sum`,
-and the build the project uses. Nothing outside the module, and never the numerical or protocol
-behaviour another stack owns.
+and the build the project uses. Nothing outside the module is yours to change, and never the
+numerical or protocol behaviour another stack owns.
 
 ## Before the first edit
 
