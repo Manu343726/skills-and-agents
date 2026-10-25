@@ -111,7 +111,7 @@ branch and moves the trunk to it, so that landing is linear, not a merge commit 
 
 ## 7. The record
 
-The issue, the labels, the comment with the finding and its evidence, the document the change
+The issue, the labels, the comment with the finding and its evidence, and the documents the change
 invalidated. Written in the same change that produces them, because nothing else survives the
 session:
 
@@ -119,6 +119,9 @@ session:
 - what you finish → done, and closed;
 - what you cannot → blocked, and the body says what by;
 - what you found and did not fix → its own issue, with the evidence.
+- the document the change invalidated → updated in the same change, by `docs-writer`, or the
+  delivery says that none was. What no change noticed is `docs-auditor`'s sweep — deliberately, not
+  per change.
 
 An issue left in progress by an agent that stopped is worse than one never started: it says someone
 is on it when nobody is.
