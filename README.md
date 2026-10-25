@@ -103,13 +103,16 @@ resolves — a library role, a project file and a built-in alike — and it is d
 repository nor the project's `opencode.jsonc`. That is why no file here names `browser`: the matrix
 is complete without it, the deny is the harness's, and a reader comparing a block against that list
 must not take the extra line for a rule the matrix lost. The number of agents is a property of the
-machine and of the moment, not of the matrix: two runs of `opencode debug agents` v2.1.4 four
-minutes apart on 2026-10-25 in one `z80-emulator` checkout at `f5d1e0b` answered 27 and 28 with
-`docs-auditor` entering the resolved set between them, and the built-ins and the machine's global
-agents are in both counts beside these roles. So run the command where you read this, and never
-read a count of the roles in this repository as a count of the agents a harness resolves. A change
-that wants the browser reachable has to add the rule to the block and show it in the resolved list;
-it will not arrive by leaving the block alone.
+checkout's configuration at the moment it is read, not of the matrix, and three things move it: the
+roles this library ships, the reading project's `agents` array, and the agents the checkout inherits
+from above it — `$HOME/.opencode/agents/` here, which a working directory outside `$HOME` never
+reaches. Measured on 2026-10-25 with `opencode debug agents` v2.1.4: 27 in a `z80-emulator` worktree
+at `f5d1e0b` read from under `$HOME`, 26 from a worktree of that same commit under `/tmp`, and 28 at
+that repository's `main` (`7198d2e`), whose array names `docs-auditor` where `f5d1e0b`'s does not.
+So run the command where you read this page, and never quote a number from another tree — a count
+taken in one checkout is a count of that checkout. A change that wants the browser reachable has
+to add the rule to the block and show it in the resolved list; it will not arrive by leaving the
+block alone.
 
 Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
 `websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
