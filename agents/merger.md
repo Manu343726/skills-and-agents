@@ -1,5 +1,5 @@
 ---
-description: Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch, and syncs the operator's checkout to the merged sha with an autostashed rebase.
+description: Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch, and brings the operator's checkout to the merged sha with `git pull --ff-only` under an autostash, stopping on a divergence rather than rebasing.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -172,10 +172,14 @@ home**: `merge_pull_request` moves `origin/main` and leaves the operator's check
 commit, so the machine the operator is looking at does not contain the change that the board says
 landed. The sync is how the merge becomes true where it is read.
 
-**It is a rebase under an autostash, not a fast-forward.** The operator edits files by hand in the
+**It is a fast-forward under an autostash, never a rebase.** The operator edits files by hand in the
 main checkout between merges, so a sync that refused on a dirty tree would refuse most of the time
-and would never sync anything. Carrying that work across is the only form that works, and a
-conflict stops the sync without ever destroying it.
+and would never sync anything: the dirty paths are stashed and carried across. The move itself is
+`git pull --ff-only`, because `main` here only ever gains the merge commits the platform wrote — so a
+clean sync is a fast-forward by definition, and the checkout has nothing of its own on `main` to
+replay. When it is not a fast-forward, the operator committed on `main` locally: that is a
+**divergence**, and a divergence is a stop and a report, never a rebase. Restoring the tree and
+reporting is how the live checkout stays a record of what was actually merged.
 
 ```sh
 cd <main checkout>
@@ -185,18 +189,27 @@ git status --porcelain                   # note the dirty paths: this is the bas
 git stash push -m "merger: autostash before sync to <merged-sha> at <iso-8601>"
 git stash list                           # capture the exact ref, e.g. stash@{0}
 
-git pull --rebase
+git pull --ff-only
 git stash pop
 
 git rev-parse HEAD                       # must be the merge_commit_sha
 git status --porcelain                   # must be the same set of paths as the baseline
 ```
 
-`git stash push` takes **no `-u`**: untracked files are not touched. If the rebase is blocked by an
-untracked file it would have overwritten, it aborts and reports rather than deleting anything.
+`git stash push` takes **no `-u`**: untracked files are not touched. If the fast-forward is blocked by
+an untracked file it would have overwritten, it aborts and reports rather than deleting anything.
+`--ff-only` is what decides, not the operator's configuration: measured on a checkout whose `main`
+carried one local commit while `origin/main` had moved, `git pull --ff-only` printed
+
+```
+fatal: Not possible to fast-forward, aborting.
+```
+
+and exited `128` with `pull.rebase` set to `true` and again with it unset. A setting a human left in
+their `~/.gitconfig` cannot turn this sync into a replay.
 
 **One conditional, and it is only this one:** when the baseline is empty there is nothing to carry
-across — skip the stash and the pop, and the sync is `git pull --rebase` alone. Measured:
+across — skip the stash and the pop, and the sync is `git pull --ff-only` alone. Measured:
 `git stash push` on a clean tree prints `No local changes to save`, creates no entry, and the
 `git stash pop` after it exits 1 with `No stash entries found`. Treating that as a conflict would
 cry wolf on the most common case, the operator who edited nothing.
@@ -211,8 +224,11 @@ Refuse, and say so, before the stash when:
 
 ### When it goes wrong
 
-**The rebase conflicts.** `git rebase --abort`, then `git stash pop` to put the operator's work
-back exactly as it was, then report the conflicting paths and stop. Nothing is left half-applied.
+**It is not a fast-forward.** `git stash pop` to put the operator's work back exactly as it was,
+report the two shas — the checkout's `main` and `origin/main` — and stop. Commits the operator made
+on `main` locally are the operator's: reconciling them is a decision (merge them, or move them to a
+branch), and rebasing them out of the way is not this role's to take. Nothing is left half-applied
+here, so no freeze marker is written — the checkout is exactly as you found it, just not synced.
 
 **The stash pop conflicts.** You:
 
@@ -261,6 +277,8 @@ operator's work: baseline 3 dirty paths, stashed as stash@{0}, popped back — t
   `a1b2c3d -> d4e5f6a`, popped back — the same `<n>` paths
   <!-- or: REFUSED — `.git/merger-sync-frozen` present since `<ts>`, stash `stash@{0}`,
        conflicts `<paths>`, checkout on `<sha>` -->
+  <!-- or: REFUSED — not a fast-forward: local `main` `<sha>`, `origin/main` `<sha>`;
+       operator's work restored, nothing rebased, nothing frozen -->
 
 ## Not done
 - <what you did not do, and why>

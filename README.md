@@ -55,7 +55,8 @@ it merges, and how to close.
    merged result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha
    and the trial-merge sha. `merger` then performs `merge_pull_request` on an approval that still
    describes `main`, proves the result with the platform, and syncs the operator's checkout to the
-   merged sha with an autostashed rebase.
+   merged sha with `git pull --ff-only` under an autostash — a divergence is a stop and a report,
+   never a rebase.
    Nobody pushes `main`. A branch that does not build or whose tests fail is refused, and a test is
    never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
@@ -117,7 +118,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. Its permission block is every role's; its contract is what keeps it delegating. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
-| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
+| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced to the merged sha with `git pull --ff-only` under an autostash. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
