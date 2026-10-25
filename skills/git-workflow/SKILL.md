@@ -57,9 +57,11 @@ description: How work moves through git — branches named after the work, every
 - **The merge keeps the authors' commits.** No force push over a published branch, no rewrite of a
   history a review has read.
 - **After the merge**: prove it on the trunk, delete the head branch, and bring the local checkout to
-  the merged commit with a fast-forward — `git pull --ff-only` under an autostash. A tree that
-  conflicts, or a `main` that has diverged from `origin/main`, is a stop and a report: not a
-  `reset --hard`, and not a rebase.
+  the merged tree with a merge — `git pull --no-rebase --no-ff` under an autostash. It leaves a local
+  merge commit whose tree is the merged tree's: ahead of `origin/main`, never pushed, never measured
+  by anyone else, so the tree is what proves the sync. A pull that conflicts — the operator's own
+  commits on `main` colliding with what arrived — is a stop and a report: not a `reset --hard`, not a
+  rebase, and not a fast-forward.
 
 ## Bringing a branch up to date
 
@@ -70,10 +72,15 @@ itself:
 ```sh
 git fetch origin
 git switch dev/<id>
-git merge origin/main     # a merge commit on the branch: what it took from main, and when
+git merge --no-ff origin/main   # main INTO the branch: a merge commit — what it took, and when
 # resolve the conflicts, if any — in the branch, keeping both intents
-git push                  # committed and pushed like any other change on the branch
+git push                        # committed and pushed like any other change on the branch
 ```
+
+`--no-ff` keeps the update visible when the branch happens to be only *behind*: without it, git
+fast-forwards the branch onto a commit `main` already had, the graph records nothing, and the next
+reader cannot tell an updated branch from one that was never touched. With it, the branch carries a
+merge commit naming `origin/main`'s tip at the moment it took it in.
 
 Then it returns to the queue: the verdict is re-measured on the new tip, and the delivery lands as a
 merge commit as always. What must never happen is the other direction — this branch's commits

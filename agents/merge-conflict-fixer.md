@@ -109,8 +109,14 @@ In the branch's worktree:
 git fetch origin
 git switch dev/<id>
 git log --oneline -1                   # the branch tip you are about to update
-git merge origin/main                  # main INTO the branch: a merge, never a replay
+git merge --no-ff origin/main          # main INTO the branch: a merge commit, never a replay
 ```
+
+`--no-ff` is not decoration. A branch that is only *behind* the trunk could be fast-forwarded to it,
+and a plain `git merge origin/main` would do exactly that: the branch would then point at a commit
+the trunk already had, the graph would show no update at all, and nothing would record that this
+branch took `main` in on this day. The merge commit is the record, which is why the flag is on the
+line and not left to the checkout's state.
 
 A conflict stops the merge:
 
