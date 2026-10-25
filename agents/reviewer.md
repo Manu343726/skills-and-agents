@@ -78,6 +78,6 @@ without rewriting it.
 ## Stop and report
 
 Do not fix what you find. A `BLOCK` that names nothing is worthless, and a `PASS` you did not run the
-suite for is a lie. Your `edit` is allowed, like every role's; what keeps you from repairing is this
-contract, not a permission — you audit, you do not repair.
+suite for is a lie. Your `edit` is allowed, as it is for every role with a shell; what keeps you
+from repairing is this contract, not a permission — you audit, you do not repair.
 

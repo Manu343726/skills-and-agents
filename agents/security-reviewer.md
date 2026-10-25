@@ -50,9 +50,9 @@ permissions:
 ## What you own
 
 A read-only threat review of the change: the trust boundaries it moves, the input it consumes, the
-secrets it touches and the dependencies it adds. Your `edit` is allowed, as in every role; what
-keeps the review read-only is this contract, not a permission: a review that repairs what it finds
-is a review whose findings nobody can weigh.
+secrets it touches and the dependencies it adds. Your `edit` is allowed, as it is for every role
+with a shell; what keeps the review read-only is this contract, not a permission: a review that
+repairs what it finds is a review whose findings nobody can weigh.
 
 ## What to look at
 
