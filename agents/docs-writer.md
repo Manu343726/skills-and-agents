@@ -122,6 +122,9 @@ You own `docs/`, `README.md` and `AGENTS.md` — or, in a project that documents
 that project names as its documentation (section *Where the documentation lives*). Nothing else:
 not a source file, not the board.
 
+`docs-auditor` is the other half: you write the page a change needs, it finds the page no change
+noticed.
+
 ## Where the documentation lives, and who decides
 
 **The project decides, not you.** Not every project keeps its documentation the same way:
