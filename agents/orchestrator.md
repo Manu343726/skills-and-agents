@@ -217,6 +217,11 @@ deliberately did not do, the branch and the commit shas — and the issue number
 A branch with no PR is not a delivery: a report is a message in a session and dies with it, while
 `list_repo_pull_requests` lists an open PR from any session.
 
+**Documentation is part of the delivery, and the sweep is separate work.** A PR names the page it
+invalidates and updates it, or states that none was — `git-workflow` § *Pull requests* — and
+`docs-writer` writes it. What no single delivery noticed is `docs-auditor`'s: a sweep of a
+directory or the whole tree, read against the code, launched deliberately.
+
 Then:
 
 1. **`verifier` on the PR**, one at a time: it records the base sha, trial-merges `dev/<id>`
