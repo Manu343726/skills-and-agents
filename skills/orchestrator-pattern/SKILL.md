@@ -114,6 +114,10 @@ session:
 An issue left in progress by an agent that stopped is worse than one never started: it says someone
 is on it when nobody is.
 
+**None of it is delegated.** A subagent reports and the session that holds the thread writes: the
+record is what a later session reads as fact, and an account written by the agent it describes is
+the claim §5 already refuses to repeat.
+
 ## Failure modes this pattern exists to prevent
 
 - **Two writers, one tree** — the files of one workstream committed by the other.
