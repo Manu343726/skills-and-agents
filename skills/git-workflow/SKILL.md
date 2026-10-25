@@ -41,13 +41,24 @@ description: How work moves through git — branches named after the work, every
 
 - **The verdict names the sha it measured** and answers first: approved, or changes requested — then
   the evidence, in severity order.
-- **A trial merge**: merge the branch onto the trunk's current tip, run every suite the diff touches
-  on the result, and report both shas. A branch tested only on its own base is untested.
-- **The merge keeps the authors' commits.** No squash of a reviewed history, no force push over a
-  published branch.
+- **A trial merge, with `git merge --no-ff`**: merge the branch onto the trunk's current tip, run
+  every suite the diff touches on the result, and report both shas. A branch tested only on its own
+  base is untested.
+- **The merge is a merge commit, always.** Through the platform, `merge_pull_request` with
+  `style: "merge"` — never `rebase`, `rebase-merge` or `squash`; locally, `git merge --no-ff`,
+  never a bare `git merge` that can fast-forward. The graph has to show the delivery as a unit — the
+  branch, its commits, and the point it landed — and this process measures shas: a rebase publishes
+  commits the verifier never measured, and a squash makes "commits `a`, `b`, `c`, each pushed as
+  it was made" a sentence nobody can check.
+- **The merge keeps the authors' commits.** No force push over a published branch, no rewrite of a
+  history a review has read.
 - **After the merge**: prove it on the trunk, delete the head branch, and bring the local checkout to
   the merged commit with an autostashed rebase — a dirty tree that conflicts is a stop, not a
   `reset --hard`.
+
+Two things are not delivery merges and stay outside the rule: `git pull --rebase` on an operator's
+checkout is a **sync** of a trunk that already holds the merges, and a `git rebase` on a feature
+branch before its first push is **authoring**. The rule governs how a branch reaches a trunk.
 
 ## When the platform cannot merge
 

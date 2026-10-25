@@ -233,7 +233,9 @@ would do.
 
 ## What a verdict carries
 
-- The base sha measured, and the sha of the trial merge when there is one.
+- The base sha measured, and the sha of the trial merge when there is one. The trial merge is
+  `git merge --no-ff`: the sha you report is then a real merge commit with two parents, where a
+  fast-forward would leave the branch tip standing in for a merge that never happened.
 - Every command, verbatim, with its output — including the runs that passed, not only the failures.
 - The counts before and after where the change claims a delta.
 - For each claim that could not be measured, the reason: the command missing, the environment

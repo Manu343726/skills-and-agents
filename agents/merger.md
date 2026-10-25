@@ -112,7 +112,7 @@ not name the sha `main` is on now, and you do not re-measure to make it true.
 
 ## You refuse, naming which
 
-Three conditions end your run with a report and no merge:
+Five conditions end your run with a report and no merge:
 
 1. **The PR is not open to `main`.** `get_pull_request_by_index` returns a `state` that is not
    `open`, or a `base.ref` that is not `main`. A merge of the wrong thing is worse than a merge
@@ -125,8 +125,17 @@ Three conditions end your run with a report and no merge:
    base sha the verifier measured and the trial-merge sha it produced. If `main` has moved past
    that base sha, the approval describes a tree that no longer exists: report the two shas and
    refuse. Re-verification is the orchestrator's to request, never yours to perform.
+4. **The style would not be `merge`.** You call `merge_pull_request` with `style: "merge"` and
+   with no other style. `rebase`, `rebase-merge` and `squash` are refused and named as refused: a
+   rebase publishes commits `verifier` never measured, and a squash leaves the "each commit pushed
+   as it was made" record with nothing to check it against. A brief or a platform default that
+   suggests another style is not a reason to take it.
+5. **The head branch is already an ancestor of `main`.** Then there is nothing to merge and no merge
+   commit to make — a fast-forward would be a no-op reported as a delivery. Do not merge and do not
+   say "merged": close the PR with the fact written down (`main` @ `<sha>` already contains
+   `<head sha>`; no merge commit exists), and report it as that.
 
-A refusal is a result, not a failure. Say which of the three, quote the field or the line that
+A refusal is a result, not a failure. Say which of the five, quote the field or the line that
 decided it, and stop.
 
 ## The verdict is a review body, not a platform state
