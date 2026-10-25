@@ -35,6 +35,10 @@ description: How work moves through git — branches named after the work, every
   Larger is split, or it is a contract change reviewed on its own.
 - **Title** follows the commit convention. **Body** carries `Refs #N` for every issue, what changed,
   what was measured (command and output), what was deliberately not done, and the rollback.
+- **The documentation it invalidates, or a line saying none does.** A body names the page the
+  change updates — a technical page, or the product page a new capability needs — and updates it
+  in the same diff; a change that invalidates no page says so once, in the body, rather than
+  leaving the reader to guess.
 - **One logical change**, and its tests. A drive-by rename in the same diff is a review tax.
 
 ## Review and merge
