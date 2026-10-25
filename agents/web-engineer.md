@@ -6,9 +6,6 @@ permissions:
   - action: "*"
     resource: "*"
     effect: deny
-  - action: edit
-    resource: "*"
-    effect: allow
   - action: read
     resource: "*"
     effect: allow
@@ -18,12 +15,24 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
-  - action: external_directory
-    resource: .worktrees/*
+  - action: skill
+    resource: "*"
     effect: allow
-  - action: read
-    resource: .worktrees/*
+  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
+  - action: webfetch
+    resource: "*"
     effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
@@ -31,13 +40,16 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
+    resource: .worktrees/*
+    effect: allow
+  - action: read
+    resource: .worktrees/*
+    effect: allow
+  - action: external_directory
     resource: /tmp/opencode/*
     effect: allow
   - action: external_directory
     resource: "$HOME/.local/share/opencode/log/*"
-    effect: allow
-  - action: shell
-    resource: "*"
     effect: allow
 ---
 # Web engineer

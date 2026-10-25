@@ -1,5 +1,5 @@
 ---
-description: Maintains the forgejo board of the repository named in the brief — labels, issue bodies, status transitions and the kanban — using the forgejo tools only.
+description: Maintains the forgejo board of the repository named in the brief — labels, issue bodies, status transitions and the kanban — through the forgejo tools, never by a source edit or a push.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -15,22 +15,42 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
-  - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+  - action: skill
+    resource: "*"
     effect: allow
-  - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
+  - action: webfetch
+    resource: "*"
     effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
   - action: forgejo_*
     resource: "*"
     effect: allow
-  - action: shell
-    resource: "*"
-    effect: deny
-
+  - action: external_directory
+    resource: .worktrees/*
+    effect: allow
+  - action: read
+    resource: .worktrees/*
+    effect: allow
+  - action: external_directory
+    resource: /tmp/opencode/*
+    effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/log/*"
+    effect: allow
 ---
 # Ticket manager
 

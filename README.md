@@ -28,7 +28,7 @@ registering the remote one for that id.
 orchestrator in the strict sense:
 
 - it holds the context of the task — the board, the documents, what the operator asked for;
-- it has **no permission to act**: no edit, no shell, no network. It reads, plans, and delegates;
+- it has **no permission to act**: no edit, no shell. It reads, plans and delegates;
 - **every task is a subagent launched in the background**, with its own fresh context and its own
   git worktree — never the main checkout;
 - it never trusts a report it has not re-measured, and it owns the record: the issue, the
@@ -65,6 +65,45 @@ it merges, and how to close.
 
 The record — the issue, its `status/*`, the documents, the merge — is the orchestrator's. It is the
 only memory a session leaves behind.
+
+## Permissions
+
+All fifteen roles share one permission matrix, written in each `agents/*.md`, with four exception
+entries in two shapes: `orchestrator` and `ticket-manager` turn the `edit` and `shell` effects to
+`deny`, and `orchestrator` alone adds `opencode_*` and `subagent`. The floor is
+`{action: "*", resource: "*", effect: deny}`: every tool a role does not explicitly allow is a tool
+the session does not have. The two `shell` denies are deliberate — `orchestrator` delegates every
+command to a subagent, and `ticket-manager` works the board with the board's tools. `edit`
+accompanies `shell`, because with a shell an `edit` scope guards nothing a role cannot already do.
+Every other line is identical across the fifteen, and `execute` grants every Code Mode tool, Forgejo
+included, because the harness offers no narrower scope that works.
+
+Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
+`websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
+because an agent that documents has to read the documentation it cites: a role that cannot open a
+URL or run a search writes its citations from memory, and memory is exactly where the sentence that
+sounds true and is not comes from. In `orchestrator` the grant is still not a licence to use it —
+it delegates the fetching as it delegates everything else — and a search provider has to be
+configured for the session (`websearch.provider` in `opencode.jsonc`, or a provider's API key in
+the environment) before a search has anything to call.
+
+| Role | edit | shell | execute | forgejo_* | skill | webfetch | websearch | subagent |
+|---|---|---|---|---|---|---|---|---|
+| `orchestrator` | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `verifier` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `merger` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `cpp-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `go-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `web-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `ticket-manager` | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 
 ## Contents
 
@@ -117,8 +156,8 @@ skills/<id>/references/*.md    long material a skill loads on demand
 ```
 
 The plugin reads `agents/` before any other root, so a repository that follows this layout needs
-no manifest. Adding an entry is adding a directory or a file; the table above is the index and is
-kept in the same change.
+no manifest. Adding an entry is adding a directory or a file; the tables under *Contents* are the
+index and are kept in the same change.
 
 ## Licence
 

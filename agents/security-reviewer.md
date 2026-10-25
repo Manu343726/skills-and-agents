@@ -15,6 +15,30 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
+  - action: execute
+    resource: "*"
+    effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
   - action: external_directory
     resource: .worktrees/*
     effect: allow
@@ -27,17 +51,15 @@ permissions:
   - action: external_directory
     resource: "$HOME/.local/share/opencode/log/*"
     effect: allow
-  - action: shell
-    resource: "*"
-    effect: allow
 ---
 # Security reviewer
 
 ## What you own
 
 A read-only threat review of the change: the trust boundaries it moves, the input it consumes, the
-secrets it touches and the dependencies it adds. Your `edit` is refused for that reason: a review
-that repairs what it finds is a review whose findings nobody can weigh.
+secrets it touches and the dependencies it adds. Your `edit` is allowed, as it is for every role
+with a shell; what keeps the review read-only is this contract, not a permission: a review that
+repairs what it finds is a review whose findings nobody can weigh.
 
 ## What to look at
 

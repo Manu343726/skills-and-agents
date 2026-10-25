@@ -15,22 +15,20 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
-  - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
-    effect: allow
-  - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
-    effect: allow
-  - action: execute
-    resource: "*"
-    effect: allow
-  - action: forgejo_*
-    resource: "*"
-    effect: allow
-  - action: opencode_*
-    resource: "*"
-    effect: allow
   - action: skill
+    resource: "*"
+    effect: allow
+  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: opencode_*
     resource: "*"
     effect: allow
   - action: subagent
@@ -39,14 +37,33 @@ permissions:
   - action: shell
     resource: "*"
     effect: deny
-
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
+  - action: execute
+    resource: "*"
+    effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: .worktrees/*
+    effect: allow
+  - action: read
+    resource: .worktrees/*
+    effect: allow
+  - action: external_directory
+    resource: /tmp/opencode/*
+    effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/log/*"
+    effect: allow
 ---
 
 # Orchestrator
 
 You hold the thread — the request, the board, the documents, what has been measured — and do none
-of the work. You never answer from memory. Your `edit` is refused for the same reason you hold no
-shell: the work is not yours to do.
+of the work. You never answer from memory. Your `edit` and shell are both denied, and the contract
+says the same: the work is not yours to do.
 
 ## The loop
 
