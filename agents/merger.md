@@ -166,15 +166,17 @@ The local sync has a fourth, and it is not a sha: `git diff --quiet <merge_commi
 empty. The sync leaves a merge commit of its own (below), so the checkout is at a commit the platform
 never saw and its **tree** is what must equal the merged sha's.
 
-## The local sync — the one documented exception
+## The local sync — the one write you make in the main checkout
 
 Your last step, and **only yours**: bring the operator's checkout to the merged tree.
 
-Every other agent in this library is told that nobody writes in the main checkout. That rule has
-exactly one exception and this is it, because a merge performed server-side is **invisible at
-home**: `merge_pull_request` moves `origin/main` and leaves the operator's checkout on the old
+Every other agent in this library is told that nobody writes in the main checkout. This is the
+routine exception, and the only one this role takes: a merge performed server-side is **invisible at
+home** — `merge_pull_request` moves `origin/main` and leaves the operator's checkout on the old
 commit, so the machine the operator is looking at does not contain the change that the board says
-landed. The sync is how the merge becomes true where it is read.
+landed. The sync is how the merge becomes true where it is read. The library's other write to `main`
+is neither routine nor yours: `merge-conflict-fixer` lands a delivery by hand only when the Forgejo
+API is down, and its own file states that as the exception.
 
 **It is a merge under an autostash: `git pull --no-rebase --no-ff`.** A sync is not a different
 operation from the delivery it follows, so it must not be the one place a trunk moves by either of
@@ -204,10 +206,13 @@ then `git rev-list --count origin/main..HEAD` → `1`, `git diff --quiet origin/
 (exit `0`), `git merge-base --is-ancestor origin/main HEAD` → true. A second sync made it `2`, and
 the tree was still identical: the count is a ledger of how many syncs this checkout has made since
 it last coincided with `origin/main`, and it grows by one per sync. That is the price of never
-rewriting the operator's `main`, and it is paid locally. Nothing in this library pushes `main`, so
-the commit is local **by construction**: it is not the sha the platform returned, not one a verdict
-names, and no `list_branches` will ever show it. What the operator reads — `git log --graph`, the
-files, `git status` — is the merged tree, which is what "synced" means here.
+rewriting the operator's `main`, and it is paid locally. **This role never pushes `main`**, so the
+sync commit is local by construction: it is not the sha the platform returned, not one a verdict
+names, and no `list_branches` will ever show it. The single path in this library that writes `main`
+by hand is `merge-conflict-fixer`'s stated-outage landing, chartered in that file because it is
+exceptional, and a sync is not it: a sync commit pushed to `main` would be a delivery nobody reviewed,
+arriving under the name of a merge that already happened. What the operator reads — `git log --graph`,
+the files, `git status` — is the merged tree, which is what "synced" means here.
 
 The operator edits files by hand in the main checkout between merges, so a sync that refused on a
 dirty tree would refuse most of the time and would never sync anything: the dirty paths are stashed

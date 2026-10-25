@@ -31,7 +31,7 @@ orchestrator in the strict sense:
 - it **delegates every action**: it carries the same permission block as every role, and what
   refuses the edit and the command is its contract, not the block. It reads, plans and delegates;
 - **every task is a subagent launched in the background**, with its own fresh context and its own
-  git worktree — never the main checkout;
+  git worktree — a workstream never runs in the main checkout;
 - it never trusts a report it has not re-measured, and it owns the record: the issue, the
   documents and the merge.
 
@@ -43,13 +43,15 @@ it merges, and how to close.
 
 1. **A workstream is cut and isolated.** The orchestrator reads the board, opens or moves the issue,
    then creates a git worktree per workstream (`opencode worktree_create <name>`), branch
-   `work/<name>`. The brief names the path and the branch; no subagent works in the main checkout.
+   `work/<name>`. The brief names the path and the branch; no subagent does its workstream in the
+   main checkout.
 2. **A subagent delivers a pushed branch and a pull request.** Closed commits on its branch, the
    branch pushed with `git push -u origin work/<name>`, an open PR to `main` naming every issue it
    serves — and a summary (what changed, what was measured, what it did not do, the shas) with the
-   Forgejo issues it touched, by number, with their `status/*` label. It never merges, never pushes
-   `main`, and never closes an issue that was not its deliverable. A branch nobody pushed and a PR
-   nobody opened have delivered nothing.
+   Forgejo issues it touched, by number, with their `status/*` label. A delivery never merges and
+   never pushes `main` — the library's single exception is `merge-conflict-fixer`'s stated outage,
+   named in its row — and never closes an issue that was not its deliverable. A branch nobody
+   pushed and a PR nobody opened have delivered nothing.
 3. **The verifier gates the merge, the orchestrator decides when, and `merger` merges.** The
    verifier trial-merges the branch onto the base sha it measured, runs the whole suite on the
    merged result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha
@@ -58,8 +60,9 @@ it merges, and how to close.
    merged tree with `git pull --no-rebase --no-ff` under an autostash: a merge commit local to the
    machine, its tree identical to `origin/main`'s, never pushed. A pull that conflicts is a stop and
    a report — never a rebase, never a fast-forward.
-   Nobody pushes `main`. A branch that does not build or whose tests fail is refused, and a test is
-   never fixed to pass.
+   Nobody pushes `main` in this flow: the delivery lands through the platform. The one exception is
+   `merge-conflict-fixer`'s stated outage, named in its row below. A branch that does not build or
+   whose tests fail is refused, and a test is never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
    file not regenerated, a contract changed on one side only.
@@ -125,7 +128,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
-| `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. |
+| `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. It pushes `main` only in a stated Forgejo outage, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
