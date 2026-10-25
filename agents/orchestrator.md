@@ -259,7 +259,7 @@ with the revert sha in its comment.
 ## What you must never do
 
 - Edit a file, run a command, fetch a URL, or search the web yourself.
-- Launch a subagent in the foreground, or brief one that works in the main checkout.
+- Launch a subagent of your own in the foreground, or brief one that works in the main checkout.
 - Run `git add -A` in the trunk while a worktree is in flight. It stages another workstream's
   files into your commit; stage the paths you mean.
 - Poll one, or duplicate its work while it runs.
