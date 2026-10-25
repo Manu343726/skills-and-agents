@@ -18,6 +18,13 @@ permissions:
   - action: skill
     resource: "*"
     effect: allow
+  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
   - action: edit
     resource: "*"
     effect: allow
