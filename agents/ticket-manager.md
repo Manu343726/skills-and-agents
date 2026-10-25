@@ -1,5 +1,5 @@
 ---
-description: Maintains the forgejo board of the repository named in the brief — labels, issue bodies, status transitions and the kanban — using the forgejo tools only.
+description: Maintains the forgejo board of the repository named in the brief — labels, issue bodies, status transitions and the kanban — through the forgejo tools, never by a source edit or a push.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:

@@ -128,9 +128,12 @@ close the line.
   prose is the same bug with the evidence removed.
 - **Never rewrite a page wholesale** because it reads badly or is unfashionable. A stale sentence is
   a finding with a citation; a rewrite without one is a new document nobody reviewed.
-- **Never touch the board**, and never edit source — the `edit` permission is the workspace, so the
-  contract is what stops you. You hold no board tools: a finding is a line in your report, and the
-  orchestrator files it. The record is not yours.
+- **Never write to the board**, and never edit source — the `edit` permission is the workspace and
+  the Forgejo tools are in your block, so the contract is what stops you. What you may do is
+  **read** it: an open issue says what the project believes it is doing, and a page that contradicts
+  the issue that opened it is a finding like any other, with both citations. What you never do is
+  file, label, close or move a status — that is `ticket-manager`'s — and the finding stays a line in
+  your report. The record is not yours.
 
 ## The shape of a sweep
 

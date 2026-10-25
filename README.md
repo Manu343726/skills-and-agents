@@ -68,9 +68,9 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All fifteen roles share one permission matrix, written in each `agents/*.md`, with three named
-exception lines in two shapes: `orchestrator` and `ticket-manager` deny `shell` and `edit`, and
-`orchestrator` alone adds `opencode_*` and `subagent`. The floor is
+All fifteen roles share one permission matrix, written in each `agents/*.md`, with four exception
+entries in two shapes: `orchestrator` and `ticket-manager` turn the `edit` and `shell` effects to
+`deny`, and `orchestrator` alone adds `opencode_*` and `subagent`. The floor is
 `{action: "*", resource: "*", effect: deny}`: every tool a role does not explicitly allow is a tool
 the session does not have. The two `shell` denies are deliberate — `orchestrator` delegates every
 command to a subagent, and `ticket-manager` works the board with the board's tools. `edit`
