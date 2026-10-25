@@ -15,6 +15,23 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
+  - action: execute
+    resource: "*"
+    effect: allow
+  - action: forgejo_*
+    resource: "*"
+    effect: allow
   - action: external_directory
     resource: .worktrees/*
     effect: allow
@@ -26,9 +43,6 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "$HOME/.local/share/opencode/log/*"
-    effect: allow
-  - action: shell
-    resource: "*"
     effect: allow
 ---
 # Reviewer
@@ -64,6 +78,6 @@ without rewriting it.
 ## Stop and report
 
 Do not fix what you find. A `BLOCK` that names nothing is worthless, and a `PASS` you did not run the
-suite for is a lie. Your `edit` is refused for the same reason — you audit, you do not repair — and
-it is the one place where the permission and this contract agree.
+suite for is a lie. Your `edit` is allowed, like every role's; what keeps you from repairing is this
+contract, not a permission — you audit, you do not repair.
 

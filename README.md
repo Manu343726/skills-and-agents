@@ -28,7 +28,8 @@ registering the remote one for that id.
 orchestrator in the strict sense:
 
 - it holds the context of the task — the board, the documents, what the operator asked for;
-- it has **no permission to act**: no edit, no shell, no network. It reads, plans, and delegates;
+- it has **no shell**: it reads, plans and delegates. Its `edit` is allowed like every role's, and
+  what keeps it from acting is its contract, not a permission;
 - **every task is a subagent launched in the background**, with its own fresh context and its own
   git worktree — never the main checkout;
 - it never trusts a report it has not re-measured, and it owns the record: the issue, the
@@ -66,13 +67,42 @@ it merges, and how to close.
 The record — the issue, its `status/*`, the documents, the merge — is the orchestrator's. It is the
 only memory a session leaves behind.
 
+## Permissions
+
+All fifteen roles share one permission matrix, written in each `agents/*.md`, with exactly two
+exceptions: `orchestrator` and `ticket-manager` deny `shell`, and `orchestrator` alone adds
+`opencode_*` and `subagent`. The floor is `{action: "*", resource: "*", effect: deny}`: every tool
+a role does not explicitly allow is a tool the session does not have. The two `shell` denies are
+deliberate — `orchestrator` delegates every command to a subagent, and `ticket-manager` works the
+board with the board's tools. Every other line is identical across the fifteen, and `execute`
+grants every Code Mode tool, Forgejo included, because the harness offers no narrower scope that
+works.
+
+| Role | edit | shell | execute | forgejo_* | skill | subagent |
+|---|---|---|---|---|---|---|
+| `orchestrator` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `verifier` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `merger` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `cpp-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `go-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `web-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `ticket-manager` | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+
 ## Contents
 
 ### Agents
 
 | Agent | Mode | Owns |
 |---|---|---|
-| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. No `edit`, no shell. |
+| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. No shell; its `edit` is the matrix's like every role's. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
@@ -117,8 +147,8 @@ skills/<id>/references/*.md    long material a skill loads on demand
 ```
 
 The plugin reads `agents/` before any other root, so a repository that follows this layout needs
-no manifest. Adding an entry is adding a directory or a file; the table above is the index and is
-kept in the same change.
+no manifest. Adding an entry is adding a directory or a file; the tables under *Contents* are the
+index and are kept in the same change.
 
 ## Licence
 

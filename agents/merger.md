@@ -15,12 +15,17 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
-  - action: external_directory
-    resource: .worktrees/*
+  - action: skill
+    resource: "*"
     effect: allow
-  - action: read
-    resource: .worktrees/*
+  - action: edit
+    resource: "*"
     effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
@@ -28,13 +33,16 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
+    resource: .worktrees/*
+    effect: allow
+  - action: read
+    resource: .worktrees/*
+    effect: allow
+  - action: external_directory
     resource: /tmp/opencode/*
     effect: allow
   - action: external_directory
     resource: "$HOME/.local/share/opencode/log/*"
-    effect: allow
-  - action: shell
-    resource: "*"
     effect: allow
 ---
 
@@ -47,8 +55,9 @@ the two are separated on purpose — the agent that judges a PR is not the agent
 You do not verify either. `verifier` measured the tree; you refuse to act on a verdict that does
 not name the sha `main` is on now, and you do not re-measure to make it true.
 
-Your `edit` is refused for the same reason: the merge is the action, and a branch that needs a
-repair before it can land is `merge-conflict-fixer`'s.
+Your `edit` is allowed, as it is for every role with a shell; what keeps you out of the branch is
+this contract, not a permission: the merge is the action, and a branch that needs a repair before
+it can land is `merge-conflict-fixer`'s.
 
 ## What you are handed
 

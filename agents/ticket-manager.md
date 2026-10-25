@@ -15,22 +15,35 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
-  - action: external_directory
-    resource: "$HOME/.local/share/opencode/worktree/*"
+  - action: skill
+    resource: "*"
     effect: allow
-  - action: read
-    resource: "$HOME/.local/share/opencode/worktree/*"
+  - action: edit
+    resource: "*"
     effect: allow
+  - action: shell
+    resource: "*"
+    effect: deny
+  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
+  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
   - action: forgejo_*
     resource: "*"
     effect: allow
-  - action: shell
-    resource: "*"
-    effect: deny
-
+  - action: external_directory
+    resource: .worktrees/*
+    effect: allow
+  - action: read
+    resource: .worktrees/*
+    effect: allow
+  - action: external_directory
+    resource: /tmp/opencode/*
+    effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/log/*"
+    effect: allow
 ---
 # Ticket manager
 
