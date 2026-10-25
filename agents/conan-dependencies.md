@@ -79,5 +79,6 @@ without rewriting it.
 ## Stop and report
 
 Do not change application sources, do not widen a version range to make a build pass, and do not add
-a dependency for something a few lines can do.
+a dependency for something a few lines can do. The `edit` permission is the whole workspace, so
+those three lines are this contract's, not a fence the permission keeps.
 
