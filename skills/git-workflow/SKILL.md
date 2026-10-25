@@ -57,23 +57,56 @@ description: How work moves through git — branches named after the work, every
 - **The merge keeps the authors' commits.** No force push over a published branch, no rewrite of a
   history a review has read.
 - **After the merge**: prove it on the trunk, delete the head branch, and bring the local checkout to
-  the merged commit with an autostashed rebase — a dirty tree that conflicts is a stop, not a
-  `reset --hard`.
+  the merged tree with a merge — `git pull --no-rebase --no-ff` under an autostash. It leaves a local
+  merge commit whose tree is the merged tree's: ahead of `origin/main`, never pushed, never measured
+  by anyone else, so the tree is what proves the sync. A pull that conflicts — the operator's own
+  commits on `main` colliding with what arrived — is a stop and a report: not a `reset --hard`, not a
+  rebase, and not a fast-forward.
 
-The rule above governs how a branch reaches a trunk, and not every rebase in a repository is that:
-`git pull --rebase` on an operator's checkout is a **sync** of a trunk that already holds the merges,
-and a `git rebase` on a feature branch before its first push is **authoring**.
+## Bringing a branch up to date
+
+**A branch is never rebased.** When a `dev/*` branch needs what `main` has gained — the PR reports
+conflicts, or a verdict measured a base that has since moved — the branch takes the trunk into
+itself:
+
+```sh
+git fetch origin
+git switch dev/<id>
+git merge --no-ff origin/main   # main INTO the branch: a merge commit — what it took, and when
+# resolve the conflicts, if any — in the branch, keeping both intents
+git push                        # committed and pushed like any other change on the branch
+```
+
+`--no-ff` keeps the update visible when the branch happens to be only *behind*: without it, git
+fast-forwards the branch onto a commit `main` already had, the graph records nothing, and the next
+reader cannot tell an updated branch from one that was never touched. With it, the branch carries a
+merge commit naming `origin/main`'s tip at the moment it took it in.
+
+Then it returns to the queue: the verdict is re-measured on the new tip, and the delivery lands as a
+merge commit as always. What must never happen is the other direction — this branch's commits
+replayed onto `main`, by `git rebase`, by `git pull --rebase`, or by a platform style that does it on
+our behalf.
+
+The reasons are the ones this process already runs on. **It measures shas.** A verdict names the
+base it measured and the tree it produced; a rebase replaces every commit on the branch with a new
+one, so what lands is not what was approved, and *"commits `a`, `b`, `c`, each pushed as it was
+made"* becomes a set of shas no verifier ever saw. **And the graph keeps what actually happened** —
+where the branch forked, which trunk commits it took and when, which conflicts were resolved and
+how. A rebase erases exactly that, and the erasure is the part no later session can reconstruct from
+anywhere else.
 
 ## When the platform cannot merge
 
-A rebase needed, a conflict the platform will not resolve, an outage. Say which, in one line, before
-anything else. In that path the branch lands **linearly** — it has just been rebased onto the trunk,
-so the landing is a fast-forward of the trunk to commits that already sit on it, not a merge
-commit — and `agents/merge-conflict-fixer.md` carries the sequence and what it refuses. Never
-resolve a conflict by dropping a test: that is a finding, and the finding is the deliverable.
+A conflict the platform will not resolve, or an outage of it. Say which, in one line, before
+anything else. The landing is not different for it: `merge-conflict-fixer` merges `main` into
+`dev/<id>`, resolves the conflicts there, pushes the branch, and the delivery lands as the merge
+commit every other delivery lands as. `agents/merge-conflict-fixer.md` carries the sequence and what
+it refuses. Never resolve a conflict by dropping a test: that is a finding, and the finding is the
+deliverable.
 
 ## Never
 
 `push --force`, `push --force-with-lease`, `reset --hard` over uncommitted work, `clean -f`, deleting a
-ref a review has not read, `stash clear`, rewriting published history. Each of them destroys something
-that git cannot give back.
+ref a review has not read, `stash clear`, rewriting published history — and, on a `dev/*` branch,
+`git rebase` and `git pull --rebase`, which rewrite it. Each of them destroys something that git
+cannot give back.
