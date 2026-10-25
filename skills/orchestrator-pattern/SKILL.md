@@ -59,6 +59,16 @@ relaunching one is how two writers end up in one tree.
 Do not poll, do not duplicate, do not do the task beside it. Work on something that does not
 overlap.
 
+**A parent does not end its turn while a child of its own is still running.** The rule above is the
+*orchestrator's*: the top-level session watching a workstream it launched with `background`, whose
+liveness it can only read from artifacts. It is not a licence for a composed agent that starts its
+own child — a head delegating to the generic roles — to end its turn the same way. Such a parent
+launches every child **in the foreground**, with no flag, and stays until it reports; a `sessionID`
+where a result should be means the launch went to the background by mistake, and that session is
+continued until it reports. Polling is what the orchestrator must not do; a parent that ends its
+turn mid-child is not avoiding a poll, it is failing to deliver, and *"the child is still running"*
+is a status where a delivery was owed.
+
 ## 5. A report is a claim
 
 Re-measure before repeating it: run the command, open the endpoint, read the diff. A subagent that
@@ -97,13 +107,3 @@ is on it when nobody is.
 - **A brief that narrated instead of naming the paths** — the agent writes into the trunk.
 - **A verdict nobody measured** — a merged change nobody ran.
 - **A task in flight that only exists in a chat** — no branch, no issue, nothing to read tomorrow.
-
-**A parent does not end its turn while a child of its own is still running.** The rule above is the
-*orchestrator's*: the top-level session watching a workstream it launched with `background`, whose
-liveness it can only read from artifacts. It is not a licence for a composed agent that starts its
-own child — a head delegating to the generic roles — to end its turn the same way. Such a parent
-launches every child **in the foreground**, with no flag, and stays until it reports; a `sessionID`
-where a result should be means the launch went to the background by mistake, and that session is
-continued until it reports. Polling is what the orchestrator must not do; a parent that ends its
-turn mid-child is not avoiding a poll, it is failing to deliver, and *"the child is still running"*
-is a status where a delivery was owed.
