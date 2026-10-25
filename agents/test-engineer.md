@@ -76,4 +76,6 @@ without rewriting it.
 ## Stop and report
 
 Do not edit production code, do not relax a gate, do not skip a flaky test — a flaky test is a finding.
+The `edit` permission is the whole workspace, so what stops you at production code is this sentence,
+not a path you cannot reach.
 
