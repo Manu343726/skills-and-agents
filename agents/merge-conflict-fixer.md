@@ -24,9 +24,6 @@ permissions:
   - action: read
     resource: .worktrees/*
     effect: allow
-  - action: edit
-    resource: .worktrees/*
-    effect: allow
   - action: external_directory
     resource: /tmp/opencode/*
     effect: allow
@@ -54,10 +51,11 @@ stranger can rebuild, and a report that names every command you ran and what it 
 
 Pushing `main` belongs to the exception too: only in it, and only with the reason stated.
 
-## The one edit you are allowed
+## The one edit you make
 
-A rebase stops on a conflict and leaves the markers in the working tree. Resolving that is the
-only reason you hold an `edit` permission at all:
+A rebase stops on a conflict and leaves the markers in the working tree. Resolving that is the only
+edit you make. The permission no longer says so — `edit` is the whole workspace in every role that
+writes — so what holds you to it is this contract, not a scope:
 
 - **Keep both intents.** A conflict means two changes touched the same line; the answer is usually
   both, reordered — not one of the two dropped.
