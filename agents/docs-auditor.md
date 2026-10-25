@@ -18,25 +18,28 @@ permissions:
   - action: skill
     resource: "*"
     effect: allow
-  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
-  - action: webfetch
-    resource: "*"
-    effect: allow
-  - action: websearch
-    resource: "*"
-    effect: allow
   - action: edit
     resource: "*"
     effect: allow
   - action: shell
     resource: "*"
     effect: allow
-  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
-  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
   - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: opencode_*
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
     resource: "*"
     effect: allow
   - action: external_directory

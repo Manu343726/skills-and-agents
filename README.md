@@ -28,7 +28,8 @@ registering the remote one for that id.
 orchestrator in the strict sense:
 
 - it holds the context of the task — the board, the documents, what the operator asked for;
-- it has **no permission to act**: no edit, no shell. It reads, plans and delegates;
+- it **delegates every action**: it carries the same permission block as every role, and what
+  refuses the edit and the command is its contract, not the block. It reads, plans and delegates;
 - **every task is a subagent launched in the background**, with its own fresh context and its own
   git worktree — never the main checkout;
 - it never trusts a report it has not re-measured, and it owns the record: the issue, the
@@ -68,42 +69,45 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All fifteen roles share one permission matrix, written in each `agents/*.md`, with four exception
-entries in two shapes: `orchestrator` and `ticket-manager` turn the `edit` and `shell` effects to
-`deny`, and `orchestrator` alone adds `opencode_*` and `subagent`. The floor is
-`{action: "*", resource: "*", effect: deny}`: every tool a role does not explicitly allow is a tool
-the session does not have. The two `shell` denies are deliberate — `orchestrator` delegates every
-command to a subagent, and `ticket-manager` works the board with the board's tools. `edit`
-accompanies `shell`, because with a shell an `edit` scope guards nothing a role cannot already do.
-Every other line is identical across the fifteen, and `execute` grants every Code Mode tool, Forgejo
-included, because the harness offers no narrower scope that works.
+All fifteen roles share **one** permission matrix, written identically in each `agents/*.md`:
+seventeen rules, no per-role exception. The floor is
+`{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a
+tool the session does not have — and `sha256` over `permissions:` through the closing `---` is one
+hash in all fifteen, `39aaf93d…0fea65056a`. `edit`, `shell`, `opencode_*` and `subagent` are every
+role's; what a role does with them is its own contract's to bound, never the block's. `#38`
+collapsed the last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit`
+and `shell`, and `orchestrator` alone carried `opencode_*` and `subagent`. `execute` grants every
+Code Mode tool, Forgejo included, because the harness offers no narrower scope that works.
 
 Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
 `websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
 because an agent that documents has to read the documentation it cites: a role that cannot open a
 URL or run a search writes its citations from memory, and memory is exactly where the sentence that
-sounds true and is not comes from. In `orchestrator` the grant is still not a licence to use it —
-it delegates the fetching as it delegates everything else — and a search provider has to be
+sounds true and is not comes from. In `orchestrator` the contract still forbids using it — it
+delegates the fetching as it delegates everything else — and a search provider has to be
 configured for the session (`websearch.provider` in `opencode.jsonc`, or a provider's API key in
 the environment) before a search has anything to call.
 
 | Role | edit | shell | execute | forgejo_* | skill | webfetch | websearch | subagent |
 |---|---|---|---|---|---|---|---|---|
-| `orchestrator` | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `verifier` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `merger` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `cpp-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `go-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `web-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `ticket-manager` | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `orchestrator` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `verifier` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `merger` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `cpp-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `go-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `web-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `ticket-manager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+Every cell is ✓ because every role carries the whole block and nothing narrower: the table is the
+matrix, and a role's own file is where its *use* of a grant is bounded.
 
 ## Contents
 
@@ -111,7 +115,7 @@ the environment) before a search has anything to call.
 
 | Agent | Mode | Owns |
 |---|---|---|
-| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. No `edit`, no shell. |
+| `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. Its permission block is every role's; its contract is what keeps it delegating. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced with an autostashed rebase. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
