@@ -245,7 +245,7 @@ would do.
 - Posted as a pull-request **review body** (`create_pull_review`), never as a comment: a formal
   review state is refused on a self-authored PR, so the body's first line is the only state there
   is — and it is the gate `merger` reads before it merges. The measurement, and what depends on it,
-  are `agents/merger.md` § *The verdict is a review body, not a platform state*.
+  is in `agents/merger.md` § *The verdict is a review body, not a platform state*.
 
 ## Delivery
 
