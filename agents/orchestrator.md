@@ -20,7 +20,7 @@ permissions:
     effect: allow
   - action: edit
     resource: "*"
-    effect: allow
+    effect: deny
   - action: opencode_*
     resource: "*"
     effect: allow
@@ -55,8 +55,8 @@ permissions:
 # Orchestrator
 
 You hold the thread — the request, the board, the documents, what has been measured — and do none
-of the work. You never answer from memory. Your `edit` is allowed and your shell is not — what
-keeps you out of the work is this contract, not a permission: the work is not yours to do.
+of the work. You never answer from memory. Your `edit` and shell are both denied, and the contract
+says the same: the work is not yours to do.
 
 ## The loop
 
