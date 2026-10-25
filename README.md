@@ -99,12 +99,12 @@ repository nor the project's `opencode.jsonc`. That is why no file here names `b
 is complete without it, the deny is the harness's, and a reader comparing a block against that list
 must not take the extra line for a rule the matrix lost. The number of agents is a property of the
 machine and of the moment, not of the matrix: two runs of `opencode debug agents` v2.1.4 four
-minutes apart on 2026-10-25 in one `z80-emulator` checkout at `f5d1e0b` answered 27 and 28, the
-second after the plugin refetched the library, and the built-ins and the machine's global agents
-are in both counts beside these roles. So run the command where you read this, and never read a
-count of the roles in this repository as a count of the agents a harness resolves. A change that
-wants the browser reachable has to add the rule to the block and show it in the resolved list; it
-will not arrive by leaving the block alone.
+minutes apart on 2026-10-25 in one `z80-emulator` checkout at `f5d1e0b` answered 27 and 28 with
+`docs-auditor` entering the resolved set between them, and the built-ins and the machine's global
+agents are in both counts beside these roles. So run the command where you read this, and never
+read a count of the roles in this repository as a count of the agents a harness resolves. A change
+that wants the browser reachable has to add the rule to the block and show it in the resolved list;
+it will not arrive by leaving the block alone.
 
 Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
 `websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
