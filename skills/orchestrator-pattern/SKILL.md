@@ -46,7 +46,10 @@ A subagent starts with **no** context of your session. In this order:
 
 1. **Where it works** — the repository (owner, name, base branch), the worktree, the branch, and
    the first command that proves the branch. The repository is named, never inferred from the
-   directory this session is in.
+   directory this session is in. The worktree is named as the **working directory**, with the
+   absolute path of every file the subagent writes: a subagent inherits the session's directory,
+   which is the trunk, and a brief that mentions a worktree without moving the agent into it is a
+   brief that writes into the trunk.
 2. **The flow** — or, better, one line: *read the `git-workflow` skill first*. A brief without the
    flow produces a report nobody can merge.
 3. **What is owned**, and what is explicitly not.
