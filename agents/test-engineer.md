@@ -7,22 +7,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: edit
-    resource: "**/tests/**"
-    effect: allow
-  - action: edit
-    resource: "**/test/**"
-    effect: allow
-  - action: edit
-    resource: "**/*_test.go"
-    effect: allow
-  - action: edit
-    resource: "**/*.test.ts"
-    effect: allow
-  - action: edit
-    resource: "**/*.test.tsx"
-    effect: allow
-  - action: edit
-    resource: "**/testdata/**"
+    resource: "*"
     effect: allow
   - action: read
     resource: "*"
@@ -37,9 +22,6 @@ permissions:
     resource: .worktrees/*
     effect: allow
   - action: read
-    resource: .worktrees/*
-    effect: allow
-  - action: edit
     resource: .worktrees/*
     effect: allow
   - action: execute
