@@ -95,6 +95,11 @@ Two roles, on purpose: one decides, another acts. A merge is gated on a verdict 
 it measured, and the merger proves the result before it calls the local checkout synced. The
 orchestrator owns the decision and the record; the merger owns the merge.
 
+A delivery lands as a **merge commit**, always: `style: "merge"` through the platform, `git merge
+--no-ff` locally, never `rebase`, `rebase-merge` or `squash`. The graph has to show the delivery as
+a unit; a rebase publishes shas the verifier never measured, and a squash turns *each commit pushed
+as it was made* into a claim nobody can check.
+
 ## 7. The record
 
 The issue, the labels, the comment with the finding and its evidence, the document the change
