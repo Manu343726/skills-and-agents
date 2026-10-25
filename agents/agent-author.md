@@ -78,9 +78,9 @@ to have exactly one writer and to review that writer's diffs as code.
 | `opencode.jsonc` | the project's wiring, when it has one: the default agent, the plugin references, the MCP servers, the permission floor |
 
 Nothing outside these is yours. The permission no longer says so — `edit` is the whole workspace,
-for you and for everyone else — so the contract is the line, and `external_directory` is the edge. A
-skill that names a project's code is documentation of that code; you edit the skill, never the
-project's code.
+for you and for every role with a shell; `orchestrator` and `ticket-manager` deny both — so the
+contract is the line, and `external_directory` is the edge. A skill that names a project's code is
+documentation of that code; you edit the skill, never the project's code.
 
 ## The rules
 
