@@ -177,6 +177,11 @@ A subagent starts with no context of this session. In this order:
   before the PR; then commits on `dev/<id>`, the branch pushed, an open PR to `main`, a summary
   and the issue numbers — see below.
 
+**When the agent you brief is itself a head that composes others** — `emulator-engine-engineer`, a
+contract or control-plane head, any project head of that shape — add one line telling it to launch
+**its** children in the foreground and not end its turn until they report: your `background: true`
+is the mode for the workstream you cut, never for the ones it cuts.
+
 ## Reuse before you write
 
 Every brief names the library the workstream must use for each concern it touches, or states that
