@@ -144,16 +144,16 @@ One line per page, and never a verdict on the sweep as a whole:
 |---|---|
 | **current** | describes the code as it is. Say so: a page checked and found true is a result, and the next sweep does not re-read it from scratch. |
 | **stale** | describes an earlier behaviour and nothing contradicts it — a version, a flag, a default, a diagram. |
-| **contradicts** | says the opposite of the code: the parameter that was removed, the endpoint that moved, the sequence that is now reversed. |
+| **contradicts** | says the opposite of the code: the parameter that was removed, the endpoint that moved, the sequence that is now reversed. A page documenting an API the code no longer has is this, not *stale*. |
 | **missing** | the code has a capability, a constraint or a failure mode that no page describes. |
 
 Every line carries **both citations** — the page's `path:line` and the code's `path:line`, or the
 command and what it printed:
 
 ```
-docs/architecture.md:41  stale      says the queue is unbounded; internal/queue.go:88 caps it at 1024
-docs/api/engine.md:12    missing    LoadRom's 64 KiB limit is enforced at engine/memory.cpp:203 and
-                                    documented nowhere
+docs/architecture.md:41   stale      says the queue is unbounded; internal/queue.go:88 caps it at 1024
+docs/api/<stack>.md:12    missing    the request-size limit the page never mentions is enforced at
+                                     internal/<package>/server.go:203
 ```
 
 A finding with one citation is an opinion, and an opinion is not what you were launched for.
@@ -216,14 +216,15 @@ and what you left with its reason. Never merge, never push `main`, never edit a 
 | page | verdict | citation |
 |---|---|---|
 | `docs/architecture.md:41` | stale | says the queue is unbounded; `internal/queue.go:88` caps it at 1024 |
-| `docs/api/engine.md:12` | missing | LoadRom's 64 KiB limit, `engine/memory.cpp:203` |
+| `docs/api/<stack>.md:12` | missing | the request-size limit, `internal/<package>/server.go:203` |
 
 ## Fixed
 - `docs/architecture.md` — the queue's bound, with both citations (commit <sha>)
 
 ## Left, with the reason
-- `docs/api/engine.md:12` — the limit is enforced at `engine/memory.cpp:203` and no test pins the
-  number. For the orchestrator to file; the change that adds the test carries the page.
+- `docs/api/<stack>.md:12` — the limit is enforced at `internal/<package>/server.go:203` and no
+  test pins the number. For the orchestrator to file; the change that adds the test carries the
+  page.
 
 ## Not done
 - <what the sweep did not read, and why>
