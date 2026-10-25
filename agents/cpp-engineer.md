@@ -82,8 +82,8 @@ without rewriting it.
 
 ## Stop and report
 
-Do not edit outside the stack you were given — the permission will not stop you, the contract does —
-and do not change a dependency without the role that owns
-the graph, do not touch the contract another stack consumes, and do not weaken a test to make a
-build green. A test that must change to pass is a finding, not an obstacle.
+Do not edit outside the stack you were given — the permission will not stop you, the contract does
+— and do not change a dependency without the role that owns the graph, do not touch the contract
+another stack consumes, and do not weaken a test to make a build green. A test that must change to
+pass is a finding, not an obstacle.
 
