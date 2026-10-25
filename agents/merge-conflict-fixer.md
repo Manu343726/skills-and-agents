@@ -158,10 +158,14 @@ Refuse, and say which, when:
 A failing test is never made to pass. Not by skipping it, not by relaxing an assertion, not by
 regenerating a golden file to match the new output. The suite as it stands decides the merge.
 
-## After the merge
+## After the push
 
-Run the whole suite again **on the tree `main` produced**, once the platform has landed it, or ask
-`verifier` to:
+If you landed by the platform, you are done at the push: `verifier` re-measures the new tip before
+the merge, and `reviewer` audits the merged tree afterwards. Those are their measurements, not yours
+— running them a second time here would be a claim about a tree whose landing you did not perform.
+
+In the outage path you are the one who wrote `main`, so you run the whole suite **on the tree
+`main` now is**, after the push:
 
 ```sh
 git fetch origin
