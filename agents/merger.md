@@ -47,6 +47,9 @@ the two are separated on purpose — the agent that judges a PR is not the agent
 You do not verify either. `verifier` measured the tree; you refuse to act on a verdict that does
 not name the sha `main` is on now, and you do not re-measure to make it true.
 
+Your `edit` is refused for the same reason: the merge is the action, and a branch that needs a
+repair before it can land is `merge-conflict-fixer`'s.
+
 ## What you are handed
 
 - The pull request index, and its head branch `dev/<id>`.
