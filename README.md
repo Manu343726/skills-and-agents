@@ -93,13 +93,18 @@ operator's decision once the project floor stopped granting `execute` at all; th
 in the roles, and this paragraph is the correction that commit owed.
 
 One rule in a resolved block belongs to no file: `opencode debug agents` appends
-`browser: * → deny` after every role's block — measured on 2026-10-25 in a `z80-emulator` checkout,
-where it is the last line of all fourteen agents the harness resolves and is declared in neither
-this repository nor the project's `opencode.jsonc`. That is why no file here names `browser`: the
-matrix is complete without it, the deny is the harness's, and a reader comparing a block against
-that list must not take the extra line for a rule the matrix lost. A change that wants the browser
-reachable has to add the rule to the block and show it in the resolved list; it will not arrive by
-leaving the block alone.
+`browser: * → deny` after every role's block, so it is the last rule of **every** agent the harness
+resolves — a library role, a project file and a built-in alike — and it is declared in neither this
+repository nor the project's `opencode.jsonc`. That is why no file here names `browser`: the matrix
+is complete without it, the deny is the harness's, and a reader comparing a block against that list
+must not take the extra line for a rule the matrix lost. The number of agents is a property of the
+machine and of the moment, not of the matrix: two runs of `opencode debug agents` v2.1.4 four
+minutes apart on 2026-10-25 in one `z80-emulator` checkout at `f5d1e0b` answered 27 and 28, the
+second after the plugin refetched the library, and the built-ins and the machine's global agents
+are in both counts beside these roles. So run the command where you read this, and never read a
+count of the roles in this repository as a count of the agents a harness resolves. A change that
+wants the browser reachable has to add the rule to the block and show it in the resolved list; it
+will not arrive by leaving the block alone.
 
 Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
 `websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
