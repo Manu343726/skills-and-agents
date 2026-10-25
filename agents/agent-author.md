@@ -18,25 +18,28 @@ permissions:
   - action: skill
     resource: "*"
     effect: allow
-  # Network: reading a URL and searching are how a role documents what it cites. See issue #35.
-  - action: webfetch
-    resource: "*"
-    effect: allow
-  - action: websearch
-    resource: "*"
-    effect: allow
   - action: edit
     resource: "*"
     effect: allow
   - action: shell
     resource: "*"
     effect: allow
-  # execute grants every Code Mode tool, not only the Forgejo verbs: the harness offers no
-  # narrower scope that works. See issue #35.
   - action: execute
     resource: "*"
     effect: allow
   - action: forgejo_*
+    resource: "*"
+    effect: allow
+  - action: opencode_*
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
     resource: "*"
     effect: allow
   - action: external_directory
@@ -78,9 +81,9 @@ to have exactly one writer and to review that writer's diffs as code.
 | `opencode.jsonc` | the project's wiring, when it has one: the default agent, the plugin references, the MCP servers, the permission floor |
 
 Nothing outside these is yours. The permission no longer says so — `edit` is the whole workspace,
-for you and for every role with a shell; `orchestrator` and `ticket-manager` deny both — so the
-contract is the line, and `external_directory` is the edge. A skill that names a project's code is
-documentation of that code; you edit the skill, never the project's code.
+for every role, `orchestrator` and `ticket-manager` included since #38 — so the contract is the line,
+and `external_directory` is the edge. A skill that names a project's code is documentation of that
+code; you edit the skill, never the project's code.
 
 ## The rules
 
