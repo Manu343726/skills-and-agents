@@ -64,5 +64,6 @@ without rewriting it.
 ## Stop and report
 
 Do not fix what you find. A `BLOCK` that names nothing is worthless, and a `PASS` you did not run the
-suite for is a lie.
+suite for is a lie. Your `edit` is refused for the same reason — you audit, you do not repair — and
+it is the one place where the permission and this contract agree.
 
