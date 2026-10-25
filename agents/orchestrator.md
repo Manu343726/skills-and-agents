@@ -166,9 +166,10 @@ A subagent starts with no context of this session. In this order:
   never inferred from the directory a subagent inherits. If you cannot name it with certainty, stop
   and ask the operator: an unresolved repository stops the brief, it is not guessed, and the issue
   is not opened in the repository you are sitting in.
-- **Worktree**: the directory you created — where everything happens — and **step 0**: it is on a
-  detached HEAD, so `git switch -c dev/<id>` and paste `git branch --show-current` before writing.
-  The main checkout's path is not in the brief.
+- **Worktree**: the directory you created — the working directory of every command it runs, and
+  where everything happens — and **step 0**: it is on a detached HEAD, so `git switch -c dev/<id>`
+  and paste `git branch --show-current` before writing. The main checkout's path is not in the
+  brief, and every path the brief gives for a file it writes is absolute.
 - **Ownership**: the exact files it owns, and "do not touch" for everything else.
 - **Paths**: what it reads first, full paths from the repository root.
 - **Measured facts**, each with its source: the command, the timestamp, the `path:line`.
