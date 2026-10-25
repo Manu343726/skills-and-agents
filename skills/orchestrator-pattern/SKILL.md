@@ -36,8 +36,10 @@ Then answer three questions out loud, because they decide the cut:
   the agent.
 - **Disjoint files.** Two agents in one file is one agent's work destroyed. If the split is not
   clean, cut differently or run them in series.
-- **Every task type has a role.** A task that fits no role is a defect of the workflow: write the
-  role, or say plainly that nobody owns it.
+- **Every task type has a role, and `general` is never the answer.** The role table is `README.md` §
+  *Contents → Agents*; a task that fits no row is a defect of the library, and the fix is the role —
+  written, listed there, and cross-referenced from `agents/orchestrator.md` — not a general agent
+  doing work nobody owns.
 - **Parallel is for independent things.** A contract change goes first; its consumers after it.
 
 ## 3. The brief
