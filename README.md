@@ -79,6 +79,7 @@ only memory a session leaves behind.
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
+| `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
