@@ -104,6 +104,10 @@ A delivery lands as a **merge commit**, always: `style: "merge"` through the pla
 --no-ff` locally, never `rebase`, `rebase-merge` or `squash`. The graph has to show the delivery as
 a unit; a rebase publishes shas the verifier never measured, and a squash turns *each commit pushed
 as it was made* into a claim nobody can check.
+A delivery the platform cannot merge at all is the one exception: `merge-conflict-fixer` rebases the
+branch and moves the trunk to it, so that landing is linear, not a merge commit —
+`skills/git-workflow/SKILL.md` § *When the platform cannot merge* states the condition, and
+`agents/merge-conflict-fixer.md` § *The sequence* the commands.
 
 ## 7. The record
 
