@@ -86,7 +86,7 @@ only memory a session leaves behind.
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
 | `ticket-manager` | subagent | The board of the repository named in the brief: issues, labels, status transitions, the kanban, and the comments that carry a finding. |
-| `agent-author` | subagent | This library: agents, skills, the index and `AGENTS.md` — descriptions true to their bodies, permissions exactly as documented. |
+| `agent-author` | subagent | This library: agents, skills, the index, `AGENTS.md` and the project's `opencode.jsonc` — descriptions true to their bodies, permissions exactly as documented. |
 
 **A role here is generic: it may name a tool and a convention, never a directory that belongs to one
 repository.** What is particular to a project — its layout, its exact build and test commands, its
