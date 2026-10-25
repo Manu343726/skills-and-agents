@@ -76,13 +76,43 @@ only memory a session leaves behind.
 
 All fifteen roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
-`{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a
-tool the session does not have — and `sha256` over `permissions:` through the closing `---` is one
-hash in all fifteen, `39aaf93d…0fea65056a`. `edit`, `shell`, `opencode_*` and `subagent` are every
-role's; what a role does with them is its own contract's to bound, never the block's. `#38`
-collapsed the last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit`
-and `shell`, and `orchestrator` alone carried `opencode_*` and `subagent`. `execute` grants every
-Code Mode tool, Forgejo included, because the harness offers no narrower scope that works.
+`{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
+the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
+in all fifteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+them hash to the same value, so a project that defines its own roles resolves twenty files carrying
+one block, not two shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's;
+what a role does with them is its own contract's to bound, never the block's. `#38` collapsed the
+last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit` and `shell`,
+and `orchestrator` alone carried `opencode_*` and `subagent`.
+
+`execute` grants **every** Code Mode tool, Forgejo included, and the block does not narrow the
+resource. `z80-emulator#47` measured why, and it is closed history a reader should not reopen by
+"fixing" the scope: the rule was committed as *"scoped to Forgejo"* and it is not — the nested tool
+answers to `<server>_<tool>`, but every MCP call passes through the outer `execute` action first, so
+one allow covers the `list_issues` a board read is and Proxmox's `execute_vm_command` and
+Playwright's `run_code_unsafe` with it. #47 proposed the narrow form
+`{action: execute, resource: forgejo_*}` and left it **unverified**: nobody measured whether the
+harness matches `execute`'s `resource` against the nested tool name, so a scoped rule is an untested
+rule, and if the match does not happen every board read prompts again. The issue closed on the
+operator's decision once the project floor stopped granting `execute` at all; the wide rule survives
+in the roles, and this paragraph is the correction that commit owed.
+
+One rule in a resolved block belongs to no file: `opencode debug agents` appends
+`browser: * → deny` after every role's block, so it is the last rule of **every** agent the harness
+resolves — a library role, a project file and a built-in alike — and it is declared in neither this
+repository nor the project's `opencode.jsonc`. That is why no file here names `browser`: the matrix
+is complete without it, the deny is the harness's, and a reader comparing a block against that list
+must not take the extra line for a rule the matrix lost. The number of agents is a property of the
+checkout's configuration at the moment it is read, not of the matrix, and three things move it: the
+roles this library ships, the reading project's `agents` array, and the agents the checkout inherits
+from above it — `$HOME/.opencode/agents/` here, which a working directory outside `$HOME` never
+reaches. Measured on 2026-10-25 with `opencode debug agents` v2.1.4: 27 in a `z80-emulator` worktree
+at `f5d1e0b` read from under `$HOME`, 26 from a worktree of that same commit under `/tmp`, and 28 at
+that repository's `main` (`7198d2e`), whose array names `docs-auditor` where `f5d1e0b`'s does not.
+So run the command where you read this page, and never quote a number from another tree — a count
+taken in one checkout is a count of that checkout. A change that wants the browser reachable has
+to add the rule to the block and show it in the resolved list; it will not arrive by leaving the
+block alone.
 
 Network access is the pair of actions the V2 permission layer names — `webfetch` for a URL and
 `websearch` for a query — granted to every role on `resource: "*"` with no per-role host list,
