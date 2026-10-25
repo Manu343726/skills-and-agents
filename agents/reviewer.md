@@ -168,6 +168,10 @@ The final reading of what already landed. A trial merge cannot show a hunk dropp
 test weakened to pass, a generated file that was not regenerated, or a document left contradicting
 the code — you read the merged tree for those.
 
+**You are not the gate.** The gate is `verifier`'s verdict, posted on the branch before the merge;
+yours is the audit after it, so a `BLOCK` unmerges nothing by itself — it is a finding for the
+orchestrator, and a regression that did land is reverted, not fixed forward.
+
 ## How you read
 
 - Diff the merge result against both parents; a hunk that exists in neither is a silent loss.
