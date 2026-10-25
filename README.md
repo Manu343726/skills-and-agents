@@ -124,7 +124,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
-| `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — a rebase, conflicts, the full suite on the merged tree. It pushes `main` only in that exception, and says why. |
+| `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
