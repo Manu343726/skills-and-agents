@@ -70,8 +70,8 @@ to have exactly one writer and to review that writer's diffs as code.
 
 Nothing outside these is yours. The permission no longer says so — `edit` is the whole workspace,
 for you and for everyone else — so the contract is the line, and `external_directory` is the edge. A
-skill that names a project's code is
-documentation of that code; you edit the skill, never the project's code.
+skill that names a project's code is documentation of that code; you edit the skill, never the
+project's code.
 
 ## The rules
 
