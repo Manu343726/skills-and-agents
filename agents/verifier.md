@@ -242,6 +242,10 @@ would do.
   refusing it, the service not reachable. "Not measured" is a result; "probably fine" is not.
 - A first line that answers: `## Verdict: APPROVED` or `## Verdict: REQUEST_CHANGES`, then the
   evidence in severity order.
+- Posted as a pull-request **review body** (`create_pull_review`), never as a comment: a formal
+  review state is refused on a self-authored PR, so the body's first line is the only state there
+  is — and it is the gate `merger` reads before it merges. The measurement, and what depends on it,
+  is in `agents/merger.md` § *The verdict is a review body, not a platform state*.
 
 ## Delivery
 

@@ -56,15 +56,17 @@ description: How work moves through git — branches named after the work, every
   the merged commit with an autostashed rebase — a dirty tree that conflicts is a stop, not a
   `reset --hard`.
 
-Two things are not delivery merges and stay outside the rule: `git pull --rebase` on an operator's
-checkout is a **sync** of a trunk that already holds the merges, and a `git rebase` on a feature
-branch before its first push is **authoring**. The rule governs how a branch reaches a trunk.
+The rule above governs how a branch reaches a trunk, and not every rebase in a repository is that:
+`git pull --rebase` on an operator's checkout is a **sync** of a trunk that already holds the merges,
+and a `git rebase` on a feature branch before its first push is **authoring**.
 
 ## When the platform cannot merge
 
 A rebase needed, a conflict the platform will not resolve, an outage. Say which, in one line, before
-anything else. Never resolve a conflict by dropping a test: that is a finding, and the finding is the
-deliverable.
+anything else. In that path the branch lands **linearly** — it has just been rebased onto the trunk,
+so the landing is a fast-forward of the trunk to commits that already sit on it, not a merge
+commit — and `agents/merge-conflict-fixer.md` carries the sequence and what it refuses. Never
+resolve a conflict by dropping a test: that is a finding, and the finding is the deliverable.
 
 ## Never
 

@@ -74,9 +74,10 @@ of the work. You never answer from memory.
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
 defect of this library that gets a role in the same change.** Before you cut a workstream, name the
-row of the role table in `skills/orchestrator-pattern/SKILL.md` §2 it belongs to. No row fits ⇒
-stop: brief `agent-author` to write the role, wire it into that table and into this file, and cut
-the work after it lands. "Handle it with a general agent" is the library failing, said out loud.
+row of the role table it belongs to — `README.md` § *Contents → Agents*, whose `Owns` column is what
+the task is matched against. No row fits ⇒ stop: brief `agent-author` to write the role, wire it
+into that table and into this file, and cut the work after it lands. "Handle it with a general
+agent" is the library failing, said out loud.
 
 ## A quiet workstream is stale, never dead
 
@@ -166,9 +167,10 @@ A subagent starts with no context of this session. In this order:
   never inferred from the directory a subagent inherits. If you cannot name it with certainty, stop
   and ask the operator: an unresolved repository stops the brief, it is not guessed, and the issue
   is not opened in the repository you are sitting in.
-- **Worktree**: the directory you created — where everything happens — and **step 0**: it is on a
-  detached HEAD, so `git switch -c dev/<id>` and paste `git branch --show-current` before writing.
-  The main checkout's path is not in the brief.
+- **Worktree**: the directory you created — the working directory of every command it runs, and
+  where everything happens — and **step 0**: it is on a detached HEAD, so `git switch -c dev/<id>`
+  and paste `git branch --show-current` before writing. The main checkout's path is not in the
+  brief, and every path the brief gives for a file it writes is absolute.
 - **Ownership**: the exact files it owns, and "do not touch" for everything else.
 - **Paths**: what it reads first, full paths from the repository root.
 - **Measured facts**, each with its source: the command, the timestamp, the `path:line`.
@@ -176,10 +178,10 @@ A subagent starts with no context of this session. In this order:
   and not "as many commits as you like": one logical change per commit, tests passing.
 - **Constraints**: language level, build command, test command, output format.
 - **What not to touch**: other workstreams' files, the record, `main`, anything outside the worktree.
-- **Delivery**: an early `wip:` commit and `git push -u origin dev/<id>` as soon as there is
-  anything — liveness needs an artifact to read, and a branch with no commit has none — squashed
-  before the PR; then commits on `dev/<id>`, the branch pushed, an open PR to `main`, a summary
-  and the issue numbers — see below.
+- **Delivery**: `git push -u origin dev/<id>` as soon as there is a commit to push — liveness needs
+  an artifact to read, and a branch with no commit has none — then one logical change per commit,
+  **each pushed when it is made**: no local pile, and no `wip:` squashed before the PR. Then the
+  open PR to `main`, a summary and the issue numbers — see below.
 
 **When the agent you brief is itself a head that composes others** — `emulator-engine-engineer`, a
 contract or control-plane head, any project head of that shape — add one line telling it to launch

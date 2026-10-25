@@ -188,9 +188,9 @@ section 6.
 defect of this library that gets a role in the same change.**
 
 You are the agent that gives the defect its role: a task nobody's frontmatter covers is a missing
-agent, written here, wired into the role table in `skills/orchestrator-pattern/SKILL.md` section 2,
-listed in `README.md`, and cross-referenced from `agents/orchestrator.md` — in one change, so no
-session ever reads a role table that does not contain the role it is being told to use.
+agent, written here, given its row in the role table (`README.md` § *Contents → Agents*) and its
+cross-reference in `agents/orchestrator.md` — in one change, so no session ever reads a role table
+that does not contain the role it is being told to use.
 
 ## Report
 

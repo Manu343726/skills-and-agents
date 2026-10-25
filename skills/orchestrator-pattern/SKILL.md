@@ -36,8 +36,10 @@ Then answer three questions out loud, because they decide the cut:
   the agent.
 - **Disjoint files.** Two agents in one file is one agent's work destroyed. If the split is not
   clean, cut differently or run them in series.
-- **Every task type has a role.** A task that fits no role is a defect of the workflow: write the
-  role, or say plainly that nobody owns it.
+- **Every task type has a role, and `general` is never the answer.** The role table is `README.md` §
+  *Contents → Agents*; a task that fits no row is a defect of the library, and the fix is the role —
+  written, listed there, and cross-referenced from `agents/orchestrator.md` — not a general agent
+  doing work nobody owns.
 - **Parallel is for independent things.** A contract change goes first; its consumers after it.
 
 ## 3. The brief
@@ -46,7 +48,10 @@ A subagent starts with **no** context of your session. In this order:
 
 1. **Where it works** — the repository (owner, name, base branch), the worktree, the branch, and
    the first command that proves the branch. The repository is named, never inferred from the
-   directory this session is in.
+   directory this session is in. The worktree is named as the **working directory**, with the
+   absolute path of every file the subagent writes: a subagent inherits the session's directory,
+   which is the trunk, and a brief that mentions a worktree without moving the agent into it is a
+   brief that writes into the trunk.
 2. **The flow** — or, better, one line: *read the `git-workflow` skill first*. A brief without the
    flow produces a report nobody can merge.
 3. **What is owned**, and what is explicitly not.
@@ -99,6 +104,10 @@ A delivery lands as a **merge commit**, always: `style: "merge"` through the pla
 --no-ff` locally, never `rebase`, `rebase-merge` or `squash`. The graph has to show the delivery as
 a unit; a rebase publishes shas the verifier never measured, and a squash turns *each commit pushed
 as it was made* into a claim nobody can check.
+A delivery the platform cannot merge at all is the one exception: `merge-conflict-fixer` rebases the
+branch and moves the trunk to it, so that landing is linear, not a merge commit —
+`skills/git-workflow/SKILL.md` § *When the platform cannot merge* states the condition, and
+`agents/merge-conflict-fixer.md` § *The sequence* the commands.
 
 ## 7. The record
 
@@ -113,6 +122,10 @@ session:
 
 An issue left in progress by an agent that stopped is worse than one never started: it says someone
 is on it when nobody is.
+
+**None of it is delegated.** A subagent reports and the session that holds the thread writes: the
+record is what a later session reads as fact, and an account written by the agent it describes is
+the claim §5 already refuses to repeat.
 
 ## Failure modes this pattern exists to prevent
 
