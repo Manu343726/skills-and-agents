@@ -33,78 +33,21 @@ permissions:
   - action: edit
     resource: .worktrees/*
     effect: allow
-  - action: shell
-    resource: grep *
-    effect: allow
-  - action: shell
-    resource: git *
-    effect: allow
   - action: execute
     resource: "*"
     effect: allow
   - action: skill
     resource: "*"
     effect: allow
+  - action: external_directory
+    resource: /tmp/opencode/*
+    effect: allow
+  - action: external_directory
+    resource: "$HOME/.local/share/opencode/log/*"
+    effect: allow
   - action: shell
-    resource: "*|*"
-    effect: deny
-  - action: shell
-    resource: "*>*"
-    effect: deny
-  - action: shell
-    resource: "*$(*"
-    effect: deny
-  - action: shell
-    resource: "*`*"
-    effect: deny
-  - action: shell
-    resource: git -c *
-    effect: deny
-  - action: shell
-    resource: git -C * -c *
-    effect: deny
-  - action: shell
-    resource: git difftool*
-    effect: deny
-  - action: shell
-    resource: git -C * difftool*
-    effect: deny
-  - action: shell
-    resource: git *--upload-pack*
-    effect: deny
-  - action: shell
-    resource: git -C * *--upload-pack*
-    effect: deny
-  - action: shell
-    resource: git *--ext-diff*
-    effect: deny
-  - action: shell
-    resource: git -C * *--ext-diff*
-    effect: deny
-  - action: shell
-    resource: git push*--force*
-    effect: deny
-  - action: shell
-    resource: git push -f*
-    effect: deny
-  - action: shell
-    resource: git -C * push*--force*
-    effect: deny
-  - action: shell
-    resource: git -C * push -f*
-    effect: deny
-  - action: shell
-    resource: git reset*--hard*
-    effect: deny
-  - action: shell
-    resource: git -C * reset*--hard*
-    effect: deny
-  - action: shell
-    resource: git clean*
-    effect: deny
-  - action: shell
-    resource: git -C * clean*
-    effect: deny
+    resource: "*"
+    effect: allow
 ---
 
 # Docs auditor
