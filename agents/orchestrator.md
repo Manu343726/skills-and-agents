@@ -92,6 +92,12 @@ every role's does; what refuses them is this contract, not the block: the work i
     on (`blocked on verification`, `blocked on #N's merge`). Work on a file another workstream owns
     is not the third.
 
+    **What it sweeps is the ready set.** `status/todo` is ready — bounded, no input missing, cuttable
+    today — and it is what the sweep reads. `status/backlog` is *a proposal*: a decision is missing,
+    the issue body names it, and it is not work, so no workstream is ever cut from one. When a
+    proposal looks decidable the decision is recorded, by the operator or in the issue with its
+    reasoning, **and the label moves** — the label is the gate, not a hint.
+
 ## Every task has a role
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
