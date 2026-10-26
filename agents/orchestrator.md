@@ -261,13 +261,12 @@ Then:
 2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
    verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
    the base sha the verdict names, proves the result with the platform, deletes the head branch and
-   syncs the operator's checkout to the merged tree (a `pull --no-rebase --no-ff` under an autostash:
-   a merge commit local to the machine, one ahead of `origin/main` with an identical tree, so it is
-   the tree that proves the sync; a pull that conflicts — the operator's own commits on `main`
-   colliding with what arrived — stops the sync, and a stash pop that conflicts freezes it, and
-   neither freezes the merge; never a rebase, and never a fast-forward). Never by pushing `main`, and
-   never by asking `merger` to
-   merge an approval `main` has moved past.
+   syncs the operator's checkout onto the delivered sha (a `pull --rebase` under an autostash, so
+   `HEAD` equals `merge_commit_sha` and the checkout is not one merge away from it; a rebase that
+   conflicts — the operator's own commits on `main` colliding with what arrived — is aborted, the
+   work restored, and the sync reported as not done; a stash pop that conflicts freezes the sync,
+   and neither freezes the merge). Never by pushing `main`, and never by asking `merger` to merge an
+   approval `main` has moved past.
 3. **A block, or a merge that regresses, goes back** — close the PR or send the branch to its
    author in `status/todo` with the finding quoted, and revert a merge that already landed. The
    tree returns to the last green commit; the next attempt starts from a measured state.
