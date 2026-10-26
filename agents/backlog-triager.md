@@ -140,9 +140,9 @@ useful half of the report.
 
 | issue | carries | verdict | evidence |
 |---|---|---|---|
-| #42 | `status/backlog` | proposal | the body asks *REST or Connect*; REST keeps the generated handlers (`backend/gen/http.go:12`), Connect deletes them; no comment records a choice |
-| #51 | `status/todo` | ready | bounded to `toolchain/romc/rom.go:88`; the container format is settled in `docs/adr/0007-rom-container.md`; no open dependency |
-| #58 | `status/todo` | blocked | waits on #53, open and unmerged; the file it needs is `scripts/check-permission-matrix.py`, added there |
+| #42 | `status/backlog` | proposal | the body asks *queue adapter A or B*; A keeps `src/<pkg>/queue_a.go:12`, B deletes it; no comment records a choice |
+| #51 | `status/todo` | ready | bounded to `src/<pkg>/container.go:88`; the format is settled in `docs/adr/<n>-<slug>.md`; no open dependency |
+| #58 | `status/todo` | blocked | waits on #53, open and unmerged; the file it needs is added by that pull request and exists nowhere on `main` |
 
 ## The decisions, for the operator
 - #42 — <the options, and what each one costs>
