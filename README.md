@@ -75,15 +75,15 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All fifteen roles share **one** permission matrix, written identically in each `agents/*.md`:
+All sixteen roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all fifteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
-them hash to the same value, so a project that defines its own roles resolves twenty files carrying
-one block, not two shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's;
-what a role does with them is its own contract's to bound, never the block's. `#38` collapsed the
-last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit` and `shell`,
+in all sixteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+them hash to the same value, so a project that defines its own roles resolves twenty-one files
+carrying one block, not two shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every
+role's; what a role does with them is its own contract's to bound, never the block's. `#38` collapsed
+the last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit` and `shell`,
 and `orchestrator` alone carried `opencode_*` and `subagent`.
 
 `execute` grants **every** Code Mode tool, Forgejo included, and the block does not narrow the
@@ -141,6 +141,7 @@ the environment) before a search has anything to call.
 | `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `ticket-manager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `generalist` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 Every cell is ✓ because every role carries the whole block and nothing narrower: the table is the
 matrix, and a role's own file is where its *use* of a grant is bounded.
@@ -166,6 +167,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
 | `ticket-manager` | subagent | The board of the repository named in the brief: issues, labels, status transitions, the kanban, and the comments that carry a finding. |
 | `agent-author` | subagent | This library: agents, skills, the index, `AGENTS.md` and the project's `opencode.jsonc` — descriptions true to their bodies, permissions exactly as documented. |
+| `generalist` | subagent | The task no other row owns: briefed only with the roles considered and rejected, delivered to the same standard as any role, and reported back when a shape arrives twice so the missing role gets written. |
 
 **A role here is generic: it may name a tool and a convention, never a directory that belongs to one
 repository.** What is particular to a project — its layout, its exact build and test commands, its
@@ -173,6 +175,16 @@ domain — belongs in that project's own skills, and a role that needs it reads 
 makes sense for one repository (this library's first `toolchain-engineer` was one: assembler,
 disassembler and ROM container for a single emulator) is a local agent in that project, not an entry
 here.
+
+**`generalist` is the row that exists so no task is homeless, and it is meant to keep losing work.**
+It is briefed only when no other row's `Owns` clause covers the task, and its brief names the roles
+the orchestrator considered and why each was rejected — without that list the role refuses the task
+and reports the gap, and that refusal is what keeps `general` (the harness's own agent, with no
+contract behind it) from ever being the answer. It is measured in briefs, not in roles: the first
+time a shape arrives it delivers and names the role that should have owned it; the second time the
+report says the library is missing a role, and the role gets written. A `generalist` that keeps
+taking one kind of task is not being useful — it is the library failing quietly, which is why its
+report carries a section for exactly that.
 
 ### Skills
 

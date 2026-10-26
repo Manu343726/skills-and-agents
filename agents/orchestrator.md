@@ -90,9 +90,22 @@ every role's does; what refuses them is this contract, not the block: the work i
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
 defect of this library that gets a role in the same change.** Before you cut a workstream, name the
 row of the role table it belongs to — `README.md` § *Contents → Agents*, whose `Owns` column is what
-the task is matched against. No row fits ⇒ stop: brief `agent-author` to write the role, wire it
-into that table and into this file, and cut the work after it lands. "Handle it with a general
-agent" is the library failing, said out loud.
+the task is matched against.
+
+No row fits ⇒ two things, never one. **Brief `generalist`** — the row of that name — and hand it the
+list the role requires: every role you considered, one line each, with the clause of its `Owns`
+column the task fell outside of. It refuses a brief without that list, and the refusal is the check
+that the gap is real rather than a row you did not read. **And keep the defect on the board**:
+`agent-author` writes the role, wires it into that table and into this file. Which half comes first
+is the size of the gap — a one-off is delivered by `generalist` and the role follows it; a shape
+that will come back is worth the role before the work. What is never allowed is either half alone:
+`generalist` with no role filed is a dumping ground, and a role filed with the task parked behind it
+is a task nobody is doing. `generalist`'s report says when it has seen a shape twice; that sentence
+is the trigger to file, not a compliment for the agent.
+
+"Handle it with a general agent" is the library failing, said out loud — `general` is the harness's
+built-in agent, and it answers with no contract at all. `generalist` carries one, and the paragraph
+above is it.
 
 ## A quiet workstream is stale, never dead
 
