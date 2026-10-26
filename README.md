@@ -70,22 +70,25 @@ it merges, and how to close.
    file not regenerated, a contract changed on one side only.
 5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
    the branch goes back to its author in `status/todo`.
+6. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
+   the open issues again and starts the next workstream the pattern's four compatibility conditions
+   allow — or names the blocker it is waiting on. The operator's silence is not a stop condition.
 
 The record — the issue, its `status/*`, the documents, the merge — is the orchestrator's. It is the
 only memory a session leaves behind.
 
 ## Permissions
 
-All sixteen roles share **one** permission matrix, written identically in each `agents/*.md`:
+All seventeen roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all sixteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
-them hash to the same value, so a project that defines its own roles resolves twenty-one files
-carrying one block, not two shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every
-role's; what a role does with them is its own contract's to bound, never the block's. `#38` collapsed
-the last two shapes into this one: `orchestrator` and `ticket-manager` used to deny `edit` and `shell`,
-and `orchestrator` alone carried `opencode_*` and `subagent`.
+in all seventeen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+them hash to the same value, so a project that defines its own roles carries one block, not two
+shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
+them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into
+this one: `orchestrator` and `ticket-manager` used to deny `edit` and `shell`, and `orchestrator`
+alone carried `opencode_*` and `subagent`.
 
 `execute` grants **every** Code Mode tool, Forgejo included, and the block does not narrow the
 resource. `z80-emulator#47` measured why, and it is closed history a reader should not reopen by
@@ -141,6 +144,7 @@ the environment) before a search has anything to call.
 | `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `ticket-manager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `backlog-triager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `generalist` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
@@ -167,6 +171,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
 | `ticket-manager` | subagent | The board of the repository named in the brief: issues, labels, status transitions, the kanban, and the comments that carry a finding. |
+| `backlog-triager` | subagent | The readiness of the board — for every open issue, whether a decision exists, and for every proposal the decision that is missing. Classifies with evidence; decides nothing, labels nothing, cuts nothing. |
 | `agent-author` | subagent | This library: agents, skills, the index, `AGENTS.md` and the project's `opencode.jsonc` — descriptions true to their bodies, permissions exactly as documented. |
 | `generalist` | subagent | The task no other row owns: briefed only with the roles considered and rejected, delivered to the same standard as any role, and reported back when a shape arrives twice so the missing role gets written. |
 
@@ -191,7 +196,7 @@ report carries a section for exactly that.
 
 | Skill | For |
 |---|---|
-| `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing. |
+| `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing, and sweeping the board for the next compatible workstream when one lands. |
 | `cpp-quality` | C++20 conventions, ownership, error handling, sanitizers, CMake. |
 | `go-quality` | Go conventions, context, errors, concurrency, package layout. |
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |

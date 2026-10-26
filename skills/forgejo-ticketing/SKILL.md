@@ -1,6 +1,6 @@
 ---
 name: forgejo-ticketing
-description: How a board carries a project's state — one issue per event, the label taxonomy the kanban reads, an issue body that keeps the finding and its evidence, status transitions that match what is actually happening, and comments instead of twins.
+description: How a board carries a project's state — one issue per event, the label taxonomy the kanban reads and what each status means for readiness, an issue body that keeps the finding and its evidence, status transitions that match what is actually happening, and comments instead of twins.
 ---
 
 # Ticketing on Forgejo
@@ -49,14 +49,19 @@ An issue whose acceptance cannot be checked is a wish.
 
 ## Status is a promise
 
-| State | Means | When you move it |
-|---|---|---|
-| `backlog` | proposed, not built, not scheduled | when it is filed as a proposal |
-| `todo` | actionable, not started | when it is agreed and queued |
-| `in-progress` | **someone is on it right now** | **before the first command** of the work |
-| `blocked` | stuck, and the body says what by | when it stops being actionable, with the reason |
-| `done` | finished, and the evidence is in the issue | with the closing comment |
+| State | Means | What the body must carry | When you move it |
+|---|---|---|---|
+| `backlog` | **a proposal.** A decision is missing. It is not work. | the decision, named: the options and what choosing each one costs | when it is filed as a proposal |
+| `todo` | **ready.** The decision exists or none is needed, the scope is bounded, no input is missing, and it can be cut into a workstream today | nothing beyond the work itself | when the decision exists and the work is queued |
+| `in-progress` | **someone is on it right now** | nothing the label asks for — the work is described already | **before the first command** of the work |
+| `blocked` | ready in principle, waiting on a **named** external thing | the blocker, with the evidence that it is the blocker | when it stops being actionable, with the reason |
+| `done` | finished, and the evidence is in the issue | the closing comment — the merged sha and the command that proves it | with the closing comment |
 
+- **`status/backlog` is not work, and no work is cut from it.** A sweep over the board reads
+  `status/todo`, the ready set. A proposal that looks decidable gets its decision made — by the
+  operator, or recorded in the issue with its reasoning — **and the label moves in the same change**.
+  **The label is the gate, not a hint**: an issue whose label disagrees with its body is a finding,
+  not a rounding error — `backlog-triager`'s to name, never to fix.
 - **Never leave an issue in progress when you stop.** Take it out in the same breath: done, blocked,
   or back to todo. An issue in progress by an agent that stopped is worse than one never started —
   it says someone is on it when nobody is.
@@ -72,8 +77,9 @@ An issue whose acceptance cannot be checked is a wish.
 
 ## Working the board as an agent
 
-1. Read the open issues **before** proposing or changing anything: `backlog` is what is proposed,
-   `todo`/`in-progress` is what is in flight, `blocked` says what is stuck.
+1. Read the open issues **before** proposing or changing anything: `backlog` is what nobody has
+   decided, `todo` is what is ready to start, `in-progress` is what someone is on, `blocked` says what
+   is stuck and by what.
 2. Move the issue in hand to `in-progress` before the first command.
 3. When the work stops — whatever the reason — set the state that is true, and write the comment that
    explains it.
