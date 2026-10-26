@@ -61,7 +61,7 @@ An issue whose acceptance cannot be checked is a wish.
   `status/todo`, the ready set. A proposal that looks decidable gets its decision made — by the
   operator, or recorded in the issue with its reasoning — **and the label moves in the same change**.
   **The label is the gate, not a hint**: an issue whose label disagrees with its body is a finding,
-  not a rounding error.
+  not a rounding error — `backlog-triager`'s to name, never to fix.
 - **Never leave an issue in progress when you stop.** Take it out in the same breath: done, blocked,
   or back to todo. An issue in progress by an agent that stopped is worse than one never started —
   it says someone is on it when nobody is.

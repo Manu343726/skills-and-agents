@@ -96,7 +96,9 @@ every role's does; what refuses them is this contract, not the block: the work i
     today — and it is what the sweep reads. `status/backlog` is *a proposal*: a decision is missing,
     the issue body names it, and it is not work, so no workstream is ever cut from one. When a
     proposal looks decidable the decision is recorded, by the operator or in the issue with its
-    reasoning, **and the label moves** — the label is the gate, not a hint.
+    reasoning, **and the label moves** — the label is the gate, not a hint. A board too large to read
+    in one pass is `backlog-triager`'s: it classifies every open issue by whether a decision exists,
+    with the evidence, and decides nothing.
 
 ## Every task has a role
 
