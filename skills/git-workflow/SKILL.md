@@ -56,12 +56,15 @@ description: How work moves through git — branches named after the work, every
   it was made" a sentence nobody can check.
 - **The merge keeps the authors' commits.** No force push over a published branch, no rewrite of a
   history a review has read.
-- **After the merge**: prove it on the trunk, delete the head branch, and bring the local checkout to
-  the merged tree with a merge — `git pull --no-rebase --no-ff` under an autostash. It leaves a local
-  merge commit whose tree is the merged tree's: ahead of `origin/main`, never pushed, never measured
-  by anyone else, so the tree is what proves the sync. A pull that conflicts — the operator's own
-  commits on `main` colliding with what arrived — is a stop and a report: not a `reset --hard`, not a
-  rebase, and not a fast-forward.
+- **After the merge**: prove it on the trunk, delete the head branch, and sync the local checkout
+  **onto the delivered sha** with `git pull --rebase` under an autostash. The delivery already
+  landed as a merge on the platform, so the checkout has nothing to land: `--rebase` leaves `main`
+  exactly on `merge_commit_sha`, `git rev-list --count origin/main..HEAD` at `0`, and the change
+  usable at the sha the board names. A local merge here would leave the operator one commit away
+  from the delivery, with a commit no verdict, no report and no `list_branches` names. A pull that
+  conflicts — the operator's own commits on `main` colliding with what arrived — is a stop and a
+  report: `git rebase --abort`, the work restored, the merge still standing. Never a
+  `reset --hard`, never a force.
 
 ## Bringing a branch up to date
 
@@ -85,7 +88,9 @@ merge commit naming `origin/main`'s tip at the moment it took it in.
 Then it returns to the queue: the verdict is re-measured on the new tip, and the delivery lands as a
 merge commit as always. What must never happen is the other direction — this branch's commits
 replayed onto `main`, by `git rebase`, by `git pull --rebase`, or by a platform style that does it on
-our behalf.
+our behalf. **That prohibition is about a work branch**: its commits are deliveries and the verdict
+measured their shas. The operator's checkout is not one — it publishes nothing, and the sync above
+moves it onto a sha that already landed.
 
 The reasons are the ones this process already runs on. **It measures shas.** A verdict names the
 base it measured and the tree it produced; a rebase replaces every commit on the branch with a new

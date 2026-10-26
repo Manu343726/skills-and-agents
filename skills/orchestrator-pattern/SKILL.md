@@ -97,13 +97,16 @@ says "done" and an orchestrator that repeats it is how a wrong sentence acquires
 ## 6. Review and merge
 
 Two roles, on purpose: one decides, another acts. A merge is gated on a verdict that states the sha
-it measured, and the merger proves the result before it calls the local checkout synced. The
+it measured, and the merger proves the result — `main` on the platform at `merge_commit_sha`, and the
+operator's checkout at that same sha — before it calls the local checkout synced. The
 orchestrator owns the decision and the record; the merger owns the merge.
 
 A delivery lands as a **merge commit**, always: `style: "merge"` through the platform, `git merge
 --no-ff` locally, never `rebase`, `rebase-merge` or `squash`. The graph has to show the delivery as
 a unit; a rebase publishes shas the verifier never measured, and a squash turns *each commit pushed
-as it was made* into a claim nobody can check.
+as it was made* into a claim nobody can check. That rule is about a delivery. The operator's
+checkout afterwards is synced with `git pull --rebase` and lands nothing — it stands an unpublished
+trunk on a sha that already landed, so the machine reads the change at the sha the board names.
 A delivery the platform cannot merge at all is the one exception, and it changes nothing about how it
 lands: `merge-conflict-fixer` merges `main` into the branch, resolves the conflicts there and pushes
 the branch, and the platform then lands the merge commit every other delivery lands as. A branch is
