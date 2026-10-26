@@ -70,6 +70,9 @@ it merges, and how to close.
    file not regenerated, a contract changed on one side only.
 5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
    the branch goes back to its author in `status/todo`.
+6. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
+   the open issues again and starts the next workstream the pattern's four compatibility conditions
+   allow — or names the blocker it is waiting on. The operator's silence is not a stop condition.
 
 The record — the issue, its `status/*`, the documents, the merge — is the orchestrator's. It is the
 only memory a session leaves behind.
@@ -191,7 +194,7 @@ report carries a section for exactly that.
 
 | Skill | For |
 |---|---|
-| `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing. |
+| `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing, and sweeping the board for the next compatible workstream when one lands. |
 | `cpp-quality` | C++20 conventions, ownership, error handling, sanitizers, CMake. |
 | `go-quality` | Go conventions, context, errors, concurrency, package layout. |
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |

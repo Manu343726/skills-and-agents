@@ -1,6 +1,6 @@
 ---
 name: orchestrator-pattern
-description: How one agent holds a whole task and gets it built — decompose into independent workstreams, isolate each one on its own branch, brief a fresh subagent with everything it needs, verify every claim yourself, and keep the record that outlives the session.
+description: How one agent holds a whole task and gets it built — decompose into independent workstreams, isolate each one on its own branch, brief a fresh subagent with everything it needs, verify every claim yourself, keep the record that outlives the session, and sweep the board for the next compatible workstream each time one lands.
 ---
 
 # Orchestrating work
@@ -134,6 +134,34 @@ is on it when nobody is.
 **None of it is delegated.** A subagent reports and the session that holds the thread writes: the
 record is what a later session reads as fact, and an account written by the agent it describes is
 the claim §5 already refuses to repeat.
+
+## 8. When a delivery lands
+
+A finished task is a **trigger**, not a resting point. The report is checked (§5), the merge decided
+(§6), the record written (§7) — and then the same turn goes back to the board,
+`list_issues, state: open`, for work it can start. The pieces were all here already; what was missing
+was *when* to look again. **The operator's silence is not a stop condition**: *and now what?* is a
+question the board answers.
+
+Compatible means four things, all of them mechanical. Without them the rule is a licence to
+manufacture work:
+
+1. **Disjoint file ownership.** Nothing in flight — and no open pull request not yet merged — owns a
+   file the new workstream would write.
+2. **No dependency on an unmerged owner.** *"It will be fine after #N lands"* is a collision
+   scheduled for later, not compatibility.
+3. **The host is a resource too.** A measurement-sensitive task — a benchmark baseline, a verifier's
+   trial merge — does not start beside work that loads the same cores, or the number it produces is
+   fiction.
+4. **The verification slot is a resource.** One verifier, one merge, across the whole board. A fourth
+   pull request behind three is not parallelism: it is a longer queue at the same throughput, with
+   more to keep consistent.
+
+**When nothing is compatible, say what blocks you** — *blocked on verification*, *blocked on #N's
+merge* — and name the queue. An idle turn that names its blocker is the honest answer; inventing
+congruent work, or "just" touching a file another workstream owns, is worse than an idle minute. Two
+writers on one file is the first failure mode below, and a rule that manufactures work to look busy
+is how it comes back.
 
 ## Failure modes this pattern exists to prevent
 
