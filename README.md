@@ -53,13 +53,14 @@ it merges, and how to close.
    named in its row — and never closes an issue that was not its deliverable. A branch nobody
    pushed and a PR nobody opened have delivered nothing.
 3. **The verifier gates the merge, the orchestrator decides when, and `merger` merges.** The
-   verifier trial-merges the branch onto the base sha it measured, runs the whole suite on the
-   merged result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha
-   and the trial-merge sha. `merger` then performs `merge_pull_request` on an approval that still
-   describes `main`, proves the result with the platform, and syncs the operator's checkout to the
-   merged tree with `git pull --no-rebase --no-ff` under an autostash: a merge commit local to the
-   machine, its tree identical to `origin/main`'s, never pushed. A pull that conflicts is a stop and
-   a report — never a rebase, never a fast-forward.
+   verifier reads the CI checks that belong to the head sha — including the finding that none
+   ran — trial-merges the branch onto the base sha it measured, runs the whole suite on the merged
+   result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha, the
+   trial-merge sha and the CI result. `merger` then performs `merge_pull_request` on an approval
+   that still describes `main`, proves the result with the platform, and syncs the operator's
+   checkout to the merged tree with `git pull --no-rebase --no-ff` under an autostash: a merge
+   commit local to the machine, its tree identical to `origin/main`'s, never pushed. A pull that
+   conflicts is a stop and a report — never a rebase, never a fast-forward.
    Nobody pushes `main` in this flow: the delivery lands through the platform. The one exception is
    `merge-conflict-fixer`'s stated outage, named in its row below. A branch that does not build or
    whose tests fail is refused, and a test is never fixed to pass.
