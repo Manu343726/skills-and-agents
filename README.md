@@ -202,6 +202,7 @@ report carries a section for exactly that.
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |
 | `documentation-standards` | Where a project's documentation lives (declared by the project; `docs/` Markdown when nothing is said), the layout, the ADR format, links, evidence beside claims, and the document-versus-ticket split. |
 | `forgejo-ticketing` | Label taxonomy, issue template, board flow, PR flow. |
+| `release-policy` | Readiness, the level question against the project's own criterion, the artefact-before-tag rule, and the finding when a project documents no procedure. |
 | `openapi-contract` | OpenAPI-first REST, generated handlers, validation, versioning. |
 | `git-workflow` | Branches, worktrees, conventional commits, PR size, review, merge. |
 
