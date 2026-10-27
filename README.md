@@ -79,11 +79,11 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All seventeen roles share **one** permission matrix, written identically in each `agents/*.md`:
+All eighteen roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all seventeen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+in all eighteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
 them hash to the same value, so a project that defines its own roles carries one block, not two
 shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
 them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into
@@ -145,6 +145,7 @@ the environment) before a search has anything to call.
 | `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `ticket-manager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `backlog-triager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `release-manager` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `agent-author` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `generalist` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
@@ -172,6 +173,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
 | `ticket-manager` | subagent | The board of the repository named in the brief: issues, labels, status transitions, the kanban, and the comments that carry a finding. |
 | `backlog-triager` | subagent | The readiness of the board — for every open issue, whether a decision exists, and for every proposal the decision that is missing. Classifies with evidence; decides nothing, labels nothing, cuts nothing. |
+| `release-manager` | subagent | The readiness of a trunk for a version, and the version's level — whether `main` should be released, which level the commits justify, and the execution of the project's own documented procedure. Never invents a version, never tags an artefact that was not built and uploaded, never assumes another project's procedure. |
 | `agent-author` | subagent | This library: agents, skills, the index, `AGENTS.md` and the project's `opencode.jsonc` — descriptions true to their bodies, permissions exactly as documented. |
 | `generalist` | subagent | The task no other row owns: briefed only with the roles considered and rejected, delivered to the same standard as any role, and reported back when a shape arrives twice so the missing role gets written. |
 

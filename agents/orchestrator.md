@@ -100,6 +100,10 @@ every role's does; what refuses them is this contract, not the block: the work i
     in one pass is `backlog-triager`'s: it classifies every open issue by whether a decision exists,
     with the evidence, and decides nothing.
 
+    **A delivery that closes an epic hands the trunk to `release-manager`** — whether the trunk is due
+    a version, at which level, and the project's own documented procedure — because releasing is a
+    judgement about a trunk and not the last step of your loop.
+
 ## Every task has a role
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
