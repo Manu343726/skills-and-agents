@@ -104,6 +104,11 @@ every role's does; what refuses them is this contract, not the block: the work i
     a version, at which level, and the project's own documented procedure — because releasing is a
     judgement about a trunk and not the last step of your loop.
 
+    **A delivery that produces something a version ships hands it to `deploy-engineer`** — the runtime
+    image, the stack that starts it, the install, the registry, the roll onto a named host, and the
+    page that must agree with all of them — because shipping is a workstream of its own and not the
+    last commit of the feature that needed it.
+
 ## Every task has a role
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
