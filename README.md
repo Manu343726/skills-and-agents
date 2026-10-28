@@ -56,18 +56,21 @@ it merges, and how to close.
    verifier reads the CI checks that belong to the head sha — including the finding that none
    ran — trial-merges the branch onto the base sha it measured, runs the whole suite on the merged
    result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha, the
-   trial-merge sha and the CI result. `merger` then performs `merge_pull_request` on an approval
-   that still describes `main`, proves the result with the platform, and syncs the operator's
-   checkout onto the delivered sha with `git pull --rebase` under an autostash: `HEAD` equals
-   `merge_commit_sha`, the sync writes no commit of its own, and nothing local is left for a later
-   branch to carry. A pull that conflicts is a stop and a report — `git rebase --abort`, the
-   operator's work restored, the merge still standing. Nobody pushes `main` in this flow: the
-   delivery lands through the platform. The one exception is
+   trial-merge sha and the CI result. **A gate that fails is a block**, whatever the cause, and the
+   verdict names the issue that owns the red — filed by the verifier when none is open — so the
+   block has an owner instead of being a sentence everybody reads past. `merger` then performs
+   `merge_pull_request` on an approval that still describes `main`, proves the result with the
+   platform, and syncs the operator's checkout onto the delivered sha with `git pull --rebase` under
+   an autostash: `HEAD` equals `merge_commit_sha`, the sync writes no commit of its own, and nothing
+   local is left for a later branch to carry. A pull that conflicts is a stop and a report —
+   `git rebase --abort`, the operator's work restored, the merge still standing. Nobody pushes
+   `main` in this flow: the delivery lands through the platform. The one exception is
    `merge-conflict-fixer`'s stated outage, named in its row below. A branch that does not build or
    whose tests fail is refused, and a test is never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
-   file not regenerated, a contract changed on one side only.
+   file not regenerated, a contract changed on one side only. A gate that fails on the merged result
+   is a `BLOCK`, never a caveat under a `PASS`, and it names the issue that owns the red.
 5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
    the branch goes back to its author in `status/todo`.
 6. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
@@ -159,7 +162,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | Agent | Mode | Owns |
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. Its permission block is every role's; its contract is what keeps it delegating. |
-| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
+| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on, where a gate that fails is a block and the issue that owns the red is named with it. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced onto the delivered sha with `git pull --rebase` under an autostash — `HEAD` equals `merge_commit_sha`, no commit of the sync's own, never pushed. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
@@ -167,7 +170,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. It pushes `main` only in a stated Forgejo outage, and says why. |
-| `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
+| `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`; a gate that fails is a `BLOCK`, and the issue that owns the red is named with it. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
