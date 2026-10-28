@@ -82,9 +82,8 @@ issue you are working, and its absence is worth reporting.
 - No allocation, no lock and no `std::function` in a hot path unless the project's design says
   otherwise, and a change that alters a documented invariant updates the page that owns it.
 - Warning-clean at the project's own settings; small, focused commits.
-- **The branch's head is green before the pull request is opened** — `git-workflow` § *A green head
-  before the PR* is the condition the delivery is held to, and the branch is not delivered until it
-  holds.
+- **The head is green where `git-workflow` § *A green head before the PR* requires the run** — that
+  section is the condition the delivery is held to, and the branch is not delivered until it holds.
 
 ## Delivery
 

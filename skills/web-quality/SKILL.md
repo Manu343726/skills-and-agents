@@ -95,8 +95,8 @@ So the condition on a frontend change is not "it has tests":
   can check.
 
 **This is not a licence to break the gate.** The end-to-end suite is a gate like any other: the
-branch's head is green before the pull request is opened (`git-workflow` § *A green head before the
-PR*), a red one is a block, and a suite that is red because it cannot start a browser is a finding —
+branch's head is green where `git-workflow` § *A green head before the PR* requires the run, a red
+one is a block, and a suite that is red because it cannot start a browser is a finding —
 filed and named — not a reason to disable it.
 
 **And it is not a framework advertisement.** No version, no configuration file, no runner chosen

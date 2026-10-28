@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: How work moves through git — branches named after the work, every commit pushed as it is made, Conventional Commits with a body that says what was measured, a head that is green before the pull request is opened, pull requests small enough to review, and a merge that keeps the history honest.
+description: How work moves through git — branches named after the work, every commit pushed as it is made, Conventional Commits with a body that says what was measured, a head that is green before the pull request is opened or, where CI runs on pull requests only, before its merge, pull requests small enough to review, and a merge that keeps the history honest.
 ---
 
 # Git workflow
@@ -30,10 +30,24 @@ description: How work moves through git — branches named after the work, every
 
 ## A green head before the PR
 
-**A branch is not delivered until the gate has passed on its head.** The pull request is opened after
-the head sha is green — not before it, and not with the fix promised in review: a red head is a tree
-nobody has seen work, and the queue is for work rather than for runs still to come. Until that run
-exists the branch is unfinished, and so is the task it carries.
+**A branch is not delivered until the gate has passed on its head.** Where the project's CI can run on
+a branch push, the pull request is opened after the head sha is green — not before it, and not with
+the fix promised in review: a red head is a tree nobody has seen work, and the queue is for work
+rather than for runs still to come. Until that run exists the branch is unfinished, and so is the
+task it carries.
+
+**Where the project's CI runs on pull requests only, the pull request is opened to produce the run.**
+A workflow that triggers on `pull_request` and on pushes to the trunk, and on nothing else, emits
+nothing for a branch push — so there is no run to wait for before the pull request exists, and the
+pull request is what causes it. There the requirement moves from *before the pull request* to *before
+the merge*, because the merge is where the gate can be observed: the branch is pushed, the pull
+request is opened, the run it produces is read at the head sha, and the pull request is not merged
+until that run is green. **The delivery says which wiring it ran under**, in one sentence, because
+the reader cannot see the workflow file: a branch whose CI can run without a pull request cites the
+run that was green before the pull request was opened, and a branch whose CI cannot says `CI runs on
+pull requests only:` and names the run id the pull request produced. Nothing else moves — a red head
+is still fixed forward with a new commit and never by rewriting, the requirement is still on the head
+sha, and a green run on another sha is not this branch's green.
 
 - **The requirement is on the head sha, not on every commit.** *At least the last, ideally all*: a
   red intermediate commit that a later commit fixes is the honest record of a break and its repair,
@@ -54,9 +68,10 @@ exists the branch is unfinished, and so is the task it carries.
   `head_sha`, or `git rev-parse` of the pushed tip) and cite the run id beside the result.
 
 This paragraph is earlier in the flow than the verdict, and the two are complementary rather than
-duplicates: it stops a red branch reaching a pull request at all, while `verifier` blocks a red gate
-at the verdict and `reviewer` audits the merged tree after it. An author who never opens the PR keeps
-the queue short; a verdict is the net under what still got through.
+duplicates: it stops a red branch reaching a pull request at all — or, where the pull request is what
+runs the gate, reaching the merge — while `verifier` blocks a red gate at the verdict and `reviewer`
+audits the merged tree after it. A branch whose run is green when its pull request arrives keeps the
+queue short; a verdict is the net under what still got through.
 
 Fixing forward is not an exception to § *Bringing a branch up to date* or § *Never*: a published
 commit is a sha somebody may have measured, so it is added to, never replaced.

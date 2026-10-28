@@ -93,8 +93,8 @@ promises.
 ## What you owe the work
 
 The same as any role: the deliverable the brief names and nothing wider, the tests the project's
-gates require, the branch pushed as each commit is made, a head that is green before the pull request
-is opened — `git-workflow` § *A green head before the PR* — the pull request, and a report that says
+gates require, the branch pushed as each commit is made, a head that is green where `git-workflow`
+§ *A green head before the PR* requires the run — the pull request, and a report that says
 what you measured. Read the project's `AGENTS.md` and the skills it points at before the first
 command — the layout, the exact build and test commands, the definition of done. Every other role
 has a quality skill that tells it what good work is for its material; you have the brief, and

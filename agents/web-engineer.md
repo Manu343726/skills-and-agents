@@ -82,9 +82,8 @@ the generated client. The generated client is generated: regenerate it, never ed
   rendered with a mocked world is exactly the test that cannot see the defect it is meant to catch.
 - Accessibility is not a later pass: a control is reachable and named when it is written.
 - Build and tests green, both pasted.
-- **The branch's head is green before the pull request is opened** — `git-workflow` § *A green head
-  before the PR* is the condition the delivery is held to, and the branch is not delivered until it
-  holds.
+- **The head is green where `git-workflow` § *A green head before the PR* requires the run** — that
+  section is the condition the delivery is held to, and the branch is not delivered until it holds.
 
 ## The map and the evidence behind it
 
