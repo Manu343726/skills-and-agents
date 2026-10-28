@@ -97,6 +97,10 @@ An image that fails the suite never becomes the tag a job pulls, and a job never
 fallback — a job that cannot use the image reports a different environment, and the difference is the
 finding.
 
+**The credential that publishes this image is the project's existing registry credential, read from
+the environment the project names** — creating, scoping and rotating it is `deploy-engineer`'s, which
+owns the registry a version ships to, so one registry has one owner of its credential and two readers.
+
 ## Provenance is not bit-reproducibility — say which one you deliver
 
 A digest proves **where the image came from** — this registry, this recipe, this build. It does not
