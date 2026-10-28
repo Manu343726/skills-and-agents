@@ -83,11 +83,11 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All twenty-two roles share **one** permission matrix, written identically in each `agents/*.md`:
+All twenty-four roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all twenty-two, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+in all twenty-four, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
 them hash to the same value, so a project that defines its own roles carries one block, not two
 shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
 them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into
@@ -146,6 +146,8 @@ the environment) before a search has anything to call.
 | `network-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `deploy-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `ci-environment-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -178,6 +180,8 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `network-engineer` | subagent | The path from a name to a process: zones and resolvers, ingress routes, TLS issuance and trust, port forwards and firewalls — measured from the vantage point that reported the fault, and never verified by disabling the check that failed. |
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
+| `deploy-engineer` | subagent | The artefacts a version ships and the stack that runs them — the runtime image, the deployment description that starts it, the install script, the registry and its credential, a published release rolled onto a named host, and the page that must agree with all of them. |
+| `ci-environment-engineer` | subagent | The container CI executes in — the recipe, when it is rebuilt, how it is tagged and published, the workflow that runs every job inside it, and what a run reports about the tests it ran. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. It pushes `main` only in a stated Forgejo outage, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`; a gate that fails is a `BLOCK`, and the issue that owns the red is named with it. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |

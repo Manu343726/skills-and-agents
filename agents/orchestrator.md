@@ -104,6 +104,11 @@ every role's does; what refuses them is this contract, not the block: the work i
     a version, at which level, and the project's own documented procedure — because releasing is a
     judgement about a trunk and not the last step of your loop.
 
+    **A delivery that produces something a version ships hands it to `deploy-engineer`** — the runtime
+    image, the stack that starts it, the install, the registry, the roll onto a named host, and the
+    page that must agree with all of them — because shipping is a workstream of its own and not the
+    last commit of the feature that needed it.
+
 ## Every task has a role
 
 **Every task type has a role. `general` is never the answer, and a task that fits no role is a
@@ -281,6 +286,10 @@ Then:
    base sha and the trial-merge sha — a review body, because Forgejo refuses a formal review state
    on a self-authored PR (`MCPError: create pull review err: reject your own pull is not allowed`).
    A block names the file and the line.
+
+   **The run `verifier` reads is produced by a workflow `ci-environment-engineer` owns** — the image
+   the jobs execute in, when it is rebuilt, how it is tagged, and what the run reports — and a red run
+   is either the change's or the environment's, which is the distinction that row exists to make.
 2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
    verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
    the base sha the verdict names, proves the result with the platform, deletes the head branch and
