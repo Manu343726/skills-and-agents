@@ -77,6 +77,9 @@ the generated client. The generated client is generated: regenerate it, never ed
   mode (a dropped frame, an underrun, a reconnect) has a test of its own.
 - Accessibility is not a later pass: a control is reachable and named when it is written.
 - Build and tests green, both pasted.
+- **The branch's head is green before the pull request is opened** — `git-workflow` § *A green head
+  before the PR* is the condition the delivery is held to, and the branch is not delivered until it
+  holds.
 
 ## Delivery
 

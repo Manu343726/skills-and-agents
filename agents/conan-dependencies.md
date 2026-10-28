@@ -78,6 +78,9 @@ is committed beside the recipe and the recipe keeps ranges.
   the project's own check.
 - Every new dependency is justified in the pull request, with what it replaces or why nothing in the
   standard library does.
+- **The branch's head is green before the pull request is opened** — `git-workflow` § *A green head
+  before the PR* is the condition the delivery is held to, and the branch is not delivered until it
+  holds.
 
 ## Delivery
 

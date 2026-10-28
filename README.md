@@ -47,7 +47,8 @@ it merges, and how to close.
    main checkout.
 2. **A subagent delivers a pushed branch and a pull request.** Closed commits on its branch, the
    branch pushed with `git push -u origin work/<name>`, an open PR to `main` naming every issue it
-   serves — and a summary (what changed, what was measured, what it did not do, the shas) with the
+   serves — opened once the branch's head is green, `git-workflow` § *A green head before the PR* —
+   and a summary (what changed, what was measured, what it did not do, the shas) with the
    Forgejo issues it touched, by number, with their `status/*` label. A delivery never merges and
    never pushes `main` — the library's single exception is `merge-conflict-fixer`'s stated outage,
    named in its row — and never closes an issue that was not its deliverable. A branch nobody
@@ -56,18 +57,21 @@ it merges, and how to close.
    verifier reads the CI checks that belong to the head sha — including the finding that none
    ran — trial-merges the branch onto the base sha it measured, runs the whole suite on the merged
    result, and answers `APPROVED` or `REQUEST_CHANGES` as a review body carrying the base sha, the
-   trial-merge sha and the CI result. `merger` then performs `merge_pull_request` on an approval
-   that still describes `main`, proves the result with the platform, and syncs the operator's
-   checkout onto the delivered sha with `git pull --rebase` under an autostash: `HEAD` equals
-   `merge_commit_sha`, the sync writes no commit of its own, and nothing local is left for a later
-   branch to carry. A pull that conflicts is a stop and a report — `git rebase --abort`, the
-   operator's work restored, the merge still standing. Nobody pushes `main` in this flow: the
-   delivery lands through the platform. The one exception is
+   trial-merge sha and the CI result. **A gate that fails is a block**, whatever the cause, and the
+   verdict names the issue that owns the red — filed by the verifier when none is open — so the
+   block has an owner instead of being a sentence everybody reads past. `merger` then performs
+   `merge_pull_request` on an approval that still describes `main`, proves the result with the
+   platform, and syncs the operator's checkout onto the delivered sha with `git pull --rebase` under
+   an autostash: `HEAD` equals `merge_commit_sha`, the sync writes no commit of its own, and nothing
+   local is left for a later branch to carry. A pull that conflicts is a stop and a report —
+   `git rebase --abort`, the operator's work restored, the merge still standing. Nobody pushes
+   `main` in this flow: the delivery lands through the platform. The one exception is
    `merge-conflict-fixer`'s stated outage, named in its row below. A branch that does not build or
    whose tests fail is refused, and a test is never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
-   file not regenerated, a contract changed on one side only.
+   file not regenerated, a contract changed on one side only. A gate that fails on the merged result
+   is a `BLOCK`, never a caveat under a `PASS`, and it names the issue that owns the red.
 5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
    the branch goes back to its author in `status/todo`.
 6. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
@@ -79,11 +83,11 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All twenty roles share **one** permission matrix, written identically in each `agents/*.md`:
+All twenty-four roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all twenty, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+in all twenty-four, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
 them hash to the same value, so a project that defines its own roles carries one block, not two
 shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
 them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into
@@ -136,6 +140,10 @@ the environment) before a search has anything to call.
 | `cpp-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `go-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `web-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `sre` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `platform-admin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `observability-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `network-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `test-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `conan-dependencies` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `deploy-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -161,17 +169,21 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | Agent | Mode | Owns |
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. Its permission block is every role's; its contract is what keeps it delegating. |
-| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on. |
+| `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on, where a gate that fails is a block and the issue that owns the red is named with it. |
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced onto the delivered sha with `git pull --rebase` under an autostash — `HEAD` equals `merge_commit_sha`, no commit of the sync's own, never pushed. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
+| `sre` | subagent | A live fault: the evidence captured before any state changes, the least invasive action that restores service, the measurement that proves it from the side that reported it, and the timeline in the issue. One attempt per action, then a report. |
+| `platform-admin` | subagent | The instances the estate runs — accounts, tokens, collaborator grants and the admin CLI or API — as idempotent provisioning that can be re-run, each credential created with its revocation route, and never the decision about who is entitled to what. |
+| `observability-engineer` | subagent | What the estate measures and what it tells a person: scrape and log pipelines, alert rules, dashboards, objectives and notification routing, as provisioned files; a rule is not done until it has been seen firing and resolving. |
+| `network-engineer` | subagent | The path from a name to a process: zones and resolvers, ingress routes, TLS issuance and trust, port forwards and firewalls — measured from the vantage point that reported the fault, and never verified by disabling the check that failed. |
 | `test-engineer` | subagent | Test suites only, and the coverage and fuzzing the project's gates ask for. |
 | `conan-dependencies` | subagent | Owns a Conan 2 dependency graph — conanfile, profiles, lockfiles, presets integration and the licence audit. |
 | `deploy-engineer` | subagent | The artefacts a version ships and the stack that runs them — the runtime image, the deployment description that starts it, the install script, the registry and its credential, a published release rolled onto a named host, and the page that must agree with all of them. |
 | `ci-environment-engineer` | subagent | The container CI executes in — the recipe, when it is rebuilt, how it is tagged and published, the workflow that runs every job inside it, and what a run reports about the tests it ran. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. It pushes `main` only in a stated Forgejo outage, and says why. |
-| `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`. |
+| `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`; a gate that fails is a `BLOCK`, and the issue that owns the red is named with it. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |
@@ -206,11 +218,15 @@ report carries a section for exactly that.
 | `cpp-quality` | C++20 conventions, ownership, error handling, sanitizers, CMake. |
 | `go-quality` | Go conventions, context, errors, concurrency, package layout. |
 | `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |
+| `incident-response` | Working a live fault: read first, capture the evidence before changing state, name the blast radius, one least-invasive action verified from the reporting side, then the timeline — and the findings a real incident leaves. |
+| `observability` | Reading metrics, logs and traces; the four alert shapes that cannot fire or fire twice; windows sized against the signal's own cadence; provisioned dashboards and cardinality. |
+| `networking` | The vantage point as part of the measurement; one resolver and why a second is a wrong answer; split-horizon; TLS expiry versus chain versus clock; ingress, forwards and leases; the lookup-in-a-loop trap. |
+| `backup-and-restore` | State versus configuration, the inventory that drifts away from reality, retention as a decision with a number, snapshots against backups, and how a restore is proven by using it. |
 | `documentation-standards` | Where a project's documentation lives (declared by the project; `docs/` Markdown when nothing is said), the layout, the ADR format, links, evidence beside claims, and the document-versus-ticket split. |
 | `forgejo-ticketing` | Label taxonomy, issue template, board flow, PR flow. |
 | `release-policy` | Readiness, the level question against the project's own criterion, the artefact-before-tag rule, and the finding when a project documents no procedure. |
 | `openapi-contract` | OpenAPI-first REST, generated handlers, validation, versioning. |
-| `git-workflow` | Branches, worktrees, conventional commits, PR size, review, merge. |
+| `git-workflow` | Branches, worktrees, conventional commits, a green head before the PR, PR size, review, merge. |
 
 ## Layout
 

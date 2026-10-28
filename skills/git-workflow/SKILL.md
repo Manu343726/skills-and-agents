@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: How work moves through git — branches named after the work, every commit pushed as it is made, Conventional Commits with a body that says what was measured, pull requests small enough to review, and a merge that keeps the history honest.
+description: How work moves through git — branches named after the work, every commit pushed as it is made, Conventional Commits with a body that says what was measured, a head that is green before the pull request is opened, pull requests small enough to review, and a merge that keeps the history honest.
 ---
 
 # Git workflow
@@ -27,6 +27,39 @@ description: How work moves through git — branches named after the work, every
 - **A commit that claims to work passes at that commit.** An exploratory commit says it is one.
 - **Never commit state**: build output, dependencies, coverage, generated artefacts that the build
   regenerates, real secrets. Configuration and sources only.
+
+## A green head before the PR
+
+**A branch is not delivered until the gate has passed on its head.** The pull request is opened after
+the head sha is green — not before it, and not with the fix promised in review: a red head is a tree
+nobody has seen work, and the queue is for work rather than for runs still to come. Until that run
+exists the branch is unfinished, and so is the task it carries.
+
+- **The requirement is on the head sha, not on every commit.** *At least the last, ideally all*: a
+  red intermediate commit that a later commit fixes is the honest record of a break and its repair,
+  and it stays. **The history is never rewritten to make a log look clean** — no amend, no squash,
+  no force-push to tidy the red away — because what the next reader needs is that the break happened
+  and what fixed it.
+- **A red head is fixed forward**: a new commit on the same branch, pushed as it is made, with the
+  green run on the new sha in the report. Not a rewrite, not a force-push, not a branch cut again
+  from the base — and not *"it was a flake"* unless a re-run of that same sha came back green and the
+  run id sits beside the sentence. A flake nobody re-ran is a failure with a nicer name.
+- **A gate that never ran is not a block.** The rule is about a gate that exists and fails. A
+  repository with no CI — no workflow file, no runner registered — delivers on the local suite, and
+  the delivery says `CI did not run:` and why, in the words `agents/verifier.md` uses — § *The CI
+  result, at the sha you measure*. A branch is not held hostage to a pipeline the project never
+  built, and a local green is never presented as a gate.
+- **The gate is read at the sha, not at the PR.** A green run on an earlier push describes a tree
+  nobody is being asked to merge; filter the runs by the branch's head sha (`list_workflow_runs` with
+  `head_sha`, or `git rev-parse` of the pushed tip) and cite the run id beside the result.
+
+This paragraph is earlier in the flow than the verdict, and the two are complementary rather than
+duplicates: it stops a red branch reaching a pull request at all, while `verifier` blocks a red gate
+at the verdict and `reviewer` audits the merged tree after it. An author who never opens the PR keeps
+the queue short; a verdict is the net under what still got through.
+
+Fixing forward is not an exception to § *Bringing a branch up to date* or § *Never*: a published
+commit is a sha somebody may have measured, so it is added to, never replaced.
 
 ## Pull requests
 

@@ -267,7 +267,11 @@ deliberately did not do, the branch and the commit shas — and the issue number
 `main`, and does not close an issue unless that issue *was* the deliverable.
 
 A branch with no PR is not a delivery: a report is a message in a session and dies with it, while
-`list_repo_pull_requests` lists an open PR from any session.
+`list_repo_pull_requests` lists an open PR from any session. **A PR whose head sha is red is not a
+delivery either**, and a suite that passed on someone's machine is not the green this asks for: the
+branch goes back to its author with the run id and the failing job, and where the repository has no
+gate at all the delivery says `CI did not run:` and why — `skills/git-workflow/SKILL.md` § *A green
+head before the PR* is the condition.
 
 **Documentation is part of the delivery, and the sweep is separate work.** A PR names the page it
 invalidates and updates it, or states that none was — `git-workflow` § *Pull requests* — and
