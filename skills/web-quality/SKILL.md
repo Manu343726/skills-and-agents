@@ -1,6 +1,6 @@
 ---
 name: web-quality
-description: Browser frontend conventions that survive a review — strict TypeScript, one owner per piece of state, a data layer that regenerates instead of hand-writing, canvas and streaming surfaces that degrade honestly, accessibility from the first line, and tests that assert behaviour.
+description: Browser frontend conventions that survive a review — strict TypeScript, one owner per piece of state, a data layer that regenerates instead of hand-writing, canvas and streaming surfaces that degrade honestly, accessibility from the first line, tests that assert behaviour, and a change exercised in a real browser before it is called verified.
 ---
 
 # Web quality
@@ -60,6 +60,48 @@ description: Browser frontend conventions that survive a review — strict TypeS
 - **The stream and the clock are faked** in tests, and the fake lives beside the setup, not in each
   file.
 - **A test must fail if the behaviour is removed** — prove it once and say so in the pull request.
+- **And a real browser exercised the change**: § *A real browser exercised the change* — a green unit
+  suite is not a verification of a screen.
+
+## A real browser exercised the change
+
+**A unit test does not verify a UI change.** It renders a component with a mocked world and asserts on
+its output, and the defects a user reports are precisely the ones that world cannot contain: a control
+that is off-screen or unreachable at a real viewport, a panel overlapping its neighbour, a label
+wrapping into the next row, an empty state that reads as an error, an interaction that renders and does
+nothing, an error in the console while the test's world stayed silent. None of those is a coverage
+problem, and no amount of coverage reaches them — they are invisible to every test that never opens a
+page.
+
+So the condition on a frontend change is not "it has tests":
+
+- **The change was exercised in a real browser, against a running application** — through the
+  project's own end-to-end runner (Playwright where the project runs it), not a mocked tree and not a
+  snapshot of the markup. Behaviour **and** appearance: the screen renders its content, the controls
+  are visible and reachable at a viewport a user has, the interaction produces the change it claims,
+  and the console carries no error. A snapshot asserts the pixels it was handed; it says nothing about
+  whether the control can be clicked.
+- **Or the change says what was not exercised, and why.** An environment that cannot start a browser
+  is a finding with an owner, written in the pull request — never a `skip`, never a silent absence.
+  *Covered by unit tests* is the sentence that means nobody looked, and it is worse than the honest
+  gap because it reads like a measurement.
+- **The end-to-end suite is the map the next agent reads.** Where a screen the change touched has no
+  coverage, that is stated: the pull request lists what the run exercised and what it did not, by
+  screen. That list is what tells the next person where to look, and the suite is part of what a UI
+  change delivers — it grows, it does not borrow.
+- **A screenshot is evidence.** A failing assertion captures the page; the run's artefacts — the
+  screenshot, the trace, the name of the step that failed — are what a reviewer reads instead of the
+  operator's screen. Say where they are. A run whose artefacts nobody can open is a report nobody
+  can check.
+
+**This is not a licence to break the gate.** The end-to-end suite is a gate like any other: the
+branch's head is green before the pull request is opened (`git-workflow` § *A green head before the
+PR*), a red one is a block, and a suite that is red because it cannot start a browser is a finding —
+filed and named — not a reason to disable it.
+
+**And it is not a framework advertisement.** No version, no configuration file, no runner chosen
+here: the project keeps its own, and this section is the condition that runner has to satisfy. The
+name above is the one the operator runs today; the requirement is a real browser driving the change.
 
 ## Review checklist
 
@@ -67,4 +109,5 @@ description: Browser frontend conventions that survive a review — strict TypeS
 - [ ] One owner per piece of state; no effect computing state from state.
 - [ ] Every failure path renders something a user can act on.
 - [ ] New controls are keyboard-reachable and named.
+- [ ] The change was exercised in a real browser, or the pull request names what was not and why.
 - [ ] The test asserts behaviour and would fail without the change.
