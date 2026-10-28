@@ -86,7 +86,7 @@ All twenty-two roles share **one** permission matrix, written identically in eac
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all eighteen, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+in all twenty-two, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
 them hash to the same value, so a project that defines its own roles carries one block, not two
 shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
 them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into

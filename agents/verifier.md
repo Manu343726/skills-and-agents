@@ -80,8 +80,8 @@ other tree is reported as what it is.
 
 Green, red and **did not run** are three different results, and a run that is still going is not even
 a result yet. **Red is a block, always** — § *A gate that fails is a block*. Green, at the head sha,
-is the approval the merge is gated on. Did-not-run is the only one of the three that can still end in
-an `APPROVED`, and only once the missing gate has an issue that owns it (§ *No checks at all*).
+is the approval the merge is gated on. Did-not-run is neither: **a project with no gate has no red**,
+and the verdict rests on what was measured and says what was not (§ *No checks at all*).
 
 - **Success, at the head sha.** Report it with the sha and the run id beside it. "CI passed" with no
   sha is not re-readable: a week later nobody can tell which tree it described.
@@ -95,14 +95,14 @@ an `APPROVED`, and only once the missing gate has an issue that owns it (§ *No 
   no tree. The verdict says `checks pending`, names the job that has not answered, and approves
   nothing — its first line is `## Verdict: REQUEST_CHANGES`, because nothing is not a pass, and the
   orchestrator decides whether to wait for the run or to send the work back.
-- **No checks at all.** A finding, said out loud, in these words: *"CI did not run: no runner
-  registered"* — or whichever reason you measured instead: `list_workflow_runs` empty for that sha,
-  a workflow file the repository does not contain, a run skipped by its own `if:`. Then the local
-  measurement is the whole of the evidence, and it is reported as ungated, with **the issue that owns
-  the missing gate** named by number — filed by you when none is open, exactly as a red one is. A
-  suite that passed on your machine is not a gate that passed, and calling it one is how a repository
-  convinces itself it has a gate it never built. This is not the failure case above: a gate that ran
-  and failed is a block, and no verdict reaches this bullet by explaining a red run away.
+- **No checks at all.** Not a red and not a block: a project with no gate has no red, and no verdict
+  can call a tree broken by a gate that does not exist. Report it in these words — *"CI did not run:
+  no runner registered"* — or whichever reason you measured instead: `list_workflow_runs` empty for
+  that sha, a workflow file the repository does not contain, a run skipped by its own `if:`. Then the
+  local measurement is the whole of the evidence, and it is reported as ungated: a suite that passed
+  on your machine is not a gate that passed, and calling it one is how a repository convinces itself
+  it has a gate it never built. This is not the failure case above — a gate that ran and failed is a
+  block, and no verdict reaches this bullet by explaining a red run away.
 
 ## A gate that fails is a block
 
@@ -155,10 +155,14 @@ local suite is the only evidence" is a complete sentence; a local green presente
 - The CI result for the head sha: the sha itself, then `success`, or `failure` with the job and the
   step, or `checks pending` with the job that has not answered, or `CI did not run:` and the reason.
   Beside the base and trial-merge shas, never in place of them.
-- When the CI result is not `success`, the first line is `## Verdict: REQUEST_CHANGES`, and the body
-  names the issue that owns the red — number and `status/*` label — or says `incomplete: the red
-  gate has no owner` and what it would have filed. The owner makes the block actionable; it is not
-  what decides the verdict.
+- When the CI result is `failure` or `checks pending`, the first line is `## Verdict:
+  REQUEST_CHANGES` — a red run is a block, and a run that has measured nothing approves nothing. A
+  red carries the issue that owns it, by number with its `status/*` label, or `incomplete: the red
+  gate has no owner` and what it would have filed; the owner makes the block actionable and is not
+  what decides the verdict. A pending run has no red to own: the verdict names the job that has not
+  answered.
+- When the CI result is `CI did not run: <reason>`, the verdict may be `APPROVED`: a project with no
+  gate has no red, and one clause in the body says so before it reports what was measured.
 - Every command, verbatim, with its output — including the runs that passed, not only the failures.
 - The counts before and after where the change claims a delta.
 - For each claim that could not be measured, the reason: the command missing, the environment
@@ -180,6 +184,8 @@ the line `merger` parses; everything that says why sits below it.
 
 - base `<base sha>`, trial merge `<trial-merge sha>`
 - CI `<head sha>`: success (run `<id>`)
+  <!-- or: `CI did not run: <reason>` — a project with no gate has no red; the local measurement is
+       the whole of the evidence and is reported as ungated -->
 
 ## Measured
 - `<command>` → `<output, verbatim>`
@@ -193,18 +199,16 @@ the line `merger` parses; everything that says why sits below it.
 
 - base `<base sha>`, trial merge `<trial-merge sha>`
 - CI `<head sha>`: failure — job `<job>`, step `<step>`, first lines: `<log>`
-  <!-- or: `checks pending` (`<job>`) — no run has measured this sha yet
-       or: `CI did not run: <reason>` — the one case that may still approve, and it names the
-           issue that owns the missing gate -->
+  <!-- or: `checks pending` (`<job>`) — no run has measured this sha yet -->
 - red owned by `#<issue>` (`status/<label>`)  <!-- or: `incomplete: the red gate has no owner` -->
 
 ## Findings
 - `<file>:<line>` — <what, in severity order>
 ```
 
-An approval carries a `success` line, or a `CI did not run:` line with an issue owning the missing
-gate — never a `failure`: a `failure` under `## Verdict: APPROVED` is the defect this section exists
-to forbid, not a stylistic slip.
+An approval carries a `success` line, or a `CI did not run:` line that says the project has no gate —
+never a `failure`: a `failure` under `## Verdict: APPROVED` is the defect this section exists to
+forbid, not a stylistic slip.
 
 ## Delivery
 
