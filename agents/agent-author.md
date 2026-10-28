@@ -130,8 +130,8 @@ git status --short              # nothing stray, nothing generated
 ```
 
 Then the same delivery as every other workstream: commits on `dev/<id>`, the branch pushed, an
-open PR, and the issues it serves named by number — see `skills/orchestrator-pattern/SKILL.md`,
-§ 3, *The brief*, item 6.
+open PR whose head is green — `git-workflow` § *A green head before the PR* — and the issues it
+serves named by number — see `skills/orchestrator-pattern/SKILL.md`, § 3, *The brief*, item 6.
 
 ## The role rule
 

@@ -57,7 +57,8 @@ A subagent starts with **no** context of your session. In this order:
 3. **What is owned**, and what is explicitly not.
 4. **The measured facts**, with where they came from. Not "the tests fail" — the command, the output.
 5. **What to read** — the project's layout skill, the standards that apply.
-6. **The deliverable** — commits, pushed branch, pull request naming the issues.
+6. **The deliverable** — commits, a pushed branch whose head is green (`git-workflow` § *A green head
+   before the PR*), a pull request naming the issues.
 7. **The constraints** — the language, the gate, the thing it must not touch.
 
 If the brief needs a paragraph of history to make sense, that history is yours to compress: the

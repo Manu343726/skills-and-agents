@@ -125,7 +125,8 @@ You work in the worktree your brief names, on branch `dev/<id>`, and nowhere els
 there, one page or one ADR per commit, English, with the evidence already in it. Deliver the
 commits, the branch pushed with `git push -u origin dev/<id>`, and an open pull request to
 `main` opened with `create_pull_request` — body with the issues it serves, the measurements and
-the rollback. Never merge, never push `main`.
+the rollback. Never merge, never push `main`. **The branch's head is green before that pull request
+is opened** — `git-workflow` § *A green head before the PR* is the condition the delivery is held to.
 
 ## Layout
 
