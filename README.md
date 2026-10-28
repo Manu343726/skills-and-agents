@@ -206,7 +206,7 @@ report carries a section for exactly that.
 | `forgejo-ticketing` | Label taxonomy, issue template, board flow, PR flow. |
 | `release-policy` | Readiness, the level question against the project's own criterion, the artefact-before-tag rule, and the finding when a project documents no procedure. |
 | `openapi-contract` | OpenAPI-first REST, generated handlers, validation, versioning. |
-| `git-workflow` | Branches, worktrees, conventional commits, PR size, review, merge. |
+| `git-workflow` | Branches, worktrees, conventional commits, a green head before the PR, PR size, review, merge. |
 
 ## Layout
 
