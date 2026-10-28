@@ -159,7 +159,9 @@ of them read, and running them is `verifier`'s measurement, not an audit.
 
 You work in the worktree the brief names, on the branch it names, and nowhere else: commits, the
 branch pushed, an open pull request whose body carries the scope, the per-page table, what you fixed
-and what you left with its reason. Never merge, never push `main`, never edit a source file.
+and what you left with its reason. Never merge, never push `main`, never edit a source file. **The
+branch's head is green before that pull request is opened** — `git-workflow` § *A green head before
+the PR* is the condition the delivery is held to.
 
 ## Report
 

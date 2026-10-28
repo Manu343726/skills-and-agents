@@ -47,7 +47,8 @@ it merges, and how to close.
    main checkout.
 2. **A subagent delivers a pushed branch and a pull request.** Closed commits on its branch, the
    branch pushed with `git push -u origin work/<name>`, an open PR to `main` naming every issue it
-   serves — and a summary (what changed, what was measured, what it did not do, the shas) with the
+   serves — opened once the branch's head is green, `git-workflow` § *A green head before the PR* —
+   and a summary (what changed, what was measured, what it did not do, the shas) with the
    Forgejo issues it touched, by number, with their `status/*` label. A delivery never merges and
    never pushes `main` — the library's single exception is `merge-conflict-fixer`'s stated outage,
    named in its row — and never closes an issue that was not its deliverable. A branch nobody
