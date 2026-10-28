@@ -173,7 +173,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch, and the operator's checkout synced onto the delivered sha with `git pull --rebase` under an autostash — `HEAD` equals `merge_commit_sha`, no commit of the sync's own, never pushed. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
-| `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses. |
+| `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses — and every change exercised in a real browser before it is called verified. |
 | `sre` | subagent | A live fault: the evidence captured before any state changes, the least invasive action that restores service, the measurement that proves it from the side that reported it, and the timeline in the issue. One attempt per action, then a report. |
 | `platform-admin` | subagent | The instances the estate runs — accounts, tokens, collaborator grants and the admin CLI or API — as idempotent provisioning that can be re-run, each credential created with its revocation route, and never the decision about who is entitled to what. |
 | `observability-engineer` | subagent | What the estate measures and what it tells a person: scrape and log pipelines, alert rules, dashboards, objectives and notification routing, as provisioned files; a rule is not done until it has been seen firing and resolving. |
@@ -217,7 +217,7 @@ report carries a section for exactly that.
 | `orchestrator-pattern` | Decomposing work, isolating workstreams in worktrees, briefing background subagents, verifying, merging, closing, and sweeping the board for the next compatible workstream when one lands. |
 | `cpp-quality` | C++20 conventions, ownership, error handling, sanitizers, CMake. |
 | `go-quality` | Go conventions, context, errors, concurrency, package layout. |
-| `web-quality` | React 19 + TypeScript conventions, state, accessibility, testing. |
+| `web-quality` | Browser frontend conventions, state, accessibility, tests that assert behaviour — and a real browser exercising the change before it is called verified. |
 | `incident-response` | Working a live fault: read first, capture the evidence before changing state, name the blast radius, one least-invasive action verified from the reporting side, then the timeline — and the findings a real incident leaves. |
 | `observability` | Reading metrics, logs and traces; the four alert shapes that cannot fire or fire twice; windows sized against the signal's own cadence; provisioned dashboards and cardinality. |
 | `networking` | The vantage point as part of the measurement; one resolver and why a second is a wrong answer; split-horizon; TLS expiry versus chain versus clock; ingress, forwards and leases; the lookup-in-a-loop trap. |
