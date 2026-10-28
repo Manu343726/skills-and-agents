@@ -77,9 +77,8 @@ contract file is the source and the generated types are never hand-written.
 - Contexts propagated, errors wrapped with `%w`, no package-level mutable state.
 - Generated code is generated: the invocation is in the repository, and the output is deterministic.
 - A contract change lands on both sides in the same change.
-- **The branch's head is green before the pull request is opened** — `git-workflow` § *A green head
-  before the PR* is the condition the delivery is held to, and the branch is not delivered until it
-  holds.
+- **The head is green where `git-workflow` § *A green head before the PR* requires the run** — that
+  section is the condition the delivery is held to, and the branch is not delivered until it holds.
 
 ## Delivery
 
