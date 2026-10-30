@@ -147,6 +147,31 @@ your machine can carry a dependency the runner lacks — so one is never offered
 other. The verdict carries both, or it says which is missing and why. "No runner registered, so the
 local suite is the only evidence" is a complete sentence; a local green presented as gated is not.
 
+## A trial-merge tree is disposable by a different test
+
+The tree you merge in is yours, it lives under `.worktrees/`, and it outlives its verdict for
+exactly as long as the pull request it measured is open.
+
+**A trial-merge tree is disposable** — `git worktree remove .worktrees/<name>` — when both hold:
+
+- **the pull request it measured is merged or closed** — `get_pull_request_by_index` returns a
+  `state` that is not `open`;
+- **`git status --porcelain` in that tree prints nothing.**
+
+**The ancestor test is not this test, and applying it is how these trees survive.** A trial merge
+is `git merge --no-ff` on your machine: its `HEAD` is a commit the platform never landed, so it is
+not an ancestor of `main` even after the pull request merged. On 2026-10-30
+`manu343726/z80-emulator` held **13 trees (846 MiB)** in exactly that state — pull requests landed,
+head branches deleted, trees clean — and every one of them failed the ancestor test for that reason
+alone (`manu343726/z80-emulator#323`). The ancestor test belongs to a delivery, where the tree's
+`HEAD` is what landed (`agents/merger.md` § *The worktree, removed once it is proved disposable*);
+a trial merge holds nothing of its own, because everything in it came from the branch and the base.
+
+The rest of the refusal is the same one: a dirty tree is not disposable, `--force` is never used, a
+tree whose directory is already gone is cleaned with `git worktree prune`, and a tree whose pull
+request is still open is kept — the run may be repeated on it, and a `REQUEST_CHANGES` verdict is
+answered by a new one on the same tree.
+
 ## What a verdict carries
 
 - The base sha measured, and the sha of the trial merge when there is one. The trial merge is

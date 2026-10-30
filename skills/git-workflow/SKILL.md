@@ -104,9 +104,11 @@ commit is a sha somebody may have measured, so it is added to, never replaced.
   it was made" a sentence nobody can check.
 - **The merge keeps the authors' commits.** No force push over a published branch, no rewrite of a
   history a review has read.
-- **After the merge**: prove it on the trunk, delete the head branch, and sync the local checkout
-  **onto the delivered sha** with `git pull --rebase` under an autostash. The delivery already
-  landed as a merge on the platform, so the checkout has nothing to land: `--rebase` leaves `main`
+- **After the merge**: prove it on the trunk, delete the head branch, **remove its worktree
+  (refused unless the tree is clean and its HEAD is an ancestor of the merge commit just proved)**,
+  and sync the local checkout **onto the delivered sha** with `git pull --rebase` under an
+  autostash. The delivery already landed as a merge on the platform, so the checkout has nothing to
+  land: `--rebase` leaves `main`
   exactly on `merge_commit_sha`, `git rev-list --count origin/main..HEAD` at `0`, and the change
   usable at the sha the board names. A local merge here would leave the operator one commit away
   from the delivery, with a commit no verdict, no report and no `list_branches` names. A pull that
