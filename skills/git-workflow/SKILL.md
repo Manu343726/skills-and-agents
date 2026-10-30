@@ -106,10 +106,11 @@ commit is a sha somebody may have measured, so it is added to, never replaced.
   history a review has read.
 - **After the merge**: prove it on the trunk, delete the head branch **on the platform**, **remove
   its worktree (refused unless the tree is clean and its HEAD is an ancestor of the merge commit
-  just proved)**, delete it **locally** — `git branch -d`, never `-D`, and only once its worktree is
-  gone, because `-d` refuses a branch a worktree still has checked out — and sync the local
-  checkout **onto the delivered sha** with `git pull --rebase` under an autostash. The delivery
-  already landed as a merge on the platform, so the checkout has nothing to land: `--rebase` leaves
+  just proved)**, sync the local checkout **onto the delivered sha** with `git pull --rebase` under
+  an autostash, and delete the branch **locally** — `git branch -d`, never `-D`, after its worktree
+  is gone (it refuses a branch a worktree still has checked out) and **after the sync**, so that
+  `-d`'s ancestor is `HEAD` itself and not an upstream the platform pruned. The delivery already
+  landed as a merge on the platform, so the checkout has nothing to land: `--rebase` leaves
   `main` exactly on `merge_commit_sha`, `git rev-list --count origin/main..HEAD` at `0`, and the
   change usable at the sha the board names. A local merge here would leave the operator one commit
   away from the delivery, with a commit no verdict, no report and no `list_branches` names. A pull

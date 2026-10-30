@@ -292,14 +292,16 @@ Then:
    is either the change's or the environment's, which is the distinction that row exists to make.
 2. **You decide when it merges; `merger` performs the merge.** Hand it the PR index and say that the
    verdict is current: it checks the three conditions itself, merges with `merge_pull_request` on
-   the base sha the verdict names, proves the result with the platform, deletes the head branch,
-   removes its worktree (refused unless the tree is clean and its HEAD is an ancestor of the merge
-   commit), and syncs the operator's checkout onto the delivered sha (a `pull --rebase` under an
-   autostash, so `HEAD` equals `merge_commit_sha` and the checkout is not one merge away from it;
-   a rebase that conflicts — the operator's own commits on `main` colliding with what arrived — is
-   aborted, the work restored, and the sync reported as not done; a stash pop that conflicts
-   freezes the sync, and neither freezes the merge). Never by pushing `main`, and never by asking
-   `merger` to merge an approval `main` has moved past.
+   the base sha the verdict names, proves the result with the platform, deletes the head branch on
+   the platform, removes its worktree (refused unless the tree is clean and its HEAD is an ancestor
+   of the merge commit), syncs the operator's checkout onto the delivered sha (a `pull --rebase`
+   under an autostash, so `HEAD` equals `merge_commit_sha` and the checkout is not one merge away
+   from it; a rebase that conflicts — the operator's own commits on `main` colliding with what
+   arrived — is aborted, the work restored, and the sync reported as not done; a stash pop that
+   conflicts freezes the sync, and neither freezes the merge), and deletes the local branch with
+   `git branch -d`, never `-D`, **after** that sync — before it, a branch whose upstream the
+   platform pruned refuses as "not fully merged" for a reason that is not the work. Never by
+   pushing `main`, and never by asking `merger` to merge an approval `main` has moved past.
 3. **A block, or a merge that regresses, goes back** — close the PR or send the branch to its
    author in `status/todo` with the finding quoted, and revert a merge that already landed. The
    tree returns to the last green commit; the next attempt starts from a measured state.
