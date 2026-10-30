@@ -189,8 +189,12 @@ git worktree list                                  # the path is not in it
 test -e .worktrees/<name>; echo $?                 # 1
 ```
 
-**It is refused unless both hold**, and the refusal is the point: `--force` deletes untracked build
-output and tracked work alike, and neither comes back.
+**The removal is taken only when both hold.** One of them git enforces and the other it does not: a
+dirty tree is refused by git itself, while the ancestor test is this role's own — measured, a clean
+tree whose `HEAD` was one commit off `main` (`git merge-base --is-ancestor` → exit `1`) was removed
+with `exit=0`, no warning. That is why the test is a command in the block above and not a sentence
+left to the remove to apply: the discipline is the contract's, and `--force` deletes untracked build
+output and tracked work alike, neither of which comes back.
 
 - **`git status --porcelain` in that tree prints nothing.** A tracked, staged or untracked line is
   work a `--force` would delete.
@@ -235,17 +239,19 @@ local merge commit the platform never landed. `agents/verifier.md` § *A trial-m
 disposable by a different test* carries the criterion that fits it, and the test above is not
 applied to it.
 
-## The local sync — the one write you make in the main checkout
+## The local sync — the one write to the trunk
 
 Your last step, and **only yours**: bring the operator's checkout onto the delivered sha.
 
 Every other agent in this library is told that nobody writes in the main checkout. This is the
-routine exception, and the only one this role takes: a merge performed server-side is **invisible at
-home** — `merge_pull_request` moves `origin/main` and leaves the operator's checkout on the old
-commit, so the machine the operator is looking at does not contain the change that the board says
-landed. The sync is how the merge becomes true where it is read. The library's other write to `main`
-is neither routine nor yours: `merge-conflict-fixer` lands a delivery by hand only when the Forgejo
-API is down, and its own file states that as the exception.
+routine exception, and the only one this role takes **to the trunk**: a merge performed server-side
+is **invisible at home** — `merge_pull_request` moves `origin/main` and leaves the operator's
+checkout on the old commit, so the machine the operator is looking at does not contain the change
+that the board says landed. The sync is how the merge becomes true where it is read. The worktree
+removal above is not a second write to the trunk and is not counted as one: it deletes a tree under
+`.worktrees/` and its entry in `.git/worktrees/`, and neither is the operator's `main`. The
+library's other write to `main` is neither routine nor yours: `merge-conflict-fixer` lands a
+delivery by hand only when the Forgejo API is down, and its own file states that as the exception.
 
 **It is a rebase under an autostash: `git pull --rebase`.** The sync writes no commit of its own.
 `origin/main` has already moved to the delivered sha — the platform wrote the merge commit — and what
