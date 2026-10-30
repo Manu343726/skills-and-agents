@@ -61,14 +61,15 @@ it merges, and how to close.
    verdict names the issue that owns the red — filed by the verifier when none is open — so the
    block has an owner instead of being a sentence everybody reads past. `merger` then performs
    `merge_pull_request` on an approval that still describes `main`, proves the result with the
-   platform, deletes the head branch and — when the tree is clean and its HEAD is an ancestor of the
-   merge commit it just proved — its worktree, and syncs the operator's checkout onto the delivered
-   sha with `git pull --rebase` under an autostash: `HEAD` equals `merge_commit_sha`, the sync
-   writes no commit of its own, and nothing local is left for a later branch to carry. A pull that
-   conflicts is a stop and a report — `git rebase --abort`, the operator's work restored, the merge
-   still standing. Nobody pushes `main` in this flow: the delivery lands through the platform. The
-   one exception is `merge-conflict-fixer`'s stated outage, named in its row below. A branch that
-   does not build or whose tests fail is refused, and a test is never fixed to pass.
+   platform, deletes the head branch on the platform, removes its worktree (only when it is clean
+   and its HEAD is an ancestor of the merge commit just proved), syncs the operator's checkout onto
+   the delivered sha with `git pull --rebase` under an autostash, and deletes the local ref with
+   `git branch -d`, never `-D`, once that sync has landed: `HEAD` equals `merge_commit_sha`, the
+   sync writes no commit of its own, and nothing local is left for a later branch to carry. A pull
+   that conflicts is a stop and a report — `git rebase --abort`, the operator's work restored, the
+   merge still standing. Nobody pushes `main` in this flow: the delivery lands through the platform.
+   The one exception is `merge-conflict-fixer`'s stated outage, named in its row below. A branch
+   that does not build or whose tests fail is refused, and a test is never fixed to pass.
 4. **`reviewer` audits what already landed** — the merged tree, not the branch — and answers `PASS`
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
    file not regenerated, a contract changed on one side only. A gate that fails on the merged result
@@ -171,7 +172,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 |---|---|---|
 | `orchestrator` | primary | The thread. Delegates everything to worktrees, verifies, decides when a verified PR merges, holds the board and the record. Its permission block is every role's; its contract is what keeps it delegating. |
 | `verifier` | subagent | Measures: builds, tests, endpoints, logs. Reports evidence, never edits; posts the verdict the merge is gated on, where a gate that fails is a block and the issue that owns the red is named with it. |
-| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch and its worktree, and the operator's checkout synced onto the delivered sha with `git pull --rebase` under an autostash — `HEAD` equals `merge_commit_sha`, no commit of the sync's own, never pushed. The worktree goes only when it is clean and its HEAD is an ancestor of the merge commit just proved; never with `--force`. |
+| `merger` | subagent | Performs the merge the orchestrator decided on: `merge_pull_request`, the proof, the head branch on the platform, its worktree, the operator's checkout synced onto the delivered sha with `git pull --rebase` under an autostash, and the local ref deleted after that sync. The worktree goes only when it is clean and its HEAD is an ancestor of the merge commit just proved, never with `--force`; the local ref with `git branch -d`, never `-D`, and never before the sync. |
 | `cpp-engineer` | subagent | C++ sources, their build description and their unit tests, in whatever layout the project uses. |
 | `go-engineer` | subagent | Go packages, their tests, the module files and the build the project uses. |
 | `web-engineer` | subagent | The browser frontend: components, state, the data layer and its tests, in whatever framework the project uses — and every change exercised in a real browser before it is called verified. |
