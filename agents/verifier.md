@@ -164,8 +164,9 @@ not an ancestor of `main` even after the pull request merged. On 2026-10-30
 `manu343726/z80-emulator` held **13 trees (846 MiB)** in exactly that state — pull requests landed,
 head branches deleted, trees clean — and every one of them failed the ancestor test for that reason
 alone (`manu343726/z80-emulator#323`). The ancestor test belongs to a delivery, where the tree's
-`HEAD` is what landed (`agents/merger.md` § *The worktree, removed once it is proved disposable*);
-a trial merge holds nothing of its own, because everything in it came from the branch and the base.
+`HEAD` is what landed (`agents/merger.md` § *The worktree and the local branch, removed once they
+are proved disposable*); a trial merge holds nothing of its own, because everything in it came from
+the branch and the base.
 
 The rest of the refusal is the same one: a dirty tree is not disposable, `--force` is never used, a
 tree whose directory is already gone is cleaned with `git worktree prune`, and a tree whose pull

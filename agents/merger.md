@@ -1,5 +1,5 @@
 ---
-description: "Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch and its worktree — refused unless the tree is clean and its HEAD is an ancestor of the merge commit just proved, never with `--force` — and brings the operator's checkout onto the delivered sha with `git pull --rebase` under an autostash: `HEAD` equals `merge_commit_sha`, the sync writes no commit of its own, and a rebase that conflicts is aborted so the merge stands and the checkout is reported unsynced."
+description: "Performs the merge the orchestrator has decided on — merges an approved pull request through Forgejo, proves the result with the platform and the branch list, removes the head branch on the platform, its worktree — refused unless the tree is clean and its HEAD is an ancestor of the merge commit just proved, never with `--force` — and the local branch ref (`git branch -d`, never `-D`, and only after the worktree is gone), and brings the operator's checkout onto the delivered sha with `git pull --rebase` under an autostash: `HEAD` equals `merge_commit_sha`, the sync writes no commit of its own, and a rebase that conflicts is aborted so the merge stands and the checkout is reported unsynced."
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permissions:
@@ -161,23 +161,26 @@ delete_branch({ owner, repo, branch: "dev/<id>" })
 
 # 4. its worktree is gone — the shell step below, and only after its test passes
 git worktree remove .worktrees/<name>
+
+# 5. and its local ref, after the worktree and never with -D
+git branch -d dev/<id>
 ```
 
 Paste the values, not a sentence about them. `merged: true` with a `merge_commit_sha`, a `main` row
 whose sha is that same sha, and the delete's response are the three facts that make the merge a
-measurement instead of a claim. The removal below is the fourth, and it is a path that is no longer
-there.
+measurement instead of a claim. The removal is the fourth, and it is a path that is no longer there;
+the local ref is the fifth, and it is a name `git branch --list` no longer prints.
 
-The local sync has a fifth, and this one **is** a sha: the checkout's `HEAD` equals
+The local sync has a sixth, and this one **is** a sha: the checkout's `HEAD` equals
 `merge_commit_sha`. The sync writes no commit of its own (below), so there is no second sha and no
 tree to compare between: the checkout stands on the delivered commit or it is not synced, and a
 report that cannot print the equality says which case it is in instead of claiming one.
 
-## The worktree, removed once it is proved disposable
+## The worktree and the local branch, removed once they are proved disposable
 
-The head branch and its worktree are one delivery, and the merge is the moment the tree stops being
-needed. **Remove its worktree** — `git worktree remove .worktrees/<name>` — after the branch is
-deleted and before the sync, from the main checkout:
+A delivery has **three** ends, not two: the head branch on the platform (`delete_branch`, § *The
+proof*), its worktree, and the local branch ref. The merge is the moment all three stop being
+needed, and they go in one order — platform branch, worktree, local branch, sync:
 
 ```sh
 git -C .worktrees/<name> status --porcelain        # nothing, or the tree is refused
@@ -187,7 +190,37 @@ git merge-base --is-ancestor <tree-head-sha> <merge_commit_sha>; echo $?   # 0
 git worktree remove .worktrees/<name>
 git worktree list                                  # the path is not in it
 test -e .worktrees/<name>; echo $?                 # 1
+
+git branch -d dev/<id>                             # the local ref, and only after the tree is gone
+git branch --list 'dev/<id>'                       # nothing
 ```
+
+**The order is not cosmetic.** `git branch -d` refuses a branch a worktree still has checked out —
+measured: `error: cannot delete branch 'dev/x' used by worktree at
+'/tmp/opencode/branch-probe/main/.worktrees/x'`, exit `1`. The tree goes first and the ref second;
+a `-d` attempted before the removal is a refusal, not a shortcut.
+
+**`-d`, never `-D`.** `-d` is git's own safety, and it is the proof this section already demands: a
+branch that is not fully merged into its upstream or `HEAD` is refused — measured, `error: the
+branch 'dev/x' is not fully merged`, exit `1`, with git pointing at `-D` in its hint. `-D` skips
+that check, so it is the one spelling that turns "the delivery landed" into an assumption. The
+consuming project's policy denies the unsafe spelling and leaves the safe one open — measured in
+`manu343726/z80-emulator`'s `opencode.jsonc`, `policies`:
+
+```
+{ "action": "tool.use", "resource": "shell:git branch -D*", "effect": "deny" },
+{ "action": "tool.use", "resource": "shell:git update-ref -d*", "effect": "deny" },
+```
+
+Through that layer, in that repository, `git branch -D <name>` → `permission.rejected: Permission
+denied: shell`, while `git branch -d <name>` reached git — `error: branch 'no-such-branch-xyz' not
+found`, exit `1`. The safe verb is the one the policy leaves open, which is why this rule can be
+executed at all.
+
+### The worktree
+
+**Remove its worktree** — `git worktree remove .worktrees/<name>` — after the platform branch is
+deleted and before the local ref and the sync, from the main checkout.
 
 **The removal is taken only when both hold.** One of them git enforces and the other it does not: a
 dirty tree is refused by git itself, while the ancestor test is this role's own — measured, a clean
@@ -225,8 +258,6 @@ nobody can find or explain.
 
 The path is the one the brief cut the work under (`agents/orchestrator.md` § *The worktree*). A
 delivery whose tree is already gone is reported as that, not as a removal this role performed.
-`git worktree remove` deletes the working tree and its administrative entry, not the branch ref:
-the local `dev/<id>` stays in `git branch`, and the report says so rather than implying it went too.
 
 The measurement behind the clause: `manu343726/z80-emulator` held **125 worktrees and 13.30 GiB**
 under `.worktrees/` on 2026-10-30 — this library documented creation twice and removal nowhere, and
@@ -238,6 +269,23 @@ A trial merge's tree fails the ancestor test for a reason that is not this role'
 local merge commit the platform never landed. `agents/verifier.md` § *A trial-merge tree is
 disposable by a different test* carries the criterion that fits it, and the test above is not
 applied to it.
+
+### The local branch ref
+
+`git worktree remove` deletes the working tree and its administrative entry, not the branch ref, so
+the ref has its own step: **`git branch -d dev/<id>`, after the worktree is gone** (*The order is
+not cosmetic*, above) and before the sync. `git branch --list 'dev/<id>'` printing nothing is the
+proof, and it goes in the report.
+
+A ref that is already gone is reported as that. A `-d` that git refuses is **not** retried with
+`-D`: the refusal means the branch is not fully merged into its upstream or `HEAD`, which is a
+finding about the delivery — report it with the branch's sha and leave the ref standing.
+
+The measurement behind the step, in `manu343726/z80-emulator` on 2026-10-30: **88** local `dev/*`
+branches, **7** of them checked out in a worktree and **8** with a live `origin/dev/*` ref, so
+**79** with neither (`git branch --list 'dev/*'` → 88, `git worktree list --porcelain`,
+`git branch -r --list 'origin/dev/*'`). The platform's copy went with `delete_branch`; the local
+copy went nowhere, because nothing said it should.
 
 ## The local sync — the one write to the trunk
 
@@ -423,6 +471,10 @@ operator's work: baseline 3 dirty paths, stashed as stash@{0}, popped back — t
   prints the path
   <!-- or: REFUSED — `.worktrees/<name>` left standing: `git status --porcelain` → `<paths>`,
        HEAD `<sha>`, not an ancestor of `<merged-sha>` -->
+- `git branch -d dev/<id>` → `Deleted branch dev/<id> (was <sha>)`; `git branch --list 'dev/<id>'`
+  → nothing
+  <!-- or: REFUSED — `error: the branch 'dev/<id>' is not fully merged`; the ref left standing at
+       `<sha>`, reported and not forced with `-D` -->
 - Local sync: `<checkout>` on `main`, baseline `<n>` dirty paths stashed as `stash@{0}`,
   `git rev-parse HEAD` → `<merged-sha>` = `merge_commit_sha`, count `origin/main..HEAD` → `0`,
   popped back — the same `<n>` paths
@@ -449,6 +501,8 @@ operator's work: baseline 3 dirty paths, stashed as stash@{0}, popped back — t
   performs, because the delivery already landed as a merge and the checkout is catching up to it.
 - Remove a worktree with `--force`, or one whose `git status --porcelain` is not empty, or one whose
   `HEAD` the platform did not land. Leave it standing and report it.
+- Delete a local branch with `-D`, or before its worktree is gone. A `-d` git refuses is reported
+  with the branch's sha, never forced.
 - Resolve a stash-pop conflict, pick a side, or commit during the sync.
 - Drop a stash you did not create and successfully pop, or delete `.git/merger-sync-frozen`.
 - Stash with `-u`, reset, check out over, or discard the operator's uncommitted work.
