@@ -74,9 +74,16 @@ it merges, and how to close.
    or `BLOCK` with the evidence: a hunk dropped in a conflict, a test weakened to pass, a generated
    file not regenerated, a contract changed on one side only. A gate that fails on the merged result
    is a `BLOCK`, never a caveat under a `PASS`, and it names the issue that owns the red.
-5. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
+5. **`qa-liaison` carries the product owner's QA pass on what was delivered.** A merge closes the
+   change; it does not accept the feature — the person who asked for it has not looked at it yet.
+   The owner annotates the running screen, and `qa-liaison` binds each annotation to a screen, an
+   element and a file, routes it to the role that owns that file, and answers it in the thread where
+   it was written. The pass ends when every annotation is fixed or deferred **with the owner's name
+   on it**; the acceptance is the owner's own sentence in the issue, never the tool's status mark and
+   never the role's.
+6. **A regression is reverted, not fixed forward.** The revert and the reason go in the issue, and
    the branch goes back to its author in `status/todo`.
-6. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
+7. **A delivery is a trigger, not a resting point.** With the record written, the orchestrator reads
    the open issues again and starts the next workstream the pattern's four compatibility conditions
    allow — or names the blocker it is waiting on. The operator's silence is not a stop condition.
 
@@ -85,11 +92,11 @@ only memory a session leaves behind.
 
 ## Permissions
 
-All twenty-four roles share **one** permission matrix, written identically in each `agents/*.md`:
+All twenty-five roles share **one** permission matrix, written identically in each `agents/*.md`:
 seventeen rules, no per-role exception. The floor is
 `{action: "*", resource: "*", effect: deny}` — every tool a role does not explicitly allow is a tool
 the session does not have — and `sha256` over `permissions:` through the closing `---` is one hash
-in all twenty-four, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
+in all twenty-five, `39aaf93d…0fea65056a`. The five local files `manu343726/z80-emulator` puts beside
 them hash to the same value, so a project that defines its own roles carries one block, not two
 shapes of one. `edit`, `shell`, `opencode_*` and `subagent` are every role's; what a role does with
 them is its own contract's to bound, never the block's. `#38` collapsed the last two shapes into
@@ -152,6 +159,7 @@ the environment) before a search has anything to call.
 | `ci-environment-engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `merge-conflict-fixer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `qa-liaison` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `security-reviewer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `docs-writer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `docs-auditor` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -186,6 +194,7 @@ matrix, and a role's own file is where its *use* of a grant is bounded.
 | `ci-environment-engineer` | subagent | The container CI executes in — the recipe, when it is rebuilt, how it is tagged and published, the workflow that runs every job inside it, and what a run reports about the tests it ran. |
 | `merge-conflict-fixer` | subagent | The exception path: a merge Forgejo's `merge_pull_request` cannot perform — it merges `main` into `dev/<id>`, resolves the conflicts there, runs the suite on the result and pushes the branch, and the platform lands the merge commit. It pushes `main` only in a stated Forgejo outage, and says why. |
 | `reviewer` | subagent | Final pass over the merged tree: runs the suite, hunts what integration hid, answers `PASS` or `BLOCK`; a gate that fails is a `BLOCK`, and the issue that owns the red is named with it. |
+| `qa-liaison` | subagent | The QA phase a product owner performs on a delivered feature: their screen annotations, each bound to a screen, an element and a file, each routed to the role that owns that file, each answered in the thread where it was written — and the proof that every one is fixed or deferred with the owner's name on it. It implements no fix and declares no acceptance. |
 | `security-reviewer` | subagent | Read-only threat review: inputs, secrets, process boundaries, supply chain. |
 | `docs-writer` | subagent | The project's documentation, wherever it declares it lives — `docs/` by default, or the external system its `AGENTS.md` names — and it coordinates with `ticket-manager`, because a ticket is documentation too. |
 | `docs-auditor` | subagent | Sweeps the documentation against the code, page by page — current, stale, contradicts, missing — and fixes the pages it can. Invoked as a sweep, not per change. |

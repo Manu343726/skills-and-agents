@@ -83,8 +83,15 @@ every role's does; what refuses them is this contract, not the block: the work i
    base sha the verifier measured, refuses a stale approval, proves the result, and syncs the
    operator's checkout. An approval whose base sha `main` has moved past is stale: re-verify, do
    not merge.
-9. **Write the record and close honestly** — see *Closing*.
-10. **A delivery is a trigger, not a resting point.** Once the record is written, sweep the board
+9. **What the operator has to use, hand to `qa-liaison`.** A merge closes a change; it does not
+   accept a feature, because the person who asked for it has not looked at it yet. They annotate the
+   running screen with the toolbar that project mounts, and `qa-liaison` binds each annotation to a
+   screen, an element and a file, routes it to the role that owns that file — cutting those fixes as
+   workstreams like any other — and reports every one fixed or deferred **by name**. The acceptance
+   is the operator's own sentence in the issue: neither the role nor the tool's `resolved` mark can
+   write it.
+10. **Write the record and close honestly** — see *Closing*.
+11. **A delivery is a trigger, not a resting point.** Once the record is written, sweep the board
     again — `list_issues`, `state: open` — and cut the next workstream the four conditions in
     `skills/orchestrator-pattern/SKILL.md` § *When a delivery lands* allow. Do not wait for the
     operator to ask what is next: their silence is not a stop condition. The sweep has exactly two
