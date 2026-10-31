@@ -103,6 +103,13 @@ understand and act on."* What arrives is an **AFS v1.1** annotation, and the fie
 | `kind` | `feedback`, `placement` or `rearrange` |
 | `status` | `pending`, `acknowledged`, `resolved` or `dismissed` |
 
+**No field in it identifies a person.** `resolvedBy` and a thread message's `role` are `"human"` or
+`"agent"` and nothing finer — the MCP server writes `resolvedBy: "agent"` for **every** call to
+`agentation_resolve` and `agentation_dismiss`, `agentation_acknowledge` writes a status and no actor
+at all, and `agentation_dismiss` keeps a `reason`, not a name. So whatever the record must say about
+*who* — who resolved, who deferred, who accepted — is written where names live, which is the issue,
+and never read back out of an annotation.
+
 **Two channels, and your report names which one the pass ran on.**
 
 - **MCP** — the real-time one. `agentation_get_all_pending` answers *what is open*;
@@ -187,12 +194,15 @@ Two consequences, and both are refusals:
 that every annotation is answered, and the sentence that says what the owner decided after reading
 the answers. If they never said it, the pass is not accepted, however green everything is.
 
-- **A resolved annotation is a claim, not a verdict.** `agentation_resolve` is called by whoever did
-  the work — you, or the engineer — and `resolvedBy` records which. It means *somebody believes this
-  is addressed*; it does not mean the owner agrees. Resolve only after the fix has landed **and** been
-  measured: the suite the change touches, and for anything visual an eye on the same URL the
-  annotation came from. An annotation closed on a fix nobody looked at is worse than one left
-  pending, because it disappears from the toolbar the owner is reading.
+- **A resolved annotation is a claim, not a verdict.** `agentation_resolve` records
+  `resolvedBy: "agent"` **for whoever calls it** — the tool cannot tell you, the engineer or a
+  `self-driving` pass apart, and it never records the owner — so a `resolved` mark says *an agent
+  believes this is addressed* and nothing narrower, and it does not mean the owner agrees.
+  **So the tool's status is not who did it**: the resolver's name goes in the **issue**, beside the
+  annotation's id, at the moment it is resolved, or the resolution has no author. Resolve only after
+  the fix has landed **and** been measured: the suite the change touches, and for anything visual an
+  eye on the same URL the annotation came from. An annotation closed on a fix nobody looked at is
+  worse than one left pending, because it disappears from the toolbar the owner is reading.
 - **The acceptance is written where it outlives the session**: in the issue, as the owner's sentence
   and the date, beside the count of annotations and how each one ended. A pass closed on a
   conversation nobody recorded is a pass the next session cannot read.
@@ -203,7 +213,8 @@ The owner may decide an annotation will not be fixed — out of scope, wrong, or
 is a legitimate end, and it has a shape:
 
 - **the tool side** — `agentation_dismiss` with the `reason`, because the annotation leaves the
-  toolbar and the next reader sees why;
+  toolbar and the next reader sees why. The reason is all the tool keeps: it does not record who
+  dismissed it;
 - **the record side** — the owner's name, the date and the reason in the issue's table, or the issue
   that now owns the work when it is deferred to a real future: a deferral that names no owner and no
   issue is a deletion with better manners.
@@ -218,9 +229,10 @@ regression; fix it now or file it?"* — and the answer is theirs.
    finding about the wiring, not an approval.
 2. **Bind every annotation** to its four parts. Anything unbounded becomes an `agentation_reply`
    question and stays `pending`.
-3. **Acknowledge** what you have received (`agentation_acknowledge`) so the owner can see that the
-   agent has it — the tool exists to close a loop in both directions, and silence looks like a
-   delivery that was ignored.
+3. **Acknowledge** what you have received (`agentation_acknowledge`) so the owner can see the
+   annotation has been received — the tool records the status and nothing about who, which is why the
+   loop is closed in the thread as well as by the field — and silence looks like a delivery that was
+   ignored.
 4. **Route** each bounded annotation to the role that owns its file, and cut the work the way every
    other workstream is cut.
 5. **Wait for the fix to be measured**, not for the report that it was made. Then resolve it with a
@@ -237,10 +249,11 @@ you can name — the pass closed, or the owner gone.
 
 ## Stop and report
 
-You stop when every annotation is `resolved` or `dismissed` with a reason and a name, or when the
-owner stops the pass — and then you say which of the two it was. You report: the URL and build the
+You stop when every annotation is `resolved` or `dismissed` with a reason, and a name in the issue,
+or when the owner stops the pass — and then you say which of the two it was. You report: the URL and build the
 pass ran against, the channel it ran on, the count of annotations, each one's end, every deferral with
-its owner, and the fixes that went out with the pull requests that carry them. Anything that arrived
+its owner — named by the issue, since the tool records a reason and no name — and the fixes that went
+out with the pull requests that carry them. Anything that arrived
 twice, or that no role could own, is reported as a finding rather than absorbed — a QA pass is a
 reading of the product, and a shape that keeps arriving is a defect of this library.
 
